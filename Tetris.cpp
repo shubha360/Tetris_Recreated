@@ -16,7 +16,7 @@ bool Tetris::init() {
 		initSdlWindow() &&
 		initGL() &&
 		m_shaderProgram.compileAndLinkShaders("Assets/Shaders/mainShader.vert", "Assets/Shaders/mainShader.frag") &&
-		fps.init(MAX_FPS);
+		m_fps.init(MAX_FPS);
 }
 
 void Tetris::run() {
@@ -139,17 +139,17 @@ bool Tetris::initGL() {
 
 void Tetris::gameLoop() {
 	SDL_Event event;
-	bool gameLoop = true;
 
-	while (gameLoop) {
+	while (m_gameState == GameState::PLAYING) {
 
-		fps.beginFrame();
+		m_fps.beginFrame();
 
-		gameLoop = processInput(&event);
+		processInput();
+		updateGame();
 
 		draw();
 
-		float currentFps = fps.calculateFps();
+		float currentFps = m_fps.calculateFps();
 
 		static int frameCount = 0;
 		frameCount++;
@@ -159,28 +159,46 @@ void Tetris::gameLoop() {
 			frameCount = 0;
 		}
 
-		fps.endFrame();
+		m_fps.endFrame();
 	}
 }
 
-bool Tetris::processInput(SDL_Event* event) {
-	
-	while (SDL_PollEvent(event)) {
-		if (event->type == SDL_QUIT) {
-			return false;
-		}
-		if (event->type == SDL_MOUSEBUTTONDOWN) {
-			if (event->button.button == SDL_BUTTON_LEFT) {
-				if ((event->motion.x >= EXIT_BUTTON_X && event->motion.x <= EXIT_BUTTON_X + EXIT_BUTTON_WIDTH)
-					&&
-					(event->motion.y >= EXIT_BUTTON_Y && event->motion.y <= EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT)) 
-				{
-					return false;
-				}
-			}
+void Tetris::processInput() {
+	SDL_Event event;
+
+	while (SDL_PollEvent(&event)) {
+
+		switch (event.type) {
+		case SDL_QUIT:
+			m_gameState = GameState::QUIT;
+			
+		case SDL_MOUSEMOTION:
+			m_inputProcessor.setMouseCoords(event.motion.x, event.motion.y);
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+			m_inputProcessor.pressKey(event.button.button);
+			break;
+
+		case SDL_MOUSEBUTTONUP:
+			m_inputProcessor.releaseKey(event.button.button);
+			break;
 		}
 	}
-	return true;
+}
+
+void Tetris::updateGame() {
+	if (m_inputProcessor.isKeyDown(SDL_BUTTON_LEFT)) {
+
+		glm::ivec2 mouseCoords = m_inputProcessor.getMouseCoords();
+
+		if ((mouseCoords.x >= EXIT_BUTTON_X && mouseCoords.x <= EXIT_BUTTON_X + EXIT_BUTTON_WIDTH)
+			&&
+			(mouseCoords.y >= EXIT_BUTTON_Y && mouseCoords.y <= EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT))
+		{
+			m_gameState = GameState::QUIT;
+		}
+	}
 }
 
 void Tetris::draw() {

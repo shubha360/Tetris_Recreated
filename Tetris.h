@@ -10,6 +10,12 @@
 #include "GLSLProgram.h"
 #include "Vertex2D.h"
 #include "FPS.h"
+#include "InputProcessor.h"
+
+enum class GameState {
+	PLAYING,
+	QUIT
+};
 
 class Tetris {
 public:
@@ -23,6 +29,7 @@ private:
 	const int SCREEN_WIDTH = 1730; // 1920
 	const int SCREEN_HEIGHT = 980; // 1080
 	const float MAX_FPS = 60.0f;
+	GameState m_gameState = GameState::PLAYING;
 
 	const GLint EXIT_BUTTON_WIDTH = SCREEN_WIDTH / 50;
 	const GLint EXIT_BUTTON_HEIGHT = SCREEN_WIDTH / 50;
@@ -55,13 +62,14 @@ private:
 	SDL_Window* m_window = nullptr;
 
 	GLSLProgram m_shaderProgram;
-	FPS fps;
+	FPS m_fps;
+	InputProcessor m_inputProcessor;
 
 	bool initSdlWindow();
 	bool initGL();
-
 	void gameLoop();
-	bool processInput(SDL_Event* event);
+	void processInput();
+	void updateGame();
 	void draw();
 	void freeTetris();
 };
