@@ -1,73 +1,33 @@
 #include "Tetris.h"
 
-Tetris::Tetris() { 
-
-	/*glm::vec3 traslationMatrix(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f, 0.0f);
-
-	m_projectionMatrix = glm::translate(m_projectionMatrix, traslationMatrix);*/
-}
+Tetris::Tetris() {}
 
 Tetris::~Tetris() {
 	freeTetris();
 }
 
 bool Tetris::init() {
-	return 
+	return
 		initSdlWindow() &&
 		initGL() &&
 		m_shaderProgram.compileAndLinkShaders("Assets/Shaders/mainShader.vert", "Assets/Shaders/mainShader.frag") &&
-		m_fps.init(MAX_FPS);
+		m_fps.init(MAX_FPS) &&
+		m_camera.init(
+			glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f, -1.0f, 1.0f),
+			glm::mat4(1.0f),
+			glm::mat4(1.0f));
 }
 
 void Tetris::run() {
 
-	m_indicies[0] = 0;
-	m_indicies[1] = 1;
-	m_indicies[2] = 2;
-	m_indicies[3] = 0;
-	m_indicies[4] = 3;
-	m_indicies[5] = 2;
+	m_imageLodaer.loadTextureFromImage32("Assets/Images/square.png", m_textureOne);
+	m_imageLodaer.bufferTextureData(m_textureOne);
 
-	ColorRGBA vertexColor = { 141, 229, 0, 255 };
+	m_imageLodaer.loadTextureFromImage32("Assets/Images/non-square.png", m_textureTwo);
+	m_imageLodaer.bufferTextureData(m_textureTwo);
 
-	m_verticies[0].setPosition(EXIT_BUTTON_X, EXIT_BUTTON_Y);
-	m_verticies[0].setColor(vertexColor);
-
-	m_verticies[1].setPosition(EXIT_BUTTON_X + EXIT_BUTTON_WIDTH, EXIT_BUTTON_Y);
-	m_verticies[1].setColor(vertexColor);
-
-	m_verticies[2].setPosition(EXIT_BUTTON_X + EXIT_BUTTON_WIDTH, EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT);
-	m_verticies[2].setColor(vertexColor);
-	
-	m_verticies[3].setPosition(EXIT_BUTTON_X, EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT);
-	m_verticies[3].setColor(vertexColor);
-
-	glGenVertexArrays(1, &m_vaoID);
-	glGenBuffers(1, &m_vboID);
-	glGenBuffers(1, &m_iboID);
-
-	glBindVertexArray(m_vaoID);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboID);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	//glEnableVertexAttribArray(2);
-
-	glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, position));
-	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, color));
-	/*glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, textureCoords));*/
-
-	glBindVertexArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
-	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vertex2D), m_verticies, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(GLuint), m_indicies, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	m_imageLodaer.loadTextureFromImage32("Assets/Images/color-test.png", m_textureTest);
+	m_imageLodaer.bufferTextureData(m_textureTest);
 
 	gameLoop();
 }
@@ -138,8 +98,6 @@ bool Tetris::initGL() {
 }
 
 void Tetris::gameLoop() {
-	SDL_Event event;
-
 	while (m_gameState == GameState::PLAYING) {
 
 		m_fps.beginFrame();
@@ -202,16 +160,60 @@ void Tetris::updateGame() {
 }
 
 void Tetris::draw() {
+	static UVDimension uvRect;
+	uvRect.set(0.0f, 0.0f, 1.0f, 1.0f);
+
+	static RectDimension destRect1;
+	destRect1.set(100, 100, 256, 256);
+
+	static RectDimension destRect2;
+	destRect2.set(100, 600, 270, 180);
+
+	static RectDimension destRect3;
+	destRect3.set(500, 500, 512, 256);
+
+	static ColorRGBA whiteColor;
+	whiteColor.set(255, 255, 255, 255);
+
+	static ColorRGBA yellowColor;
+	yellowColor.set(255, 255, 0, 255);
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_shaderProgram.useProgram();
 
-	GLint mvpLoc = m_shaderProgram.getUniformLocation("mvpMatrix");
-	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, &m_mvp[0][0]);
+	glActiveTexture(GL_TEXTURE0);
+	GLint samplerLoc = m_shaderProgram.getUniformLocation("imageSampler");
+	glUniform1i(samplerLoc, 0);
 
-	glBindVertexArray(m_vaoID);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-	glBindVertexArray(0);
+	m_camera.sendMatrixDataToShader(m_shaderProgram);
+
+	m_textureRenderer.begin();
+
+	m_textureRenderer.draw(
+		destRect1,
+		uvRect,
+		m_textureOne.id,
+		whiteColor
+	);
+
+	m_textureRenderer.draw(
+		destRect2,
+		uvRect,
+		m_textureTwo.id,
+		whiteColor
+	);
+
+	m_textureRenderer.draw(
+		destRect3,
+		uvRect,
+		m_textureTest.id,
+		yellowColor
+	);
+
+	m_textureRenderer.end();
+
+	m_textureRenderer.renderTextures();
 
 	m_shaderProgram.unuseProgram();
 
@@ -219,20 +221,18 @@ void Tetris::draw() {
 }
 
 void Tetris::freeTetris() {
+	m_imageLodaer.freeTexture(m_textureOne);
+	m_imageLodaer.deleteTexture(m_textureOne);
+
+	m_imageLodaer.freeTexture(m_textureTwo);
+	m_imageLodaer.deleteTexture(m_textureTwo);
+
+	m_imageLodaer.freeTexture(m_textureTest);
+	m_imageLodaer.deleteTexture(m_textureTest);
+
 	if (m_window) {
 		SDL_DestroyWindow(m_window);
 		m_window = nullptr;
-	}
-	if (m_iboID) {
-		glDeleteBuffers(1, &m_iboID);
-	}
-
-	if (m_vboID) {
-		glDeleteBuffers(1, &m_vboID);
-	}
-
-	if (m_vaoID) {
-		glDeleteVertexArrays(1, &m_vaoID);
 	}
 
 	SDL_Quit();

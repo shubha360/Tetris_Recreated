@@ -11,6 +11,9 @@
 #include "Vertex2D.h"
 #include "FPS.h"
 #include "InputProcessor.h"
+#include "ImageLoader.h"
+#include "Camera.h"
+#include "TextureRenderer.h"
 
 enum class GameState {
 	PLAYING,
@@ -38,32 +41,16 @@ private:
 	const GLint EXIT_BUTTON_X = SCREEN_WIDTH - EXIT_BUTTON_WIDTH - EXIT_BUTTON_MARGIN;
 	const GLint EXIT_BUTTON_Y = EXIT_BUTTON_MARGIN;
 
-	glm::mat4 m_projectionMatrix = glm::ortho(
-		0.0f,
-		(float)SCREEN_WIDTH,
-		(float)SCREEN_HEIGHT,
-		0.0f,
-		-1.0f,
-		1.0f
-	);
-
-	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
-	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
-
-	glm::mat4 m_mvp = m_projectionMatrix * m_viewMatrix * m_modelMatrix;
-
-	GLuint m_vaoID = 0;
-	GLuint m_vboID = 0;
-	GLuint m_iboID = 0;
-
-	Vertex2D m_verticies[4] = {};
-	GLuint m_indicies[6] = {};
-
 	SDL_Window* m_window = nullptr;
 
 	GLSLProgram m_shaderProgram;
 	FPS m_fps;
 	InputProcessor m_inputProcessor;
+	ImageLoader m_imageLodaer;
+	Camera m_camera;
+	TextureRenderer m_textureRenderer;
+
+	TextureData m_textureOne, m_textureTwo, m_textureTest;
 
 	bool initSdlWindow();
 	bool initGL();

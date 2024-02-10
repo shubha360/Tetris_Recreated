@@ -72,6 +72,7 @@ void GLSLProgram::unuseProgram() {
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 }
 
 void GLSLProgram::freeProgram() {
