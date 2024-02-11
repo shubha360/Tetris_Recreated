@@ -29,7 +29,8 @@ void ImageLoader::loadTextureFromImage32(const std::string& imagePath, TextureDa
             );
 
         if (texture.data == nullptr) {
-            printf("Failed to load image at %s\n", imagePath.c_str());
+            printf("Error at loadTextureFromImage32() in ImageLoader.cpp\n"
+                "Failed to load image at %s\n", imagePath.c_str());
             texture.path = "";
             texture.bitsPerPixel = 0;
         }
@@ -40,7 +41,8 @@ void ImageLoader::loadTextureFromImage32(const std::string& imagePath, TextureDa
 void ImageLoader::bufferTextureData(TextureData& texture) {
 
     if (texture.id != 0) {
-        printf("ImageLoader.cpp -> bufferTextureData()\n -> Texture data is already buffered!\n");
+        printf("Error at bufferTextureData() in ImageLoader.cpp\n"
+            "Texture data is already buffered!\n");
     }
 
     if (texture.data != nullptr) {
@@ -61,7 +63,8 @@ void ImageLoader::bufferTextureData(TextureData& texture) {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
     else {
-        printf("Texture has no pixel data!\n");
+        printf("Error at bufferTextureData() in ImageLoader.cpp\n"
+            "Texture has no pixel data!\n");
     }
 }
 

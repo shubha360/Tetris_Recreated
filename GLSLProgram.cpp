@@ -14,13 +14,10 @@ bool GLSLProgram::compileAndLinkShaders(const std::string& vertexShaderPath, con
 	m_fragmentShaderID = compileShader(fragmentShaderPath, GL_FRAGMENT_SHADER);
 
 	if (m_vertexShaderID == 0 || m_fragmentShaderID == 0) {
-		printf("Unable to compile shaders!\n");
+		printf("Error at compileAndLinkShaders() in GLSLProgram.cpp\n"
+			"Unable to compile shaders!\n");
 		return false;
 	}
-
-	/*glBindAttribLocation(m_programID, 0, "vertexPos");
-	glBindAttribLocation(m_programID, 1, "vertexColor");
-	glBindAttribLocation(m_programID, 2, "vertexUV");*/
 
 	glAttachShader(m_programID, m_vertexShaderID);
 	glAttachShader(m_programID, m_fragmentShaderID);
@@ -43,7 +40,8 @@ bool GLSLProgram::compileAndLinkShaders(const std::string& vertexShaderPath, con
 		glDeleteShader(m_vertexShaderID);
 		glDeleteShader(m_fragmentShaderID);
 
-		printf("Failed to link program!\n%s\n", &infoLog[0]);
+		printf("Error at compileAndLinkShaders() in GLSLProgram.cpp\n"
+			"Failed to link program!\n%s\n", &infoLog[0]);
 		return false;
 	}
 
@@ -57,7 +55,8 @@ GLint GLSLProgram::getUniformLocation(const char* uniformName) {
 	GLint location = glGetUniformLocation(m_programID, uniformName);
 
 	if (location == GL_INVALID_INDEX) {
-		printf("Uniform %s was not found in the shader!\n", uniformName);
+		printf("Error at getUniformLocation() in GLSLProgram.cpp\n"
+			"Uniform %s was not found in the shader!\n", uniformName);
 	}
 
 	return location;
@@ -69,26 +68,20 @@ void GLSLProgram::useProgram() {
 
 void GLSLProgram::unuseProgram() {
 	glUseProgram(0);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
 }
 
 void GLSLProgram::freeProgram() {
-	if (m_programID != 0) {
-		glDeleteProgram(m_programID);
-		m_programID = 0;
-	}
-
 	if (m_vertexShaderID != 0) {
 		glDeleteShader(m_vertexShaderID);
 		m_vertexShaderID = 0;
 	}
-
 	if (m_fragmentShaderID != 0) {
 		glDeleteShader(m_fragmentShaderID);
 		m_fragmentShaderID = 0;
+	}
+	if (m_programID != 0) {
+		glDeleteProgram(m_programID);
+		m_programID = 0;
 	}
 }
 
@@ -135,7 +128,8 @@ GLuint GLSLProgram::compileShader(const std::string& shaderPath, const GLenum sh
 
 		std::string shaderName = (shaderType == GL_VERTEX_SHADER ? "vertex" : "fragment");
 
-		printf("Failed to compile %s shader!\n%s\n", shaderName.c_str(), &errorLog[0]);
+		printf("Error at compileShader() in GLSLProgram.cpp\n"
+			"Failed to compile %s shader!\n%s\n", shaderName.c_str(), &errorLog[0]);
 
 		return 0;
 	}

@@ -35,7 +35,8 @@ void Tetris::run() {
 bool Tetris::initSdlWindow() {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-		printf("Failed to initialize SDL! SDL_Error: %s\n", SDL_GetError());
+		printf("Error at initSdlWindow() in Tetris.cpp\n"
+			"Failed to initialize SDL!SDL_Error: % s\n", SDL_GetError());
 		return false;
 	}
 
@@ -47,7 +48,8 @@ bool Tetris::initSdlWindow() {
 	attribResponse += SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	if (attribResponse < 0) {
-		printf("Failed to set an SDL_GL attribute! Error: %s\n", SDL_GetError());
+		printf("Error at initSdlWindow() in Tetris.cpp\n"
+			"Failed to set an SDL_GL attribute! Error: %s\n", SDL_GetError());
 		return false;
 	}
 
@@ -61,7 +63,8 @@ bool Tetris::initSdlWindow() {
 	);
 
 	if (m_window == nullptr) {
-		printf("Failed to create window! Error: %s\n", SDL_GetError());
+		printf("Error at initSdlWindow() in Tetris.cpp\n"
+			"Failed to create window! Error: %s\n", SDL_GetError());
 		return false;
 	}
 
@@ -73,14 +76,16 @@ bool Tetris::initGL() {
 	SDL_GLContext glContext = SDL_GL_CreateContext(m_window);
 
 	if (glContext == nullptr) {
-		printf("Failed to create GL context! Error: %s\n", SDL_GetError());
+		printf("Error at initGL() in Tetris.cpp\n"
+			"Failed to create GL context! Error: %s\n", SDL_GetError());
 		return false;
 	}
 
 	GLenum response = glewInit();
 
 	if (response != GLEW_OK) {
-		printf("Failed to initialize GLEW!\n");
+		printf("Error at initGL() in Tetris.cpp\n"
+			"Failed to initialize GLEW!\n");
 		return false;
 	}
 

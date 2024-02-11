@@ -70,10 +70,15 @@ void TextureRenderer::renderTextures() {
 		for (auto& batch : m_renderBatches) {
 			glBindTexture(GL_TEXTURE_2D, batch.m_textureID);
 			glDrawElements(GL_TRIANGLES, batch.m_numIndices, GL_UNSIGNED_INT, &(m_vertexIndices[batch.m_offset]));
-			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 		glBindVertexArray(0);
+		
+		glBindTexture(GL_TEXTURE_2D, 0);
+		
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
 	}
 }
 
@@ -147,37 +152,34 @@ void TextureRenderer::setupRenderBatches() {
 		currentVertex = 0;
 
 		m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[0]->m_textureID);
-		addIndices(curentIndex, currentVertex);
-		curentIndex += 6;
-		currentVertex += 4;
+		addIndicesToBuffer(curentIndex, currentVertex);
 
 		for (int i = 1; i < m_glyphPointers.size(); i++) {
+			
 			if (m_glyphPointers[i]->m_textureID == m_glyphPointers[i - 1]->m_textureID) {
 				m_renderBatches.back().m_numIndices += 6;
-				addIndices(curentIndex, currentVertex);
-				curentIndex += 6;
-				currentVertex += 4;
 			}
 			else {
 				m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[i]->m_textureID);
-				addIndices(curentIndex, currentVertex);
-				curentIndex += 6;
-				currentVertex += 4;
 			}
+
+			addIndicesToBuffer(curentIndex, currentVertex);
 		}
 	}
 }
 
-void TextureRenderer::addIndices(const unsigned int currentIndex, const unsigned int currentVertex) {
+void TextureRenderer::addIndicesToBuffer(unsigned int& currentIndex, unsigned int& currentVertex) {
 	// first triangle
-	m_vertexIndices[currentIndex] = currentVertex; // top left
-	m_vertexIndices[currentIndex + 1] = currentVertex + 1; // top right
-	m_vertexIndices[currentIndex + 2] = currentVertex + 2; // bottom right
+	m_vertexIndices[currentIndex++] = currentVertex; // top left
+	m_vertexIndices[currentIndex++] = currentVertex + 1; // top right
+	m_vertexIndices[currentIndex++] = currentVertex + 2; // bottom right
 
 	// second triangle
-	m_vertexIndices[currentIndex + 3] = currentVertex; // top left
-	m_vertexIndices[currentIndex + 4] = currentVertex + 3; // bottom left
-	m_vertexIndices[currentIndex + 5] = currentVertex + 2; // bottom right
+	m_vertexIndices[currentIndex++] = currentVertex; // top left
+	m_vertexIndices[currentIndex++] = currentVertex + 3; // bottom left
+	m_vertexIndices[currentIndex++] = currentVertex + 2; // bottom right
+
+	currentVertex += 4;
 }
 
 bool TextureRenderer::compareByTextureID(Glyph* a, Glyph* b) {

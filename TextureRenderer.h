@@ -63,7 +63,7 @@ private:
 
 	void createVao();
 	void setupRenderBatches();
-	void addIndices(const unsigned int currentIndex, const unsigned int currentVertex);
+	void addIndicesToBuffer(unsigned int& currentIndex, unsigned int& currentVertex);
 
 	static bool compareByTextureID(Glyph* a, Glyph* b);
 };

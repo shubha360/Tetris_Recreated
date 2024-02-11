@@ -13,14 +13,15 @@ void FPS::beginFrame() {
 	this->frameStartTicks = (float)SDL_GetTicks();
 }
 
-bool FPS::endFrame() {
+const bool FPS::endFrame() {
 	float frameTick = (float)SDL_GetTicks() - frameStartTicks;
 
 	float desiredFrameTime = 1000.0f / desiredFps;
 
 	// return false if frame time is more than desired time
 	if (frameTick > desiredFrameTime) {
-		printf("Frame time is more than desired max frame time.\n");
+		printf("Error at endFrame() in FPS.cpp\n"
+			"Frame time is more than desired max frame time.\n");
 		return false;
 	}
 
