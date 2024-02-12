@@ -51,8 +51,8 @@ bool GLSLProgram::compileAndLinkShaders(const std::string& vertexShaderPath, con
 	return true;
 }
 
-GLint GLSLProgram::getUniformLocation(const char* uniformName) {
-	GLint location = glGetUniformLocation(m_programID, uniformName);
+GLint GLSLProgram::getUniformLocation(const std::string& uniformName) {
+	GLint location = glGetUniformLocation(m_programID, uniformName.c_str());
 
 	if (location == GL_INVALID_INDEX) {
 		printf("Error at getUniformLocation() in GLSLProgram.cpp\n"

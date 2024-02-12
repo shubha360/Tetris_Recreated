@@ -1,7 +1,7 @@
 #include "ImageLoader.h"
 
 ImageLoader::ImageLoader() {
-    stbi_set_flip_vertically_on_load(1);
+    //stbi_set_flip_vertically_on_load(1);
 }
 
 void ImageLoader::loadTextureFromImage32(const std::string& imagePath, TextureData& texture) {

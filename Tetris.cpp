@@ -10,7 +10,7 @@ bool Tetris::init() {
 	return
 		initSdlWindow() &&
 		initGL() &&
-		m_shaderProgram.compileAndLinkShaders("Assets/Shaders/mainShader.vert", "Assets/Shaders/mainShader.frag") &&
+		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_FPS) &&
 		m_camera.init(
 			glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f, -1.0f, 1.0f),
@@ -20,13 +20,13 @@ bool Tetris::init() {
 
 void Tetris::run() {
 
-	m_imageLodaer.loadTextureFromImage32("Assets/Images/square.png", m_textureOne);
+	m_imageLodaer.loadTextureFromImage32("resources/images/square.png", m_textureOne);
 	m_imageLodaer.bufferTextureData(m_textureOne);
 
-	m_imageLodaer.loadTextureFromImage32("Assets/Images/non-square.png", m_textureTwo);
+	m_imageLodaer.loadTextureFromImage32("resources/images/non-square.png", m_textureTwo);
 	m_imageLodaer.bufferTextureData(m_textureTwo);
 
-	m_imageLodaer.loadTextureFromImage32("Assets/Images/color-test.png", m_textureTest);
+	m_imageLodaer.loadTextureFromImage32("resources/images/color-test.png", m_textureTest);
 	m_imageLodaer.bufferTextureData(m_textureTest);
 
 	gameLoop();

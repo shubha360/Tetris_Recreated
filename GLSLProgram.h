@@ -12,7 +12,7 @@ public:
 	~GLSLProgram();
 
 	bool compileAndLinkShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
-	GLint getUniformLocation(const char* uniformName);
+	GLint getUniformLocation(const std::string& uniformName);
 	void useProgram();
 	void unuseProgram();
 
