@@ -29,8 +29,8 @@ public:
 	void run();	
 
 private:
-	const int SCREEN_WIDTH = 1730; // 1920
-	const int SCREEN_HEIGHT = 980; // 1080
+	const unsigned int SCREEN_WIDTH = 1730; // 1920
+	const unsigned int SCREEN_HEIGHT = 980; // 1080
 	const float MAX_FPS = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
 

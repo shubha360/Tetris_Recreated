@@ -3,24 +3,24 @@
 Glyph::Glyph(const RectDimension& destRect, const UVDimension& uvRect, GLuint textureID, const ColorRGBA& color) {
 	this->m_textureID = textureID;
 
-	// TOP LEFT
-	m_vertices[0].setPosition(destRect.topLeftX, destRect.topLeftY);
-	m_vertices[0].setTextureCoords(uvRect.bottomLeftX, uvRect.bottomLeftY + uvRect.height);
+	// BOTTOM LEFT
+	m_vertices[0].setPosition(destRect.bottomLeftX, destRect.bottomLeftY);
+	m_vertices[0].setTextureCoords(uvRect.bottomLeftX, uvRect.bottomLeftY);
 	m_vertices[0].color = color;
 
-	// TOP RIGHT
-	m_vertices[1].setPosition(destRect.topLeftX + destRect.width, destRect.topLeftY);
-	m_vertices[1].setTextureCoords(uvRect.bottomLeftX + uvRect.width, uvRect.bottomLeftY + uvRect.height);
+	// BOTTOM RIGHT
+	m_vertices[1].setPosition(destRect.bottomLeftX + destRect.width, destRect.bottomLeftY);
+	m_vertices[1].setTextureCoords(uvRect.bottomLeftX + uvRect.width, uvRect.bottomLeftY);
 	m_vertices[1].color = color;
 
-	// BOTTOM RIGHT
-	m_vertices[2].setPosition(destRect.topLeftX + destRect.width, destRect.topLeftY + destRect.height);
-	m_vertices[2].setTextureCoords(uvRect.bottomLeftX + uvRect.width, uvRect.bottomLeftY);
+	// bottom RIGHT
+	m_vertices[2].setPosition(destRect.bottomLeftX + destRect.width, destRect.bottomLeftY + destRect.height);
+	m_vertices[2].setTextureCoords(uvRect.bottomLeftX + uvRect.width, uvRect.bottomLeftY + uvRect.height);
 	m_vertices[2].color = color;
 
-	// BOTTOM LEFT
-	m_vertices[3].setPosition(destRect.topLeftX, destRect.topLeftY + destRect.height);
-	m_vertices[3].setTextureCoords(uvRect.bottomLeftX, uvRect.bottomLeftY);
+	// bottom LEFT
+	m_vertices[3].setPosition(destRect.bottomLeftX, destRect.bottomLeftY + destRect.height);
+	m_vertices[3].setTextureCoords(uvRect.bottomLeftX, uvRect.bottomLeftY + uvRect.height);
 	m_vertices[3].color = color;
 }
 

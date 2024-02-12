@@ -12,10 +12,7 @@ bool Tetris::init() {
 		initGL() &&
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_FPS) &&
-		m_camera.init(
-			glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f, -1.0f, 1.0f),
-			glm::mat4(1.0f),
-			glm::mat4(1.0f));
+		m_camera.init(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void Tetris::run() {

@@ -10,9 +10,11 @@ public:
 	Camera();
 	~Camera();
 
-	bool init(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, glm::mat4 modelMatrix);
+	bool init(const unsigned int screenWidth, const unsigned int screenHeight);
 
 	void sendMatrixDataToShader(GLSLProgram& shaderProgram);
+
+	glm::ivec2 convertScreenCoordsToWorldCoords(const glm::ivec2& screenCoords);
 
 private:
 	glm::mat4 m_mvp = glm::mat4(1.0f);
@@ -20,5 +22,7 @@ private:
 	glm::mat4 m_projectionMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
+
+	unsigned int screenWidth = 0, screenHeight = 0;
 };
 

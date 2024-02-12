@@ -14,7 +14,7 @@ public:
 
 	void setMouseCoords(int x, int y) { m_mouseCoords.x = x; m_mouseCoords.y = y; }
 
-	glm::ivec2 getMouseCoords() { return m_mouseCoords; }
+	glm::ivec2 getMouseCoords() const { return m_mouseCoords; }
 
 private:
 	std::unordered_map<unsigned int, bool> m_keyMap;
