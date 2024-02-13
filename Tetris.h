@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
+#include "Window.h"
 #include "GLSLProgram.h"
 #include "Vertex2D.h"
 #include "FPS.h"
@@ -32,6 +33,7 @@ public:
 private:
 	const unsigned int SCREEN_WIDTH = 1730; // 1920
 	const unsigned int SCREEN_HEIGHT = 980; // 1080
+	const ColorRGBA CLEAR_COLOR { 0,50,120,255 };
 	const float MAX_FPS = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
 
@@ -42,8 +44,8 @@ private:
 	const GLint EXIT_BUTTON_X = SCREEN_WIDTH - EXIT_BUTTON_WIDTH - EXIT_BUTTON_MARGIN;
 	const GLint EXIT_BUTTON_Y = EXIT_BUTTON_MARGIN;
 
-	SDL_Window* m_window = nullptr;
 
+	Window m_window;
 	GLSLProgram m_shaderProgram;
 	FPS m_fps;
 	InputProcessor m_inputProcessor;
@@ -53,8 +55,6 @@ private:
 	Font m_lazyFont;
 	TextureData m_textureOne, m_textureTwo, m_textureTest;
 
-	bool initSdlWindow();
-	bool initGL();
 	void gameLoop();
 	void processInput();
 	void updateGame();

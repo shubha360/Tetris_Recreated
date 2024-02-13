@@ -8,99 +8,28 @@ Tetris::~Tetris() {
 
 bool Tetris::init() {
 	return
-		initSdlWindow() &&
-		initGL() &&
-		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
-		m_fps.init(MAX_FPS) &&
-		m_camera.init(SCREEN_WIDTH, SCREEN_HEIGHT) && 
-		m_lazyFont.initFontBitmap16x16("resources/fonts/lazy_font.png");
+		m_window.init ( SCREEN_WIDTH, SCREEN_HEIGHT, CLEAR_COLOR ) &&
+		m_shaderProgram.compileAndLinkShaders ( "resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag" ) &&
+		m_fps.init ( MAX_FPS ) &&
+		m_camera.init ( m_window.getWindowWidth(), m_window.getWindowHeight() ) &&
+		m_lazyFont.initFontBitmap16x16 ( "resources/fonts/lazy_font.png", 0.8f );
 }
 
 void Tetris::run() {
 
-	ImageLoader::LoadTextureFromImage32("resources/images/square.png", m_textureOne);
-	ImageLoader::BufferTextureData32(m_textureOne);
+	ImageLoader::LoadTextureFromImage("resources/images/square.png", m_textureOne, 4);
+	ImageLoader::BufferTextureData(m_textureOne);
 	ImageLoader::FreeTexture(m_textureOne);
 
-	ImageLoader::LoadTextureFromImage32("resources/images/non-square.png", m_textureTwo);
-	ImageLoader::BufferTextureData32(m_textureTwo);
+	ImageLoader::LoadTextureFromImage("resources/images/non-square.png", m_textureTwo, 4);
+	ImageLoader::BufferTextureData(m_textureTwo);
 	ImageLoader::FreeTexture(m_textureTwo);
 
-	ImageLoader::LoadTextureFromImage32("resources/images/color-test.png", m_textureTest);
-	ImageLoader::BufferTextureData32(m_textureTest);
+	ImageLoader::LoadTextureFromImage("resources/images/color-test.png", m_textureTest, 4);
+	ImageLoader::BufferTextureData(m_textureTest);
 	ImageLoader::FreeTexture(m_textureTest);
 
 	gameLoop();
-}
-
-bool Tetris::initSdlWindow() {
-
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-		printf("Error at initSdlWindow() in Tetris.cpp\n"
-			"Failed to initialize SDL!SDL_Error: % s\n", SDL_GetError());
-		return false;
-	}
-
-	int attribResponse = 0;
-
-	attribResponse += SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	attribResponse += SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	attribResponse += SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	attribResponse += SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-
-	if (attribResponse < 0) {
-		printf("Error at initSdlWindow() in Tetris.cpp\n"
-			"Failed to set an SDL_GL attribute! Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	m_window = SDL_CreateWindow(
-		"Tetris",
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT,
-		SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN*/
-	);
-
-	if (m_window == nullptr) {
-		printf("Error at initSdlWindow() in Tetris.cpp\n"
-			"Failed to create window! Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	return true;
-}
-
-bool Tetris::initGL() {
-
-	SDL_GLContext glContext = SDL_GL_CreateContext(m_window);
-
-	if (glContext == nullptr) {
-		printf("Error at initGL() in Tetris.cpp\n"
-			"Failed to create GL context! Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	GLenum response = glewInit();
-
-	if (response != GLEW_OK) {
-		printf("Error at initGL() in Tetris.cpp\n"
-			"Failed to initialize GLEW!\n");
-		return false;
-	}
-
-	printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
-
-	glClearColor(0.0f, 0.05f, 0.25f, 1.0f);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_DEPTH_TEST);
-
-	// SDL_GL_SetSwapInterval(1);
-
-	return true;
 }
 
 void Tetris::gameLoop() {
@@ -176,7 +105,7 @@ void Tetris::draw() {
 	destRect2.set(100, 600, 270, 180);
 
 	static RectDimension destRect3;
-	destRect3.set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 512, 256);
+	destRect3.set(m_window.getWindowWidth() / 2, m_window.getWindowHeight() / 2, 512, 256);
 
 	static ColorRGBA whiteColor;
 	whiteColor.set(255, 255, 255, 255);
@@ -186,6 +115,9 @@ void Tetris::draw() {
 
 	static ColorRGBA magentaColor;
 	magentaColor.set(255, 0, 255, 255);
+
+	static ColorRGBA blackColor;
+	blackColor.set(0, 0, 0, 255);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -228,7 +160,7 @@ void Tetris::draw() {
 		"Always carrying guns.\n\n"
 		"Here: +880123456789@@uck.$$$\n"
 		"Drugs, smuggling, rapes",
-		0, SCREEN_HEIGHT, magentaColor, m_textureRenderer
+		0, m_window.getWindowHeight(), magentaColor, m_textureRenderer
 	);
 
 	m_textureRenderer.end();
@@ -237,7 +169,7 @@ void Tetris::draw() {
 
 	m_shaderProgram.unuseProgram();
 
-	SDL_GL_SwapWindow(m_window);
+	m_window.swapBuffer();
 }
 
 void Tetris::freeTetris() {
@@ -246,10 +178,7 @@ void Tetris::freeTetris() {
 	ImageLoader::DeleteTexture(m_textureTwo);
 	ImageLoader::DeleteTexture(m_textureTest);
 
-	if (m_window) {
-		SDL_DestroyWindow(m_window);
-		m_window = nullptr;
-	}
+	m_window.deleteWindow();
 
 	SDL_Quit();
 }

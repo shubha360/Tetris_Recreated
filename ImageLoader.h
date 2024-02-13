@@ -8,11 +8,11 @@
 
 class ImageLoader {
 public:
-	static void LoadTextureFromImage32(const std::string& imagePath, TextureData& texture);
-	static void LoadTextureFromImage8(const std::string& imagePath, TextureData& texture);
 
-	static void BufferTextureData32(TextureData& texture);
-	static void BufferTextureData8(TextureData& texture);
+	static void LoadTextureFromImage(const std::string& imagePath, TextureData& texture, 
+		const unsigned int colorChannels);
+
+	static void BufferTextureData(TextureData& texture);
 
 	static void FreeTexture(TextureData& texture);
 	static void DeleteTexture(TextureData& texture);

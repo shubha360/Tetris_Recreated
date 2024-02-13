@@ -6,15 +6,17 @@ Font::~Font() {
 	ImageLoader::DeleteTexture(m_fontTexture);
 }
 
-bool Font::initFontBitmap16x16(const std::string& bmpFilePath) {
+bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontScale /*= 1.0f*/) {
 
-	ImageLoader::LoadTextureFromImage8("resources/fonts/lazy_font.png", m_fontTexture);
+	ImageLoader::LoadTextureFromImage("resources/fonts/lazy_font.png", m_fontTexture, 1);
 
 	if (m_fontTexture.data == nullptr) {
 		printf("Error at initFontBitmap() in Font.cpp\n"
 		"Failed to load image at %s for bitmap font!", bmpFilePath.c_str());
 		return false;
 	}
+
+	m_bitmapFontScale = fontScale;
 
 	const unsigned int CELL_WIDTH = m_fontTexture.width / 16;
 	const unsigned int CELL_HEIGHT = m_fontTexture.height / 16;
@@ -147,13 +149,13 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath) {
 	// if top is 2 and cell height is 20
 	// then top height will be, cell height - top
 	// 20 - 2 = 18
-	m_topHeight = CELL_HEIGHT - top;
+	m_maxHeight = CELL_HEIGHT - top;
 
 	for (int i = 0; i < 256; i++) {
-		m_uvDimensions[i].height = (float) m_topHeight / (float) m_fontTexture.height;
+		m_uvDimensions[i].height = (float) m_maxHeight / (float) m_fontTexture.height;
 	}
 
-	ImageLoader::BufferTextureData8(m_fontTexture);
+	ImageLoader::BufferTextureData(m_fontTexture);
 	ImageLoader::FreeTexture(m_fontTexture);
 
 	m_spaceSize = CELL_WIDTH / 2;
@@ -179,11 +181,11 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 
 	for (int i = 0; i < text.length(); i++) {
 		if (text[i] == ' ') {
-			drawX += m_spaceSize;
+			drawX += m_spaceSize * m_bitmapFontScale;
 		}
 		else if (text[i] == '\n') {
 			drawX = topLeftX;
-			drawY -= m_newLine;
+			drawY -= m_newLine * m_bitmapFontScale;
 		}
 		else {
 			unsigned int ASCII = (unsigned char) text[i];
@@ -191,8 +193,8 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 			currentDims.set(
 				drawX,
 				drawY,
-				m_characterWidths[ASCII],
-				m_topHeight
+				m_characterWidths[ASCII] * m_bitmapFontScale,
+				m_maxHeight * m_bitmapFontScale
 			);
 
 			textureRenderer.draw(
@@ -203,7 +205,7 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 				color
 			);
 
-			drawX += m_characterWidths[ASCII];
+			drawX += m_characterWidths[ASCII] * m_bitmapFontScale;
 		}
 	}
 }
