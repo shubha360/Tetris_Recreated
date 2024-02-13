@@ -5,6 +5,7 @@
 
 #include "stb_image.h"
 #include "TextureData.h"
+#include "ErrorReporter.h"
 
 class ImageLoader {
 public:

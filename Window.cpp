@@ -9,8 +9,7 @@ Window::~Window() {
 bool Window::init(const unsigned int windowWidth, const unsigned int windowHeight, const ColorRGBA& clearColor)
 {	
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-		printf("Error at init() in Window.cpp\n"
-			"Failed to initialize SDL!SDL_Error: % s\n", SDL_GetError());
+		REPORT_ERROR("Failed to initialize SDL. SDL_Error: " + std::string(SDL_GetError()), init);
 		return false;
 	}
 
@@ -22,8 +21,7 @@ bool Window::init(const unsigned int windowWidth, const unsigned int windowHeigh
 	attribResponse += SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	if (attribResponse < 0) {
-		printf("Error at init() in Window.cpp\n"
-			"Failed to set an SDL_GL attribute! Error: %s\n", SDL_GetError());
+		REPORT_ERROR("Failed to set an SDL_GL attribute. SDL_Error: " + std::string(SDL_GetError()), init);
 		return false;
 	}
 
@@ -37,8 +35,7 @@ bool Window::init(const unsigned int windowWidth, const unsigned int windowHeigh
 	);
 
 	if (m_window == nullptr) {
-		printf("Error at initSdlWindow() in Tetris.cpp\n"
-			"Failed to create window! Error: %s\n", SDL_GetError());
+		REPORT_ERROR("Failed to create window. SDL_Error: " + std::string(SDL_GetError()), init);
 		return false;
 	}
 
@@ -48,16 +45,14 @@ bool Window::init(const unsigned int windowWidth, const unsigned int windowHeigh
 	SDL_GLContext glContext = SDL_GL_CreateContext(m_window);
 
 	if (glContext == nullptr) {
-		printf("Error at initGL() in Tetris.cpp\n"
-			"Failed to create GL context! Error: %s\n", SDL_GetError());
+		REPORT_ERROR("Failed to create GL context. SDL_Error: " + std::string(SDL_GetError()), init);
 		return false;
 	}
 
 	GLenum response = glewInit();
 
 	if (response != GLEW_OK) {
-		printf("Error at initGL() in Tetris.cpp\n"
-			"Failed to initialize GLEW!\n");
+		REPORT_ERROR("Failed to initialize GLEW.", init);
 		return false;
 	}
 

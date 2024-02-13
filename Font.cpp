@@ -11,8 +11,7 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 	ImageLoader::LoadTextureFromImage("resources/fonts/lazy_font.png", m_fontTexture, 1);
 
 	if (m_fontTexture.data == nullptr) {
-		printf("Error at initFontBitmap() in Font.cpp\n"
-		"Failed to load image at %s for bitmap font!", bmpFilePath.c_str());
+		REPORT_ERROR("Failed to load image at " + bmpFilePath + " for bitmap font.", initFontBitmap16x16);
 		return false;
 	}
 
@@ -168,9 +167,8 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 void Font::renderText(const std::string& text, const int topLeftX, const int topLeftY, 
 	const ColorRGBA& color, TextureRenderer& textureRenderer) {
 
-	if (m_fontTexture.id == 0) {
-		printf("Error at renderText() in Font.cpp\n"
-			"Didn't load any font yet!\n");
+	if (m_fontTexture.id != 0) {
+		REPORT_ERROR("Didn't load any font yet.", renderText);
 		return;
 	}
 

@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "ColorRGBA.h"
+#include "ErrorReporter.h"
 
 class Window {
 public:

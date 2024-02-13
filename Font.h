@@ -11,6 +11,7 @@
 #include "UVDimension.h"
 #include "ColorRGBA.h"
 #include "TextureRenderer.h"
+#include "ErrorReporter.h"
 
 class Font {
 public:

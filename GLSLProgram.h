@@ -6,6 +6,8 @@
 #include <iterator>
 #include <vector>
 
+#include "ErrorReporter.h"
+
 class GLSLProgram {
 public:
 	GLSLProgram();

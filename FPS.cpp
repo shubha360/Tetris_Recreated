@@ -20,8 +20,7 @@ const bool FPS::endFrame() {
 
 	// return false if frame time is more than desired time
 	if (frameTick > desiredFrameTime) {
-		printf("Error at endFrame() in FPS.cpp\n"
-			"Frame time is more than desired max frame time.\n");
+		printf("Frame time is more than desired max frame time.\n");
 		return false;
 	}
 

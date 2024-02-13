@@ -6,9 +6,7 @@ void ImageLoader::LoadTextureFromImage(const std::string& imagePath, TextureData
     const unsigned int colorChannels) {
 
     if (colorChannels != 1 && colorChannels != 4) {
-        printf("Error at loadTextureFromImage32() in ImageLoader.cpp\n"
-            "Invalid color channel %d\n", colorChannels);
-
+        REPORT_ERROR("Invalid color channel " + std::to_string(colorChannels) + ".", LoadTextureFromImage);
         return;
     }
 
@@ -36,8 +34,8 @@ void ImageLoader::LoadTextureFromImage(const std::string& imagePath, TextureData
             );
 
         if (texture.data == nullptr) {
-            printf("Error at loadTextureFromImage32() in ImageLoader.cpp\n"
-                "Failed to load image at %s\n", imagePath.c_str());
+            REPORT_ERROR("Failed to load image at " + imagePath, LoadTextureFromImage);
+
             texture.path = "";
             texture.bitsPerPixel = 0;
         }
@@ -51,14 +49,12 @@ void ImageLoader::LoadTextureFromImage(const std::string& imagePath, TextureData
 void ImageLoader::BufferTextureData(TextureData& texture) {
 
     if (texture.id != 0) {
-        printf("Error at bufferTextureData() in ImageLoader.cpp\n"
-            "Texture data is already buffered!\n");
+        REPORT_ERROR("Texture data is already buffered.", BufferTextureData);
         return;
     }
 
     if (texture.data == nullptr) {
-        printf("Error at bufferTextureData() in ImageLoader.cpp\n"
-            "Texture has no pixel data!\n");
+        REPORT_ERROR("Texture has no pixel data.", BufferTextureData);
         return;
     }
 
