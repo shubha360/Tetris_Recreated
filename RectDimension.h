@@ -1,12 +1,12 @@
 #pragma once
 
 struct RectDimension {
-	int bottomLeftX, bottomLeftY;
+	int x, y;
 	unsigned int width, height;
 
-	void set(int bottomLeftX, int bottomLeftY, unsigned int width, unsigned int height) {
-		this->bottomLeftX = bottomLeftX;
-		this->bottomLeftY = bottomLeftY;
+	void set(int x, int y, unsigned int width, unsigned int height) {
+		this->x = x;
+		this->y = y;
 		this->width = width;
 		this->height = height;
 	}

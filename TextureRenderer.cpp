@@ -1,25 +1,58 @@
 #include "TextureRenderer.h"
 
-Glyph::Glyph(const RectDimension& destRect, const UVDimension& uvRect, GLuint textureID, const ColorRGBA& color) {
+Glyph::Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect, 
+	GLuint textureID, const ColorRGBA& color) {
+	
 	this->m_textureID = textureID;
 
+	int bottomLeftX = 0, bottomLeftY = 0;
+	int width = destRect.width;
+	int height = destRect.height;
+
+	switch (renderOrigin) {
+	case GlyphOrigin::BOTTOM_LEFT:
+		bottomLeftX = destRect.x;
+		bottomLeftY = destRect.y;
+		break;
+
+	case GlyphOrigin::BOTTOM_RIGHT:
+		bottomLeftX = destRect.x - width;
+		bottomLeftY = destRect.y;
+		break;
+
+	case GlyphOrigin::TOP_RIGHT:
+		bottomLeftX = destRect.x - width;
+		bottomLeftY = destRect.y - height;
+		break;
+
+	case GlyphOrigin::TOP_LEFT:
+		bottomLeftX = destRect.x;
+		bottomLeftY = destRect.y - height;
+		break;
+
+	case GlyphOrigin::CENTER:
+		bottomLeftX = destRect.x - width / 2;
+		bottomLeftY = destRect.y - height / 2;
+		break;
+	}
+
 	// BOTTOM LEFT
-	m_vertices[0].setPosition(destRect.bottomLeftX, destRect.bottomLeftY);
+	m_vertices[0].setPosition(bottomLeftX, bottomLeftY);
 	m_vertices[0].setTextureCoords(uvRect.bottomLeftX, uvRect.bottomLeftY);
 	m_vertices[0].color = color;
 
 	// BOTTOM RIGHT
-	m_vertices[1].setPosition(destRect.bottomLeftX + destRect.width, destRect.bottomLeftY);
+	m_vertices[1].setPosition(bottomLeftX + width, bottomLeftY);
 	m_vertices[1].setTextureCoords(uvRect.bottomLeftX + uvRect.width, uvRect.bottomLeftY);
 	m_vertices[1].color = color;
 
 	// bottom RIGHT
-	m_vertices[2].setPosition(destRect.bottomLeftX + destRect.width, destRect.bottomLeftY + destRect.height);
+	m_vertices[2].setPosition(bottomLeftX + width, bottomLeftY + height);
 	m_vertices[2].setTextureCoords(uvRect.bottomLeftX + uvRect.width, uvRect.bottomLeftY + uvRect.height);
 	m_vertices[2].color = color;
 
 	// bottom LEFT
-	m_vertices[3].setPosition(destRect.bottomLeftX, destRect.bottomLeftY + destRect.height);
+	m_vertices[3].setPosition(bottomLeftX, bottomLeftY + height);
 	m_vertices[3].setTextureCoords(uvRect.bottomLeftX, uvRect.bottomLeftY + uvRect.height);
 	m_vertices[3].color = color;
 }
@@ -45,8 +78,9 @@ void TextureRenderer::begin() {
 	m_vertexIndices.clear();
 }
 
-void TextureRenderer::draw(const RectDimension& destRect, const UVDimension& uvRect, GLuint textureID, const ColorRGBA& color) {
-	m_glyphs.emplace_back(destRect, uvRect, textureID, color);
+void TextureRenderer::draw(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect, 
+	GLuint textureID, const ColorRGBA& color) {
+	m_glyphs.emplace_back(renderOrigin, destRect, uvRect, textureID, color);
 }
 
 void TextureRenderer::end() {
@@ -123,47 +157,51 @@ void TextureRenderer::setupRenderBatches() {
 
 	if (!m_glyphPointers.empty()) {
 
-		// setup the vbo and buffer vertex data
-		std::vector<Vertex2D> vertices;
-		vertices.resize(m_glyphPointers.size() * 4);
+		{
+			// setup the vbo and buffer vertex data
+			std::vector<Vertex2D> vertices;
+			vertices.resize(m_glyphPointers.size() * 4);
 
-		unsigned int currentVertex = 0;
+			unsigned int currentVertex = 0;
 
-		for (auto& glyph : m_glyphPointers) {
-			for (int vertex = 0; vertex < 4; vertex++) {
-				vertices[currentVertex++] = glyph->m_vertices[vertex];
+			for (auto& glyph : m_glyphPointers) {
+				for (int vertex = 0; vertex < 4; vertex++) {
+					vertices[currentVertex++] = glyph->m_vertices[vertex];
+				}
 			}
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+
+			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex2D), nullptr, GL_DYNAMIC_DRAW);
+
+			glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex2D), vertices.data());
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
 
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex2D), nullptr, GL_DYNAMIC_DRAW);
+		{
+			// Setup render batches and the ibo
+			m_vertexIndices.resize(m_glyphPointers.size() * 6);
 
-		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex2D), vertices.data());
+			unsigned int numIndices = 6;
+			unsigned int curentIndex = 0;
+			unsigned int currentVertex = 0;
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-		// Setup render batches and the ibo
-		m_vertexIndices.resize(m_glyphPointers.size() * 6);
-
-		unsigned int numIndices = 6;
-		unsigned int curentIndex = 0;
-		currentVertex = 0;
-
-		m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[0]->m_textureID);
-		addIndicesToBuffer(curentIndex, currentVertex);
-
-		for (int i = 1; i < m_glyphPointers.size(); i++) {
-			
-			if (m_glyphPointers[i]->m_textureID == m_glyphPointers[i - 1]->m_textureID) {
-				m_renderBatches.back().m_numIndices += 6;
-			}
-			else {
-				m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[i]->m_textureID);
-			}
-
+			m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[0]->m_textureID);
 			addIndicesToBuffer(curentIndex, currentVertex);
+
+			for (int i = 1; i < m_glyphPointers.size(); i++) {
+
+				if (m_glyphPointers[i]->m_textureID == m_glyphPointers[i - 1]->m_textureID) {
+					m_renderBatches.back().m_numIndices += 6;
+				}
+				else {
+					m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[i]->m_textureID);
+				}
+
+				addIndicesToBuffer(curentIndex, currentVertex);
+			}
 		}
 	}
 }

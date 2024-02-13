@@ -8,13 +8,15 @@
 
 class ImageLoader {
 public:
-	ImageLoader();
+	static void LoadTextureFromImage32(const std::string& imagePath, TextureData& texture);
+	static void LoadTextureFromImage8(const std::string& imagePath, TextureData& texture);
 
-	void loadTextureFromImage32(const std::string& imagePath, TextureData& texture);
-	void bufferTextureData(TextureData& texture);
-	void freeTexture(TextureData& texture);
-	void deleteTexture(TextureData& texture);
+	static void BufferTextureData32(TextureData& texture);
+	static void BufferTextureData8(TextureData& texture);
+
+	static void FreeTexture(TextureData& texture);
+	static void DeleteTexture(TextureData& texture);
 
 private:
-	std::map<std::string, TextureData> m_textureCache;
+	static std::map<std::string, TextureData> m_textureCache;
 };

@@ -12,19 +12,23 @@ bool Tetris::init() {
 		initGL() &&
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_FPS) &&
-		m_camera.init(SCREEN_WIDTH, SCREEN_HEIGHT);
+		m_camera.init(SCREEN_WIDTH, SCREEN_HEIGHT) && 
+		m_lazyFont.initFontBitmap16x16("resources/fonts/lazy_font.png");
 }
 
 void Tetris::run() {
 
-	m_imageLodaer.loadTextureFromImage32("resources/images/square.png", m_textureOne);
-	m_imageLodaer.bufferTextureData(m_textureOne);
+	ImageLoader::LoadTextureFromImage32("resources/images/square.png", m_textureOne);
+	ImageLoader::BufferTextureData32(m_textureOne);
+	ImageLoader::FreeTexture(m_textureOne);
 
-	m_imageLodaer.loadTextureFromImage32("resources/images/non-square.png", m_textureTwo);
-	m_imageLodaer.bufferTextureData(m_textureTwo);
+	ImageLoader::LoadTextureFromImage32("resources/images/non-square.png", m_textureTwo);
+	ImageLoader::BufferTextureData32(m_textureTwo);
+	ImageLoader::FreeTexture(m_textureTwo);
 
-	m_imageLodaer.loadTextureFromImage32("resources/images/color-test.png", m_textureTest);
-	m_imageLodaer.bufferTextureData(m_textureTest);
+	ImageLoader::LoadTextureFromImage32("resources/images/color-test.png", m_textureTest);
+	ImageLoader::BufferTextureData32(m_textureTest);
+	ImageLoader::FreeTexture(m_textureTest);
 
 	gameLoop();
 }
@@ -172,7 +176,7 @@ void Tetris::draw() {
 	destRect2.set(100, 600, 270, 180);
 
 	static RectDimension destRect3;
-	destRect3.set(500, 500, 512, 256);
+	destRect3.set(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 512, 256);
 
 	static ColorRGBA whiteColor;
 	whiteColor.set(255, 255, 255, 255);
@@ -180,19 +184,23 @@ void Tetris::draw() {
 	static ColorRGBA yellowColor;
 	yellowColor.set(255, 255, 0, 255);
 
+	static ColorRGBA magentaColor;
+	magentaColor.set(255, 0, 255, 255);
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_shaderProgram.useProgram();
 
 	glActiveTexture(GL_TEXTURE0);
-	GLint samplerLoc = m_shaderProgram.getUniformLocation("imageSampler");
+	GLint samplerLoc = m_shaderProgram.getUniformLocation("u_imageSampler");
 	glUniform1i(samplerLoc, 0);
 
 	m_camera.sendMatrixDataToShader(m_shaderProgram);
 
-	m_textureRenderer.begin();
+	m_textureRenderer.begin();	
 
 	m_textureRenderer.draw(
+		GlyphOrigin::BOTTOM_LEFT,
 		destRect1,
 		uvRect,
 		m_textureOne.id,
@@ -200,6 +208,7 @@ void Tetris::draw() {
 	);
 
 	m_textureRenderer.draw(
+		GlyphOrigin::BOTTOM_LEFT,
 		destRect2,
 		uvRect,
 		m_textureTwo.id,
@@ -207,10 +216,19 @@ void Tetris::draw() {
 	);
 
 	m_textureRenderer.draw(
+		GlyphOrigin::CENTER,
 		destRect3,
 		uvRect,
 		m_textureTest.id,
 		yellowColor
+	);
+	
+	m_lazyFont.renderText(
+		"The name is Thomas Shelby.\n"
+		"Always carrying guns.\n\n"
+		"Here: +880123456789@@uck.$$$\n"
+		"Drugs, smuggling, rapes",
+		0, SCREEN_HEIGHT, magentaColor, m_textureRenderer
 	);
 
 	m_textureRenderer.end();
@@ -223,14 +241,10 @@ void Tetris::draw() {
 }
 
 void Tetris::freeTetris() {
-	m_imageLodaer.freeTexture(m_textureOne);
-	m_imageLodaer.deleteTexture(m_textureOne);
 
-	m_imageLodaer.freeTexture(m_textureTwo);
-	m_imageLodaer.deleteTexture(m_textureTwo);
-
-	m_imageLodaer.freeTexture(m_textureTest);
-	m_imageLodaer.deleteTexture(m_textureTest);
+	ImageLoader::DeleteTexture(m_textureOne);
+	ImageLoader::DeleteTexture(m_textureTwo);
+	ImageLoader::DeleteTexture(m_textureTest);
 
 	if (m_window) {
 		SDL_DestroyWindow(m_window);

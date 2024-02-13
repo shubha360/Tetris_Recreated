@@ -12,12 +12,21 @@
 class TextureRenderer;
 class RenderBatch;
 
+enum class GlyphOrigin {
+	BOTTOM_LEFT,
+	BOTTOM_RIGHT,
+	TOP_RIGHT,
+	TOP_LEFT,
+	CENTER
+};
+
 class Glyph {
-public:
+public:	
 	friend class TextureRenderer;
 	friend class RenderBatch;
 
-	Glyph(const RectDimension& destRect, const UVDimension& uvRect, GLuint textureID, const ColorRGBA& color);
+	Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect, 
+		GLuint textureID, const ColorRGBA& color);
 
 private:
 	GLuint m_textureID = 0;
@@ -44,7 +53,8 @@ public:
 
 	void begin();
 
-	void draw(const RectDimension& destRect, const UVDimension& uvRect, GLuint textureID, const ColorRGBA& color);
+	void draw(const GlyphOrigin renderOrigin,  const RectDimension& destRect, const UVDimension& uvRect, 
+		GLuint textureID, const ColorRGBA& color);
 
 	void end();
 

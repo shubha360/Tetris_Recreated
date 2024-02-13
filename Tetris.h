@@ -14,6 +14,7 @@
 #include "ImageLoader.h"
 #include "Camera.h"
 #include "TextureRenderer.h"
+#include "Font.h"
 
 enum class GameState {
 	PLAYING,
@@ -46,10 +47,10 @@ private:
 	GLSLProgram m_shaderProgram;
 	FPS m_fps;
 	InputProcessor m_inputProcessor;
-	ImageLoader m_imageLodaer;
 	Camera m_camera;
 	TextureRenderer m_textureRenderer;
 
+	Font m_lazyFont;
 	TextureData m_textureOne, m_textureTwo, m_textureTest;
 
 	bool initSdlWindow();

@@ -18,7 +18,7 @@ bool Camera::init(const unsigned int screenWidth, const unsigned int screenHeigh
 }
 
 void Camera::sendMatrixDataToShader(GLSLProgram& shaderProgram) {
-	GLint mvpLoc = shaderProgram.getUniformLocation("mvpMatrix");
+	GLint mvpLoc = shaderProgram.getUniformLocation("u_mvpMatrix");
 	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, &m_mvp[0][0]);
 }
 
