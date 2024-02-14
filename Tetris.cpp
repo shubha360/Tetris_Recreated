@@ -33,6 +33,7 @@ void Tetris::run() {
 }
 
 void Tetris::gameLoop() {
+
 	while (m_gameState == GameState::PLAYING) {
 
 		m_fps.beginFrame();
@@ -95,29 +96,6 @@ void Tetris::updateGame() {
 }
 
 void Tetris::draw() {
-	static UVDimension uvRect;
-	uvRect.set(0.0f, 0.0f, 1.0f, 1.0f);
-
-	static RectDimension destRect1;
-	destRect1.set(100, 100, 256, 256);
-
-	static RectDimension destRect2;
-	destRect2.set(100, 600, 270, 180);
-
-	static RectDimension destRect3;
-	destRect3.set(m_window.getWindowWidth() / 2, m_window.getWindowHeight() / 2, 512, 256);
-
-	static ColorRGBA whiteColor;
-	whiteColor.set(255, 255, 255, 255);
-
-	static ColorRGBA yellowColor;
-	yellowColor.set(255, 255, 0, 255);
-
-	static ColorRGBA magentaColor;
-	magentaColor.set(255, 0, 255, 255);
-
-	static ColorRGBA blackColor;
-	blackColor.set(0, 0, 0, 255);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -129,43 +107,73 @@ void Tetris::draw() {
 
 	m_camera.sendMatrixDataToShader(m_shaderProgram);
 
-	m_textureRenderer.begin();	
+	{
+		static UVDimension uvRect;
+		uvRect.set(0.0f, 0.0f, 1.0f, 1.0f);
 
-	m_textureRenderer.draw(
-		GlyphOrigin::BOTTOM_LEFT,
-		destRect1,
-		uvRect,
-		m_textureOne.id,
-		whiteColor
-	);
+		static RectDimension destRect1;
+		destRect1.set(100, 100, 256, 256);
 
-	m_textureRenderer.draw(
-		GlyphOrigin::BOTTOM_LEFT,
-		destRect2,
-		uvRect,
-		m_textureTwo.id,
-		whiteColor
-	);
+		static RectDimension destRect2;
+		destRect2.set(100, 600, 270, 180);
 
-	m_textureRenderer.draw(
-		GlyphOrigin::CENTER,
-		destRect3,
-		uvRect,
-		m_textureTest.id,
-		yellowColor
-	);
-	
-	m_lazyFont.renderText(
-		"The name is Thomas Shelby.\n"
-		"Always carrying guns.\n\n"
-		"Here: +880123456789@@uck.$$$\n"
-		"Drugs, smuggling, rapes",
-		0, m_window.getWindowHeight(), magentaColor, m_textureRenderer
-	);
+		static RectDimension destRect3;
+		destRect3.set(m_window.getWindowWidth() / 2, m_window.getWindowHeight() / 2, 512, 256);
 
-	m_textureRenderer.end();
+		static ColorRGBA whiteColor;
+		whiteColor.set(255, 255, 255, 255);
 
-	m_textureRenderer.renderTextures();
+		static ColorRGBA yellowColor;
+		yellowColor.set(255, 255, 0, 255);
+
+		static ColorRGBA magentaColor;
+		magentaColor.set(255, 0, 255, 255);
+
+		static ColorRGBA blackColor;
+		blackColor.set(0, 0, 0, 255);
+
+		if (m_drawUpdateNeeded) {
+			m_textureRenderer.begin();
+
+			m_textureRenderer.draw(
+				GlyphOrigin::BOTTOM_LEFT,
+				destRect1,
+				uvRect,
+				m_textureOne.id,
+				whiteColor
+			);
+
+			m_textureRenderer.draw(
+				GlyphOrigin::BOTTOM_LEFT,
+				destRect2,
+				uvRect,
+				m_textureTwo.id,
+				whiteColor
+			);
+
+			m_textureRenderer.draw(
+				GlyphOrigin::CENTER,
+				destRect3,
+				uvRect,
+				m_textureTest.id,
+				yellowColor
+			);
+
+			m_lazyFont.renderText(
+				"The name is Thomas Shelby.\n"
+				"Always carrying guns.\n\n"
+				"Here: +880123456789@@uck.$$$\n"
+				"Drugs, smuggling, rapes",
+				0, m_window.getWindowHeight(), magentaColor, m_textureRenderer
+			);
+
+			m_textureRenderer.end();
+
+			m_drawUpdateNeeded = false;
+		}
+
+		m_textureRenderer.renderTextures();
+	}
 
 	m_shaderProgram.unuseProgram();
 
@@ -177,6 +185,8 @@ void Tetris::freeTetris() {
 	ImageLoader::DeleteTexture(m_textureOne);
 	ImageLoader::DeleteTexture(m_textureTwo);
 	ImageLoader::DeleteTexture(m_textureTest);
+
+	m_lazyFont.deleteFont();
 
 	m_window.deleteWindow();
 

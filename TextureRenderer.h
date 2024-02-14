@@ -44,6 +44,7 @@ private:
 	unsigned int m_offset;
 	unsigned int m_numIndices;
 	GLuint m_textureID;
+	GLuint m_iboID = 0;
 };
 
 class TextureRenderer {
@@ -64,8 +65,9 @@ public:
 
 private:
 	GLuint m_vaoID = 0, m_vboID = 0;
+	std::vector<GLuint> m_iboIDs;
 
-	std::vector<GLuint> m_vertexIndices;
+	//std::vector<GLuint> m_vertexIndices;
 
 	std::vector<Glyph> m_glyphs;
 	std::vector<Glyph*> m_glyphPointers;
@@ -73,7 +75,7 @@ private:
 
 	void createVao();
 	void setupRenderBatches();
-	void addIndicesToBuffer(unsigned int& currentIndex, unsigned int& currentVertex);
+	void addIndicesToBuffer(std::vector<GLuint>& indices, unsigned int& currentIndex, unsigned int& currentVertex);
 
 	static bool compareByTextureID(Glyph* a, Glyph* b);
 };

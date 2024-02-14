@@ -55,6 +55,8 @@ private:
 	Font m_lazyFont;
 	TextureData m_textureOne, m_textureTwo, m_textureTest;
 
+	bool m_drawUpdateNeeded = true;
+
 	void gameLoop();
 	void processInput();
 	void updateGame();

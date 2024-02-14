@@ -27,6 +27,8 @@ public:
 	void renderText(const std::string& text, const int topLeftX, const int topLeftY,
 		const ColorRGBA& color, TextureRenderer& textureRenderer);
 
+	void deleteFont();
+
 private:
 	unsigned int m_spaceSize = 0;
 	unsigned int m_newLine = 0;

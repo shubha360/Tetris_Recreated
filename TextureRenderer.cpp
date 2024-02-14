@@ -75,7 +75,11 @@ void TextureRenderer::begin() {
 	m_glyphs.clear();
 	m_glyphPointers.clear();
 	m_renderBatches.clear();
-	m_vertexIndices.clear();
+
+	if (!m_iboIDs.empty()) {
+		glDeleteBuffers(m_iboIDs.size(), m_iboIDs.data());
+		m_iboIDs.clear();
+	}
 }
 
 void TextureRenderer::draw(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect, 
@@ -103,21 +107,32 @@ void TextureRenderer::renderTextures() {
 
 		for (auto& batch : m_renderBatches) {
 			glBindTexture(GL_TEXTURE_2D, batch.m_textureID);
-			glDrawElements(GL_TRIANGLES, batch.m_numIndices, GL_UNSIGNED_INT, &(m_vertexIndices[batch.m_offset]));
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, batch.m_iboID);
+			glDrawElements(GL_TRIANGLES, batch.m_numIndices, GL_UNSIGNED_INT, nullptr);
 		}
 
 		glBindVertexArray(0);
 		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
+
+		//for (auto& id : m_iboIDs) {
+		//	printf("%d ", id);
+		//}
+		//printf("\n\n");
 	}
 }
 
 void TextureRenderer::freeTextureRenderer() {
 	
+	if (!m_iboIDs.empty()) {
+		glDeleteBuffers(m_iboIDs.size(), m_iboIDs.data());
+	}
+
 	if (m_vboID != 0) {
 		glDeleteBuffers(1, &m_vboID);
 		m_vboID = 0;
@@ -126,7 +141,7 @@ void TextureRenderer::freeTextureRenderer() {
 	if (m_vaoID != 0) {
 		glDeleteVertexArrays(1, &m_vaoID);
 		m_vaoID = 0;
-	}
+	}	
 }
 
 void TextureRenderer::createVao() {
@@ -182,14 +197,15 @@ void TextureRenderer::setupRenderBatches() {
 
 		{
 			// Setup render batches and the ibo
-			m_vertexIndices.resize(m_glyphPointers.size() * 6);
+			std::vector<GLuint> vertexIndices;
+			vertexIndices.resize(m_glyphPointers.size() * 6);
 
 			unsigned int numIndices = 6;
 			unsigned int curentIndex = 0;
 			unsigned int currentVertex = 0;
 
 			m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[0]->m_textureID);
-			addIndicesToBuffer(curentIndex, currentVertex);
+			addIndicesToBuffer(vertexIndices, curentIndex, currentVertex);
 
 			for (int i = 1; i < m_glyphPointers.size(); i++) {
 
@@ -200,22 +216,41 @@ void TextureRenderer::setupRenderBatches() {
 					m_renderBatches.emplace_back(curentIndex, numIndices, m_glyphPointers[i]->m_textureID);
 				}
 
-				addIndicesToBuffer(curentIndex, currentVertex);
+				addIndicesToBuffer(vertexIndices, curentIndex, currentVertex);
+			}
+
+			m_iboIDs.resize(m_renderBatches.size());
+
+			glGenBuffers(m_iboIDs.size(), m_iboIDs.data());
+
+			for (int i = 0; i < m_iboIDs.size(); i++) {
+
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboIDs[i]);
+
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_renderBatches[i].m_numIndices * sizeof(Vertex2D), nullptr, GL_DYNAMIC_DRAW);
+
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, m_renderBatches[i].m_numIndices * sizeof(Vertex2D), &vertexIndices[m_renderBatches[i].m_offset]);
+
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+				m_renderBatches[i].m_iboID = m_iboIDs[i];
 			}
 		}
 	}
 }
 
-void TextureRenderer::addIndicesToBuffer(unsigned int& currentIndex, unsigned int& currentVertex) {
+void TextureRenderer::addIndicesToBuffer(std::vector<GLuint>& indices, 
+	unsigned int& currentIndex, unsigned int& currentVertex) {
+	
 	// first triangle
-	m_vertexIndices[currentIndex++] = currentVertex; // top left
-	m_vertexIndices[currentIndex++] = currentVertex + 1; // top right
-	m_vertexIndices[currentIndex++] = currentVertex + 2; // bottom right
+	indices[currentIndex++] = currentVertex; // top left
+	indices[currentIndex++] = currentVertex + 1; // top right
+	indices[currentIndex++] = currentVertex + 2; // bottom right
 
 	// second triangle
-	m_vertexIndices[currentIndex++] = currentVertex; // top left
-	m_vertexIndices[currentIndex++] = currentVertex + 3; // bottom left
-	m_vertexIndices[currentIndex++] = currentVertex + 2; // bottom right
+	indices[currentIndex++] = currentVertex; // top left
+	indices[currentIndex++] = currentVertex + 3; // bottom left
+	indices[currentIndex++] = currentVertex + 2; // bottom right
 
 	currentVertex += 4;
 }

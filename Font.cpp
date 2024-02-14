@@ -3,7 +3,7 @@
 Font::Font() { }
 
 Font::~Font() {
-	ImageLoader::DeleteTexture(m_fontTexture);
+	deleteFont();
 }
 
 bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontScale /*= 1.0f*/) {
@@ -167,7 +167,7 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 void Font::renderText(const std::string& text, const int topLeftX, const int topLeftY, 
 	const ColorRGBA& color, TextureRenderer& textureRenderer) {
 
-	if (m_fontTexture.id != 0) {
+	if (m_fontTexture.id == 0) {
 		REPORT_ERROR("Didn't load any font yet.", renderText);
 		return;
 	}
@@ -206,6 +206,13 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 			drawX += m_characterWidths[ASCII] * m_bitmapFontScale;
 		}
 	}
+}
+
+void Font::deleteFont() {
+	ImageLoader::DeleteTexture(m_fontTexture);
+
+	m_uvDimensions.clear();
+	m_characterWidths.clear();
 }
 
 //bool Font::initFontTTF(const std::string& fontFilePath,
