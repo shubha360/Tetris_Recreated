@@ -12,7 +12,7 @@ bool Tetris::init() {
 		m_shaderProgram.compileAndLinkShaders ( "resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag" ) &&
 		m_fps.init ( MAX_FPS ) &&
 		m_camera.init ( m_window.getWindowWidth(), m_window.getWindowHeight() ) &&
-		m_lazyFont.initFontBitmap16x16 ( "resources/fonts/lazy_font.png", 0.8f );
+		m_lazyFont.initFromFontFile ( "resources/fonts/Quicksand.otf", 32);
 }
 
 void Tetris::run() {
@@ -162,7 +162,7 @@ void Tetris::draw() {
 			m_lazyFont.renderText(
 				"The name is Thomas Shelby.\n"
 				"Always carrying guns.\n\n"
-				"Here: +880123456789@@uck.$$$\n"
+				"Here: +880123456789@@duck.$$$\n"
 				"Drugs, smuggling, rapes",
 				0, m_window.getWindowHeight(), magentaColor, m_textureRenderer
 			);

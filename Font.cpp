@@ -6,7 +6,8 @@ Font::~Font() {
 	deleteFont();
 }
 
-bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontScale /*= 1.0f*/) {
+bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontScale /*= 1.0f*/,
+	const int letterSpacing /*= 5*/, const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
 
 	ImageLoader::LoadTextureFromImage("resources/fonts/lazy_font.png", m_fontTexture, 1);
 
@@ -14,8 +15,6 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 		REPORT_ERROR("Failed to load image at " + bmpFilePath + " for bitmap font.", initFontBitmap16x16);
 		return false;
 	}
-
-	m_bitmapFontScale = fontScale;
 
 	const unsigned int CELL_WIDTH = m_fontTexture.width / 16;
 	const unsigned int CELL_HEIGHT = m_fontTexture.height / 16;
@@ -144,22 +143,189 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 		}
 	}
 
-	// top height
-	// if top is 2 and cell height is 20
-	// then top height will be, cell height - top
-	// 20 - 2 = 18
-	m_maxHeight = CELL_HEIGHT - top;
-
-	for (int i = 0; i < 256; i++) {
-		m_uvDimensions[i].height = (float) m_maxHeight / (float) m_fontTexture.height;
-	}
-
 	ImageLoader::BufferTextureData(m_fontTexture);
 	ImageLoader::FreeTexture(m_fontTexture);
 
 	m_spaceSize = CELL_WIDTH / 2;
 	m_newLine = aBottom - top;
 	m_lineHeight = bottom - top;
+
+	for (int i = 0; i < 256; i++) {
+		m_uvDimensions[i].height = (float)m_lineHeight / (float)m_fontTexture.height;
+	}
+
+	m_bitmapFontScale = fontScale;
+	m_letterSpacing = letterSpacing;
+	m_lineSpacing = lineSpacing;
+	m_addToSpaceLength = addToSpaceLength;
+
+	return true;
+}
+
+bool Font::initFromFontFile(const std::string& fontFilePath, const unsigned int fontSize /*= 32*/,
+	const int letterSpacing /*= 5*/, const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
+
+	const unsigned int TOTAL_FONTS = 256;
+
+	static FT_Library library;
+	FT_Error error = FT_Init_FreeType(&library);
+	if (error) {
+		REPORT_ERROR("Failed to initialize FreeType.", initFromFontFile);
+		return false;
+	}
+
+	unsigned int maxCellWidth = 0;
+	unsigned int maxCellHeight = 0;
+	int maxBearing = 0;
+	int maxHang = 0;
+
+	std::vector<TextureData> characterTextures;
+	characterTextures.resize(TOTAL_FONTS);
+
+	std::vector<FT_Glyph_Metrics> characterMetrics;
+	characterMetrics.resize(TOTAL_FONTS);
+
+	FT_Face face = 0;
+	error = FT_New_Face(library, fontFilePath.c_str(), 0, &face);
+	if (error) {
+		REPORT_ERROR("Failed to create font face.", initFromFontFile);
+
+		FT_Done_FreeType(library);
+		return false;
+	}
+
+	error = FT_Set_Pixel_Sizes(face, 0, fontSize);
+	if (error) {
+		REPORT_ERROR("Failed to set font size.", initFromFontFile);
+
+		FT_Done_Face(face);
+		FT_Done_FreeType(library);
+		return false;
+	}
+
+	for (int i = 0; i < TOTAL_FONTS; i++) {
+
+		error = FT_Load_Char(face, i, FT_LOAD_RENDER);
+		if (error) {
+			REPORT_ERROR("Failed to load character " + std::to_string((char)i) + ".", initFromFontFile);
+
+			FT_Done_Face(face);
+			FT_Done_FreeType(library);
+			return false;
+		}
+
+		characterMetrics[i] = face->glyph->metrics;
+
+		characterTextures[i].width = face->glyph->bitmap.width;
+		characterTextures[i].height = face->glyph->bitmap.rows;
+
+		characterTextures[i].data = new unsigned char[characterTextures[i].width * characterTextures[i].height];
+
+		memcpy(characterTextures[i].data, face->glyph->bitmap.buffer,
+			characterTextures[i].width * characterTextures[i].height);
+
+		if (characterMetrics[i].horiBearingY / 64 > maxBearing) {
+			maxBearing = characterMetrics[i].horiBearingY / 64;
+		}
+
+		if (characterMetrics[i].width / 64 > maxCellWidth) {
+			maxCellWidth = characterMetrics[i].width / 64;
+
+		}
+
+		int glyphHang = (characterMetrics[i].height - characterMetrics[i].horiBearingY) / 64;
+		if (glyphHang > maxHang)
+		{
+			maxHang = glyphHang;
+		}
+	}
+
+	maxCellHeight = maxBearing + maxHang;
+
+	unsigned int textureWidth = maxCellWidth * 16;
+	unsigned int textureHeight = maxCellHeight * 16;
+
+	m_fontTexture.data = new unsigned char[textureWidth * textureHeight];
+	memset(m_fontTexture.data, 0, textureWidth * textureHeight);
+
+	m_fontTexture.width = textureWidth;
+	m_fontTexture.height = textureHeight;
+	m_fontTexture.bitsPerPixel = 1;
+
+	UVDimension currentUV = {};
+	unsigned int currentChar = 0;
+
+	m_uvDimensions.resize(256);
+	m_characterWidths.resize(256);
+
+	unsigned int currentCellX = 0;
+	unsigned int currentCellY = 0;
+
+	for (int row = 0; row < 16; row++) {
+		for (int column = 0; column < 16; column++) {
+
+			currentCellX = maxCellWidth * column;
+			currentCellY = maxCellHeight * row;
+
+			currentUV.set(
+				(float)maxCellWidth * column / (float)m_fontTexture.width,
+
+				// if texture height is 10 and cell height is 2
+				// for row = 0, (10 - ((0 + 1) * 2)) = 10 - 2 = 8
+				// for row = 1, (10 - ((1 + 1) * 2)) = 10 - 4 = 6
+				// for row = 4, (10 - ((4 + 1) * 2)) = 10 - 10 = 10
+				(float)(m_fontTexture.height - ((row + 1) * maxCellHeight)) / (float)m_fontTexture.height,
+
+
+				(float)(characterMetrics[currentChar].width / 64) / (float)m_fontTexture.width,
+				(float)maxCellHeight / (float)m_fontTexture.height
+			);
+
+			m_uvDimensions[currentChar] = currentUV;
+			m_characterWidths[currentChar] = characterMetrics[currentChar].width / 64;
+
+			int currentCharTop = currentCellY + maxBearing - characterMetrics[currentChar].horiBearingY / 64;
+
+			unsigned char* destPixels = m_fontTexture.data;
+			unsigned char* srcPixels = characterTextures[currentChar].data;
+
+			for (int i = 0; i < characterTextures[currentChar].height; i++) {
+
+				memcpy(
+					&destPixels[(i + currentCharTop) * m_fontTexture.width + currentCellX],
+					&srcPixels[i * characterTextures[currentChar].width],
+					characterTextures[currentChar].width
+				);
+			}
+
+			currentChar++;
+		}
+	}
+
+	ImageLoader::BufferTextureData(m_fontTexture);
+
+	delete[] m_fontTexture.data;
+	m_fontTexture.data = nullptr;
+
+	for (auto& it : characterTextures) {
+		delete[] it.data;
+		it.data = nullptr;
+	}
+
+	FT_Done_Face(face);
+	FT_Done_FreeType(library);
+
+	m_spaceSize = maxCellWidth / 2;
+	m_newLine = maxBearing;
+	m_lineHeight = maxCellHeight;
+
+	for (int i = 0; i < 256; i++) {
+		m_uvDimensions[i].height = (float)m_lineHeight / (float)m_fontTexture.height;
+	}
+
+	m_letterSpacing = letterSpacing;
+	m_lineSpacing = lineSpacing;
+	m_addToSpaceLength = addToSpaceLength;
 
 	return true;
 }
@@ -172,6 +338,13 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 		return;
 	}
 
+	/*textureRenderer.draw(
+		GlyphOrigin::BOTTOM_LEFT,
+		RectDimension { 0,0,700,700 },
+		UVDimension { 0.0f, 0.0f, 1.0f, 1.0f },
+		m_fontTexture.id, ColorRGBA { 255,255,255,255 }
+	);*/
+
 	int drawX = topLeftX;
 	int drawY = topLeftY;
 	
@@ -179,11 +352,11 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 
 	for (int i = 0; i < text.length(); i++) {
 		if (text[i] == ' ') {
-			drawX += m_spaceSize * m_bitmapFontScale;
+			drawX += (m_spaceSize + m_addToSpaceLength) * m_bitmapFontScale;
 		}
 		else if (text[i] == '\n') {
 			drawX = topLeftX;
-			drawY -= m_newLine * m_bitmapFontScale;
+			drawY -= (m_newLine + m_lineSpacing) * m_bitmapFontScale;
 		}
 		else {
 			unsigned int ASCII = (unsigned char) text[i];
@@ -192,7 +365,7 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 				drawX,
 				drawY,
 				m_characterWidths[ASCII] * m_bitmapFontScale,
-				m_maxHeight * m_bitmapFontScale
+				m_lineHeight * m_bitmapFontScale
 			);
 
 			textureRenderer.draw(
@@ -203,7 +376,7 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 				color
 			);
 
-			drawX += m_characterWidths[ASCII] * m_bitmapFontScale;
+			drawX += (m_characterWidths[ASCII] + m_letterSpacing) * m_bitmapFontScale;
 		}
 	}
 }
@@ -214,96 +387,3 @@ void Font::deleteFont() {
 	m_uvDimensions.clear();
 	m_characterWidths.clear();
 }
-
-//bool Font::initFontTTF(const std::string& fontFilePath,
-//    const unsigned int fontSize /*= 32*/, const unsigned int spaceSize /*= 0*/) {
-//
-//    const unsigned int TOTAL_FONTS = 256;
-//
-//    static FT_Library library;
-//    FT_Error error = FT_Init_FreeType(&library);
-//    if (error) {
-//        printf("Error at initFont() in Font.cpp\n"
-//            "Failed to initialize FreeType! FT error: %X", error);
-//        return false;
-//    }
-//
-//    unsigned int maxCellWidth = 0;
-//    unsigned int maxCellHeight = 0;
-//    int maxBearing = 0;
-//    int maxHang = 0;
-//
-//    std::vector<TextureData> characterTextures;
-//    characterTextures.resize(TOTAL_FONTS);
-//    
-//    std::vector<FT_Glyph_Metrics> characterMetrics;
-//    characterMetrics.resize(TOTAL_FONTS);
-//
-//    FT_Face face = 0;
-//    error = FT_New_Face(library, fontFilePath.c_str(), 0, &face);
-//    if (error) {
-//        printf("Error at initFont() in Font.cpp\n"
-//            "Failed to create font face! FT error: %X", error);
-//        
-//        FT_Done_FreeType(library);
-//        return false;
-//    }
-//
-//    error = FT_Set_Pixel_Sizes(face, 0, fontSize);
-//    if (error) {
-//        printf("Error at initFont() in Font.cpp\n"
-//            "Failed to set font size! FT error: %X", error);
-//
-//        FT_Done_Face(face);
-//        FT_Done_FreeType(library);
-//        return false;
-//    }
-//
-//    for (int i = 0; i < TOTAL_FONTS; i++) {
-//
-//        error = FT_Load_Char(face, i, FT_LOAD_RENDER);
-//        if (error) {
-//            printf("Error at initFont() in Font.cpp\n"
-//                "Failed to load character %c ! FT error: %X", i, error);
-//
-//            FT_Done_Face(face);
-//            FT_Done_FreeType(library);
-//            return false;
-//        }
-//
-//        characterMetrics[i] = face->glyph->metrics;
-//
-//        characterTextures[i].width = face->glyph->bitmap.width;
-//        characterTextures[i].height = face->glyph->bitmap.rows;
-//
-//        
-//        
-//        /// TODO: DO NOT FORGET TO DELETE THIS DATA!!!
-//
-//        characterTextures[i].data = new unsigned char[characterTextures[i].width * characterTextures[i].height];
-//        
-//        memcpy(characterTextures[i].data, face->glyph->bitmap.buffer, 
-//            characterTextures[i].width * characterTextures[i].height);
-//
-//        if (characterMetrics[i].horiBearingY / 64 > maxBearing) {
-//            maxBearing = characterMetrics[i].horiBearingY / 64;
-//        }
-//
-//        if (characterMetrics[i].width / 64 > maxCellWidth) {
-//            maxCellWidth = characterMetrics[i].width / 64;
-//        }
-//
-//        // TODO: Experiment with glyphHang
-//
-//        int glyphHang = (characterMetrics[i].horiBearingY - characterMetrics[i].height) / 64;
-//        if (glyphHang < maxHang)
-//        {
-//            maxHang = glyphHang;
-//        }
-//    }
-//
-//    maxCellHeight = maxBearing - maxHang;
-//
-//    FT_Done_FreeType(library);
-//    return true;
-//}
