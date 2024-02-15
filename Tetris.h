@@ -16,6 +16,8 @@
 #include "Camera.h"
 #include "TextureRenderer.h"
 #include "Font.h"
+#include "GUI.h"
+#include "GUIRenderer.h"
 
 enum class GameState {
 	PLAYING,
@@ -51,6 +53,9 @@ private:
 	InputProcessor m_inputProcessor;
 	Camera m_camera;
 	TextureRenderer m_textureRenderer;
+	
+	GUI m_gui;
+	GUIRenderer m_guiRenderer;
 
 	Font m_lazyFont;
 	TextureData m_textureOne, m_textureTwo, m_textureTest;

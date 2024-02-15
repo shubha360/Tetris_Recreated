@@ -9,42 +9,12 @@
 #include "UVDimension.h"
 #include "Vertex2D.h"
 
-class TextureRenderer;
-class RenderBatch;
-
 enum class GlyphOrigin {
 	BOTTOM_LEFT,
 	BOTTOM_RIGHT,
 	TOP_RIGHT,
 	TOP_LEFT,
 	CENTER
-};
-
-class Glyph {
-public:	
-	friend class TextureRenderer;
-	friend class RenderBatch;
-
-	Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect, 
-		GLuint textureID, const ColorRGBA& color);
-
-private:
-	GLuint m_textureID = 0;
-
-	Vertex2D m_vertices[4] = {};
-};
-
-class RenderBatch {
-public:
-	friend class TextureRenderer;	
-	RenderBatch(unsigned int offset, unsigned int numIndices, GLuint textureID);
-
-private:
-
-	unsigned int m_offset;
-	unsigned int m_numIndices;
-	GLuint m_textureID;
-	GLuint m_iboID = 0;
 };
 
 class TextureRenderer {
@@ -64,6 +34,33 @@ public:
 	void freeTextureRenderer();	
 
 private:
+	class Glyph {
+	public:
+		friend class TextureRenderer;
+		friend class RenderBatch;
+
+		Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect,
+			GLuint textureID, const ColorRGBA& color);
+
+	private:
+		GLuint m_textureID = 0;
+
+		Vertex2D m_vertices[4] = {};
+	};
+
+	class RenderBatch {
+	public:
+		friend class TextureRenderer;
+		RenderBatch(unsigned int offset, unsigned int numIndices, GLuint textureID);
+
+	private:
+
+		unsigned int m_offset;
+		unsigned int m_numIndices;
+		GLuint m_textureID;
+		GLuint m_iboID = 0;
+	};
+
 	GLuint m_vaoID = 0, m_vboID = 0;
 	std::vector<GLuint> m_iboIDs;
 

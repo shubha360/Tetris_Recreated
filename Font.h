@@ -23,14 +23,20 @@ public:
 		const int letterSpacing = 0, const int lineSpacing = 0, const int addToSpaceLength = 0);
 
 	bool initFromFontFile(const std::string& fontFilePath, const unsigned int fontSize = 32, 
-		const int letterSpacing = 0, const int lineSpacing = 0, const int addToSpaceLength = 0);
+		const float fontScale = 1.0f, const int letterSpacing = 0, 
+		const int lineSpacing = 0, const int addToSpaceLength = 0);
 
-	void renderText(const std::string& text, const int topLeftX, const int topLeftY,
+	void drawTextToRenderer(const std::string& text, const int topLeftX, const int topLeftY,
 		const ColorRGBA& color, TextureRenderer& textureRenderer);
+
+	unsigned int getLineWidth(const std::string& text);
+
+	unsigned int getLineHeight() const { return m_lineHeight * m_fontScale; }
 
 	void setLetterSpacing(const int letterSpacing) { m_letterSpacing = letterSpacing; }
 	void setLineSpacing(const int lineSpacing) { m_lineSpacing = lineSpacing; }
 	void setAddToSpaceLength(const int addToSpaceLength) { m_addToSpaceLength = addToSpaceLength; }
+	void setFontScale(const float fontScale) { m_fontScale = fontScale; }
 
 	void deleteFont();
 
@@ -43,7 +49,7 @@ private:
 	int m_lineSpacing = 0;
 	int m_addToSpaceLength = 0;
 
-	float m_bitmapFontScale = 1.0f;
+	float m_fontScale = 1.0f;
 
 	TextureData m_fontTexture;
 

@@ -5,8 +5,8 @@ Camera::Camera() {}
 Camera::~Camera() {}
 
 bool Camera::init(const unsigned int screenWidth, const unsigned int screenHeight) {
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
+	this->m_screenWidth = screenWidth;
+	this->m_screenHeight = screenHeight;
 	
 	this->m_projectionMatrix = glm::ortho(0.0f, (float)screenWidth, 0.0f, (float)screenHeight, -1.0f, 1.0f);
 	this->m_viewMatrix = glm::mat4(1.0f);
@@ -23,6 +23,6 @@ void Camera::sendMatrixDataToShader(GLSLProgram& shaderProgram) {
 }
 
 glm::ivec2 Camera::convertScreenCoordsToWorldCoords(const glm::ivec2& screenCoords) {
-	return glm::ivec2(screenCoords.x, screenWidth - screenCoords.y);
+	return glm::ivec2(screenCoords.x, m_screenHeight - screenCoords.y);
 }
 

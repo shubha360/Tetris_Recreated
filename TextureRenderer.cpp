@@ -1,6 +1,6 @@
 #include "TextureRenderer.h"
 
-Glyph::Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect, 
+TextureRenderer::Glyph::Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect,
 	GLuint textureID, const ColorRGBA& color) {
 	
 	this->m_textureID = textureID;
@@ -57,7 +57,7 @@ Glyph::Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, cons
 	m_vertices[3].color = color;
 }
 
-RenderBatch::RenderBatch(unsigned int offset, unsigned int numIndices, GLuint textureID) :
+TextureRenderer::RenderBatch::RenderBatch(unsigned int offset, unsigned int numIndices, GLuint textureID) :
 	m_offset(offset), m_numIndices(numIndices), m_textureID(textureID) {}
 
 TextureRenderer::TextureRenderer() {}

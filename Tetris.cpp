@@ -12,7 +12,8 @@ bool Tetris::init() {
 		m_shaderProgram.compileAndLinkShaders ( "resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag" ) &&
 		m_fps.init ( MAX_FPS ) &&
 		m_camera.init ( m_window.getWindowWidth(), m_window.getWindowHeight() ) &&
-		m_lazyFont.initFromFontFile ( "resources/fonts/Quicksand.otf", 32);
+		m_lazyFont.initFromFontFile ( "resources/fonts/Quicksand.otf", 32) &&
+		m_guiRenderer.init();
 }
 
 void Tetris::run() {
@@ -29,6 +30,16 @@ void Tetris::run() {
 	ImageLoader::BufferTextureData(m_textureTest);
 	ImageLoader::FreeTexture(m_textureTest);
 
+	m_gui.addTextButton(
+		"Exit",
+		0.5f,
+		ColorRGBA{ 255, 255, 255, 255 },
+		ColorRGBA{ 0, 0, 0, 255 },
+		GlyphOrigin::TOP_RIGHT,
+		RectDimension{ (int)SCREEN_WIDTH - 10, (int)SCREEN_HEIGHT - 10, 80, 40 },
+		[&]() { m_gameState = GameState::QUIT; }
+		);
+
 	gameLoop();
 }
 
@@ -39,6 +50,8 @@ void Tetris::gameLoop() {
 		m_fps.beginFrame();
 
 		processInput();
+
+		m_gui.updateGUI(m_inputProcessor, m_camera);
 		updateGame();
 
 		draw();
@@ -82,7 +95,7 @@ void Tetris::processInput() {
 }
 
 void Tetris::updateGame() {
-	if (m_inputProcessor.isKeyDown(SDL_BUTTON_LEFT)) {
+	/*if (m_inputProcessor.isKeyDown(SDL_BUTTON_LEFT)) {
 
 		glm::ivec2 mouseCoords = m_inputProcessor.getMouseCoords();
 
@@ -92,7 +105,7 @@ void Tetris::updateGame() {
 		{
 			m_gameState = GameState::QUIT;
 		}
-	}
+	}*/
 }
 
 void Tetris::draw() {
@@ -159,7 +172,7 @@ void Tetris::draw() {
 				yellowColor
 			);
 
-			m_lazyFont.renderText(
+			m_lazyFont.drawTextToRenderer(
 				"The name is Thomas Shelby.\n"
 				"Always carrying guns.\n\n"
 				"Here: +880123456789@@duck.$$$\n"
@@ -176,6 +189,8 @@ void Tetris::draw() {
 	}
 
 	m_shaderProgram.unuseProgram();
+
+	m_guiRenderer.renderGUI(m_gui, m_camera);
 
 	m_window.swapBuffer();
 }

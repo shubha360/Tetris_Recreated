@@ -9,7 +9,7 @@ Font::~Font() {
 bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontScale /*= 1.0f*/,
 	const int letterSpacing /*= 5*/, const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
 
-	ImageLoader::LoadTextureFromImage("resources/fonts/lazy_font.png", m_fontTexture, 1);
+	ImageLoader::LoadTextureFromImage(bmpFilePath, m_fontTexture, 1);
 
 	if (m_fontTexture.data == nullptr) {
 		REPORT_ERROR("Failed to load image at " + bmpFilePath + " for bitmap font.", initFontBitmap16x16);
@@ -154,7 +154,7 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 		m_uvDimensions[i].height = (float)m_lineHeight / (float)m_fontTexture.height;
 	}
 
-	m_bitmapFontScale = fontScale;
+	m_fontScale = fontScale;
 	m_letterSpacing = letterSpacing;
 	m_lineSpacing = lineSpacing;
 	m_addToSpaceLength = addToSpaceLength;
@@ -163,7 +163,8 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 }
 
 bool Font::initFromFontFile(const std::string& fontFilePath, const unsigned int fontSize /*= 32*/,
-	const int letterSpacing /*= 5*/, const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
+	const float fontScale /*= 1.0f*/, const int letterSpacing /*= 5*/, 
+	const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
 
 	const unsigned int TOTAL_FONTS = 256;
 
@@ -326,15 +327,16 @@ bool Font::initFromFontFile(const std::string& fontFilePath, const unsigned int 
 	m_letterSpacing = letterSpacing;
 	m_lineSpacing = lineSpacing;
 	m_addToSpaceLength = addToSpaceLength;
+	m_fontScale = fontScale;
 
 	return true;
 }
 
-void Font::renderText(const std::string& text, const int topLeftX, const int topLeftY, 
+void Font::drawTextToRenderer(const std::string& text, const int topLeftX, const int topLeftY, 
 	const ColorRGBA& color, TextureRenderer& textureRenderer) {
 
 	if (m_fontTexture.id == 0) {
-		REPORT_ERROR("Didn't load any font yet.", renderText);
+		REPORT_ERROR("Didn't load any font yet.", drawTextToRenderer);
 		return;
 	}
 
@@ -352,11 +354,11 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 
 	for (int i = 0; i < text.length(); i++) {
 		if (text[i] == ' ') {
-			drawX += (m_spaceSize + m_addToSpaceLength) * m_bitmapFontScale;
+			drawX += (m_spaceSize + m_addToSpaceLength) * m_fontScale;
 		}
 		else if (text[i] == '\n') {
 			drawX = topLeftX;
-			drawY -= (m_newLine + m_lineSpacing) * m_bitmapFontScale;
+			drawY -= (m_newLine + m_lineSpacing) * m_fontScale;
 		}
 		else {
 			unsigned int ASCII = (unsigned char) text[i];
@@ -364,8 +366,8 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 			currentDims.set(
 				drawX,
 				drawY,
-				m_characterWidths[ASCII] * m_bitmapFontScale,
-				m_lineHeight * m_bitmapFontScale
+				m_characterWidths[ASCII] * m_fontScale,
+				m_lineHeight * m_fontScale
 			);
 
 			textureRenderer.draw(
@@ -376,9 +378,27 @@ void Font::renderText(const std::string& text, const int topLeftX, const int top
 				color
 			);
 
-			drawX += (m_characterWidths[ASCII] + m_letterSpacing) * m_bitmapFontScale;
+			drawX += (m_characterWidths[ASCII] + m_letterSpacing) * m_fontScale;
 		}
 	}
+}
+
+unsigned int Font::getLineWidth(const std::string& text) {
+
+	unsigned int width = 0;
+
+	for (int i = 0; i < text.length(); i++) {
+		if (text[i] == '\n') {
+			break;
+		}
+		else if (text[i] == ' ') {
+			width += (m_spaceSize + m_addToSpaceLength) * m_fontScale;
+		}
+		else {
+			width += (m_characterWidths[(unsigned char)text[i]] + m_letterSpacing) * m_fontScale;
+		}
+	}
+	return width;
 }
 
 void Font::deleteFont() {
