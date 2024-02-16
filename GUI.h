@@ -26,11 +26,15 @@ public:
 	GUI();
 	~GUI();
 
+	bool init();
+
 	void addTextButton(const std::string& label, float labelScale, 
 		const ColorRGBA& textColor, const ColorRGBA& buttonColor,
 		const GlyphOrigin& renderOrigin, const RectDimension& dimension, std::function<void()> buttonFunction);
 
 	void updateGUI(InputProcessor& inputProcessor, Camera& camera);
+
+	void freeGUI();
 
 private:
 	class Component {
@@ -81,6 +85,11 @@ private:
 	};
 
 	std::vector<std::unique_ptr<Component>> m_components;
+
+	SDL_Cursor* m_arrowCursor = nullptr;
+	SDL_Cursor* m_indexPointerCursor = nullptr;
+
+	SDL_Cursor* m_currentCursor = nullptr;
 
 	bool isMouseInsideComponent(const glm::ivec2& mouseScreenCoords, Component& component);
 };

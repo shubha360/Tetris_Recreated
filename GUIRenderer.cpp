@@ -7,19 +7,19 @@ GUIRenderer::~GUIRenderer() {
 }
 
 bool GUIRenderer::init() {
-	if (!m_glslProgram.compileAndLinkShaders("gui_resources/shaders/gui_shader.vert",
-		"gui_resources/shaders/gui_shader.frag")) {
+	if (!m_glslProgram.compileAndLinkShaders("gui_resource/shaders/gui_shader.vert",
+		"gui_resource/shaders/gui_shader.frag")) {
 		REPORT_ERROR("Failed to compile or link GUI shader.", init);
 		return false;
 	}
 
 	ImageLoader::LoadTextureFromImage(
-		"gui_resources/images/rounded_rect_button512x256.png", m_roundedRectButtonTexture, 4
+		"gui_resource/images/rounded_rect_button512x256.png", m_roundedRectButtonTexture, 4
 	);
 	ImageLoader::BufferTextureData(m_roundedRectButtonTexture);
 	ImageLoader::FreeTexture(m_roundedRectButtonTexture);
 
-	if (!m_font.initFromFontFile("gui_resources/fonts/Quicksand-Regular.otf", 64)) {
+	if (!m_font.initFromFontFile("gui_resource/fonts/Quicksand-Regular.otf", 64)) {
 		REPORT_ERROR("Failed to initialize font for GUI.", init);
 		return false;
 	}
@@ -79,9 +79,11 @@ void GUIRenderer::renderGUI(GUI& gui, Camera& camera) {
 }
 
 void GUIRenderer::freeGUIRenderer() {
-	m_glslProgram.freeProgram();
-
 	ImageLoader::DeleteTexture(m_roundedRectButtonTexture);
+	m_font.deleteFont();
+
+	m_renderer.freeTextureRenderer();
+	m_glslProgram.freeProgram();
 }
 
 void GUIRenderer::getLabelCoordinates(int& x, int& y, const std::string& label, 

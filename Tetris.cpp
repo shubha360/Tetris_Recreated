@@ -8,11 +8,12 @@ Tetris::~Tetris() {
 
 bool Tetris::init() {
 	return
-		m_window.init ( SCREEN_WIDTH, SCREEN_HEIGHT, CLEAR_COLOR ) &&
+		m_window.init ( true, 1720, 980, CLEAR_COLOR ) &&
 		m_shaderProgram.compileAndLinkShaders ( "resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag" ) &&
 		m_fps.init ( MAX_FPS ) &&
 		m_camera.init ( m_window.getWindowWidth(), m_window.getWindowHeight() ) &&
 		m_lazyFont.initFromFontFile ( "resources/fonts/Quicksand.otf", 32) &&
+		m_gui.init() &&
 		m_guiRenderer.init();
 }
 
@@ -36,7 +37,7 @@ void Tetris::run() {
 		ColorRGBA{ 255, 255, 255, 255 },
 		ColorRGBA{ 0, 0, 0, 255 },
 		GlyphOrigin::TOP_RIGHT,
-		RectDimension{ (int)SCREEN_WIDTH - 10, (int)SCREEN_HEIGHT - 10, 80, 40 },
+		RectDimension{ (int)m_window.getWindowWidth() - 10, (int)m_window.getWindowHeight() - 10, 80, 40},
 		[&]() { m_gameState = GameState::QUIT; }
 		);
 
@@ -94,19 +95,7 @@ void Tetris::processInput() {
 	}
 }
 
-void Tetris::updateGame() {
-	/*if (m_inputProcessor.isKeyDown(SDL_BUTTON_LEFT)) {
-
-		glm::ivec2 mouseCoords = m_inputProcessor.getMouseCoords();
-
-		if ((mouseCoords.x >= EXIT_BUTTON_X && mouseCoords.x <= EXIT_BUTTON_X + EXIT_BUTTON_WIDTH)
-			&&
-			(mouseCoords.y >= EXIT_BUTTON_Y && mouseCoords.y <= EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT))
-		{
-			m_gameState = GameState::QUIT;
-		}
-	}*/
-}
+void Tetris::updateGame() {}
 
 void Tetris::draw() {
 
@@ -202,6 +191,13 @@ void Tetris::freeTetris() {
 	ImageLoader::DeleteTexture(m_textureTest);
 
 	m_lazyFont.deleteFont();
+
+	m_gui.freeGUI();
+	m_guiRenderer.freeGUIRenderer();
+
+	m_textureRenderer.freeTextureRenderer();
+
+	m_shaderProgram.freeProgram();
 
 	m_window.deleteWindow();
 

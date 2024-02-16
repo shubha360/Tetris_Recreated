@@ -13,7 +13,7 @@ public:
 	Window();
 	~Window();
 
-	bool init(const unsigned int windowWidth, const unsigned int windowHeight, const ColorRGBA& clearColor);
+	bool init(const bool fullScreen, const unsigned int windowWidth, const unsigned int windowHeight, const ColorRGBA& clearColor);
 
 	void swapBuffer() const;
 

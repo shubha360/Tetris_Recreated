@@ -6,7 +6,7 @@ Window::~Window() {
 	deleteWindow();
 }
 
-bool Window::init(const unsigned int windowWidth, const unsigned int windowHeight, const ColorRGBA& clearColor)
+bool Window::init(const bool fullScreen, const unsigned int windowWidth, const unsigned int windowHeight, const ColorRGBA& clearColor)
 {	
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		REPORT_ERROR("Failed to initialize SDL. SDL_Error: " + std::string(SDL_GetError()), init);
@@ -25,22 +25,33 @@ bool Window::init(const unsigned int windowWidth, const unsigned int windowHeigh
 		return false;
 	}
 
+	Uint32 windowFlags = SDL_WINDOW_OPENGL;
+
+	if (fullScreen) {
+		SDL_DisplayMode dm;
+		SDL_GetCurrentDisplayMode(0, &dm);
+		m_windowWidth = dm.w;
+		m_windowHeight = dm.h;
+		windowFlags |= SDL_WINDOW_FULLSCREEN;
+	}
+	else {
+		m_windowWidth = windowWidth;
+		m_windowHeight = windowHeight;
+	}
+
 	m_window = SDL_CreateWindow(
 		"Tetris",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		windowWidth,
-		windowHeight,
-		SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLwindow*/
+		m_windowWidth,
+		m_windowHeight,
+		windowFlags
 	);
 
 	if (m_window == nullptr) {
 		REPORT_ERROR("Failed to create window. SDL_Error: " + std::string(SDL_GetError()), init);
 		return false;
 	}
-
-	m_windowWidth = windowWidth;
-	m_windowHeight = windowHeight;
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(m_window);
 
