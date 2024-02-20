@@ -227,9 +227,9 @@ void TextureRenderer::setupRenderBatches() {
 
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboIDs[i]);
 
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_renderBatches[i].m_numIndices * sizeof(Vertex2D), nullptr, GL_DYNAMIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_renderBatches[i].m_numIndices * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
 
-				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, m_renderBatches[i].m_numIndices * sizeof(Vertex2D), &vertexIndices[m_renderBatches[i].m_offset]);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, m_renderBatches[i].m_numIndices * sizeof(GLuint), &vertexIndices[m_renderBatches[i].m_offset]);
 
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
