@@ -4,57 +4,55 @@
 #include <vector>
 #include <string>
 
-class Matrix;
-
 class Tetrimino {
 public:
-	friend class Matrix;
-
 	Tetrimino();
 	virtual ~Tetrimino();
 
 	void addToMatrix(std::vector<std::string>& matrix);
 
-	virtual void rotateRight(std::vector<std::string>& matrix, char emptyCellSign) = 0;
-	virtual void rotateLeft(std::vector<std::string>& matrix, char emptyCellSign) = 0;
+	virtual bool rotateRight(std::vector<std::string>& matrix, char emptyCellSign) = 0;
+	virtual bool rotateLeft(std::vector<std::string>& matrix, char emptyCellSign) = 0;
 
-	void moveLeft();
-	void moveRight();
+	bool moveLeft(std::vector<std::string>& matrix, char emptyCellSign);
+	bool moveRight(std::vector<std::string>& matrix, char emptyCellSign);
 
 protected:
 	glm::ivec2 m_originPosition = glm::ivec2(0);
 	std::vector<glm::ivec2> m_otherMinoPos;
 
-	// these will change upon rotating and moving
-	int m_topY = 0, m_bottomY = 0;
-	int m_leftX = 0, m_rightX = 0;
+	char m_minoSign = ' ';
 
-	char m_minoChar = ' ';
-
-	// updates the left, right, top, bottom coordinates
-	void updateCoordinates(int left, int right, int top, int bottom);
+	int m_matrixWidth = 0, m_matrixHeight = 0;
 
 	glm::ivec2 rotateMinoRight(const glm::ivec2& minoPostion) const;
 	glm::ivec2 rotateMinoLeft(const glm::ivec2& minoPostion) const;
 
-	void performRotation(std::vector<std::string>& matrix, glm::ivec2 newMinoPos[3], 
+	void performTransformation(std::vector<std::string>& matrix, 
+		glm::ivec2 newOriginPos, glm::ivec2 newMinoPos[3],
 		char emptyCellSign, char minoSign);
+
+	bool canMinoMoveLeft(const glm::ivec2& minoPos, std::vector<std::string>& matrix, char emptyCellSign);
+	bool canMinoMoveRight(const glm::ivec2& minoPos, std::vector<std::string>& matrix, char emptyCellSign);
+
+	bool isCellPartOfThis(const glm::ivec2& cellPos);
+	bool isMinoInsideMatrix(const glm::ivec2& minoPos);
 };
 
 class Tetrimino_T : public Tetrimino {
 public:
-	Tetrimino_T(int originPositionX, int originPositionY);
+	Tetrimino_T(int originPositionX, int originPositionY, int matrixWidth, int matrixHeight);
 	~Tetrimino_T();
 
-	void rotateRight(std::vector<std::string>& matrix, char emptyCellSign);
-	void rotateLeft(std::vector<std::string>& matrix, char emptyCellSign);
+	bool rotateRight(std::vector<std::string>& matrix, char emptyCellSign);
+	bool rotateLeft(std::vector<std::string>& matrix, char emptyCellSign);
 };
 
 class Tetrimino_L : public Tetrimino {
 public:
-	Tetrimino_L(int originPositionX, int originPositionY);
+	Tetrimino_L(int originPositionX, int originPositionY, int matrixWidth, int matrixHeight);
 	~Tetrimino_L();
 
-	void rotateRight(std::vector<std::string>& matrix, char emptyCellSign);
-	void rotateLeft(std::vector<std::string>& matrix, char emptyCellSign);
+	bool rotateRight(std::vector<std::string>& matrix, char emptyCellSign);
+	bool rotateLeft(std::vector<std::string>& matrix, char emptyCellSign);
 };

@@ -11,8 +11,6 @@
 #include "UVDimension.h"
 #include "ImageLoader.h"
 
-#include "Tetrimino.h"
-
 class Matrix {
 public:
 	Matrix();
@@ -20,10 +18,11 @@ public:
 
 	bool init(unsigned int screenWidth, unsigned int screenHeight);
 
-	void addTetrimino(Tetrimino* terimino);
 	void drawMatrix(TextureRenderer& renderer) const;
 
 	std::vector<std::string>& getMatrix() { return m_matrix; }
+	const int getWidth() const { return NUM_COLUMNS; }
+	const int getHeight() const { return NUM_ROWS; }
 	const char getEmptyCellSign() const { return EMPTY_CELL_SIGN; }
 
 private:

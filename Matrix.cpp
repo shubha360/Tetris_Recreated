@@ -28,14 +28,6 @@ bool Matrix::init(unsigned int screenWidth, unsigned int screenHeight) {
 	return true;
 }
 
-void Matrix::addTetrimino(Tetrimino* terimino) {
-	m_matrix[terimino->m_originPosition.y][terimino->m_originPosition.x] = terimino->m_minoChar;
-
-	for (auto& pos : terimino->m_otherMinoPos) {
-		m_matrix[pos.y][pos.x] = terimino->m_minoChar;
-	}
-}
-
 void Matrix::drawMatrix(TextureRenderer& renderer) const {
 
 	static UVDimension minoUV { 0.0f, 0.0f, 1.0f, 1.0f };

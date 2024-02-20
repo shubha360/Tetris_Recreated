@@ -13,10 +13,8 @@ bool Tetris::init() {
 bool Tetris::initGame() {
 	m_matrix.init(m_window.getWindowWidth(), m_window.getWindowHeight());
 	
-	/*m_tempMino.rotateLeft(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());
-	m_tempMino.rotateRight(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());*/
 	m_tempMino.addToMatrix(m_matrix.getMatrix());
-	//m_tempMino.rotateRight(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());
+	m_tempMino2.addToMatrix(m_matrix.getMatrix());
 	return true;
 }
 
@@ -104,11 +102,22 @@ void Tetris::processInput() {
 		}
 	}
 
+	// move left or right
 	if (m_inputProcessor.isKeyPressed(SDLK_a)) {
-		m_tempMino.rotateLeft(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());
+		m_tempMino.moveLeft(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());
 		m_drawUpdateNeeded = true;
 	}
 	else if (m_inputProcessor.isKeyPressed(SDLK_d)) {
+		m_tempMino.moveRight(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());
+		m_drawUpdateNeeded = true;
+	}
+
+	// rotate left or right
+	else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
+		m_tempMino.rotateLeft(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());
+		m_drawUpdateNeeded = true;
+	}
+	else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
 		m_tempMino.rotateRight(m_matrix.getMatrix(), m_matrix.getEmptyCellSign());
 		m_drawUpdateNeeded = true;
 	}
