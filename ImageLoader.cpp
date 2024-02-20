@@ -14,7 +14,7 @@ void ImageLoader::LoadTextureFromImage(const std::string& imagePath, TextureData
 
     if (it != m_textureCache.end()) { // Found in the cache
         texture = it->second;
-        printf("Loaded from cache.\n\n");
+        //printf("Loaded from cache.\n\n");
     }
     else { // Not found in the cache
 
@@ -41,7 +41,7 @@ void ImageLoader::LoadTextureFromImage(const std::string& imagePath, TextureData
         }
         else {
             m_textureCache.insert(make_pair(imagePath, texture));
-            printf("Loaded from file.\n\n");
+            //printf("Loaded from file.\n\n");
         }
     }    
 }
