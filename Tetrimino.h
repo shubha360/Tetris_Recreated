@@ -26,11 +26,10 @@ public:
 	bool moveDown();
 
 protected:
-	glm::ivec2 m_originPosition = glm::ivec2(0);
-	std::vector<glm::ivec2> m_otherMinoPos;
+	glm::ivec2 m_minoPositions[4] = {};
+	int m_originMinoIndex = 0;
 
 	char m_minoSign = ' ';
-	int originMinoIndex = 0;
 	int m_spawnPositionX = 0, m_spawnPositionY = 0;
 	Orientation m_orientation = Orientation::HORIZONTAL;
 
@@ -39,13 +38,13 @@ protected:
 	glm::ivec2 rotateMinoRight(const glm::ivec2& minoPostion) const;
 	glm::ivec2 rotateMinoLeft(const glm::ivec2& minoPostion) const;
 
-	void performTransformation(glm::ivec2 newOriginPos, glm::ivec2 newMinoPos[3]);
+	void performTransformation(glm::ivec2 newMinoPos[4]);
 
 	bool canMinoMoveLeft(const glm::ivec2& minoPos);
 	bool canMinoMoveRight(const glm::ivec2& minoPos);
 	bool canMinoMoveDown(const glm::ivec2& minoPos);
 
-	bool isCellPartOfThis(const glm::ivec2& cellPos);
+	bool isCellPartOfThis(const glm::ivec2& cellPos) const;
 	bool isMinoInsideMatrix(const glm::ivec2& minoPos);
 
 	void changeOrientation();
@@ -87,11 +86,11 @@ public:
 	bool rotateLeft();
 };
 
-class Tetrimino_I : public Tetrimino {
-public:
-	Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix);
-	~Tetrimino_I();
-
-	bool rotateRight();
-	bool rotateLeft();
-};
+//class Tetrimino_I : public Tetrimino {
+//public:
+//	Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix);
+//	~Tetrimino_I();
+//
+//	bool rotateRight();
+//	bool rotateLeft();
+//};

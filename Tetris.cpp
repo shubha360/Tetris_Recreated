@@ -104,31 +104,33 @@ void Tetris::processInput() {
 		}
 	}
 
+	Tetrimino* current = &m_tempMinoL;
+
 	// move left or right
 	if (m_inputProcessor.isKeyPressed(SDLK_a)) {
-		if (m_tempMinoO.moveLeft()) {
+		if (current->moveLeft()) {
 			m_drawUpdateNeeded = true;
 		}
 	}
 	else if (m_inputProcessor.isKeyPressed(SDLK_d)) {
-		if (m_tempMinoO.moveRight()) {
+		if (current->moveRight()) {
 			m_drawUpdateNeeded = true;
 		}
 	}
 	else if (m_inputProcessor.isKeyPressed(SDLK_s)) {
-		if (m_tempMinoO.moveDown()) {
+		if (current->moveDown()) {
 			m_drawUpdateNeeded = true;
 		}
 	}
 
 	// rotate left or right
 	else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
-		if (m_tempMinoO.rotateLeft()) {
+		if (current->rotateLeft()) {
 			m_drawUpdateNeeded = true;
 		}
 	}
 	else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
-		if (m_tempMinoO.rotateRight()) {
+		if (current->rotateRight()) {
 			m_drawUpdateNeeded = true;
 		}
 	}
