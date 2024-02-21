@@ -43,8 +43,10 @@ private:
 	GameState m_gameState = GameState::PLAYING;
 
 	Matrix m_matrix;
-	Tetrimino_T m_tempMino = Tetrimino_T (3, 18, &m_matrix);
-	Tetrimino_L m_tempMino2 = Tetrimino_L(6, 19, &m_matrix);
+	Tetrimino_T m_tempMinoT = Tetrimino_T(3, 10, &m_matrix);
+	Tetrimino_L m_tempMinoL = Tetrimino_L(5, 19, &m_matrix);
+	Tetrimino_J m_tempMinoJ = Tetrimino_J(6, 3, &m_matrix);
+	Tetrimino_O m_tempMinoO = Tetrimino_O(1, 1, &m_matrix);
 
 	// Engine Tools
 	Window m_window;

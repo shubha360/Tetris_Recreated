@@ -18,12 +18,14 @@ public:
 
 	bool moveLeft();
 	bool moveRight();
+	bool moveDown();
 
 protected:
 	glm::ivec2 m_originPosition = glm::ivec2(0);
 	std::vector<glm::ivec2> m_otherMinoPos;
 
 	char m_minoSign = ' ';
+	int m_spawnPositionX = 0, m_spawnPositionY = 0;
 
 	Matrix* m_matrix = nullptr;
 
@@ -34,6 +36,7 @@ protected:
 
 	bool canMinoMoveLeft(const glm::ivec2& minoPos);
 	bool canMinoMoveRight(const glm::ivec2& minoPos);
+	bool canMinoMoveDown(const glm::ivec2& minoPos);
 
 	bool isCellPartOfThis(const glm::ivec2& cellPos);
 	bool isMinoInsideMatrix(const glm::ivec2& minoPos);
@@ -52,6 +55,24 @@ class Tetrimino_L : public Tetrimino {
 public:
 	Tetrimino_L(int originPositionX, int originPositionY, Matrix* matrix);
 	~Tetrimino_L();
+
+	bool rotateRight();
+	bool rotateLeft();
+};
+
+class Tetrimino_J : public Tetrimino {
+public:
+	Tetrimino_J(int originPositionX, int originPositionY, Matrix* matrix);
+	~Tetrimino_J();
+
+	bool rotateRight();
+	bool rotateLeft();
+};
+
+class Tetrimino_O : public Tetrimino {
+public:
+	Tetrimino_O(int originPositionX, int originPositionY, Matrix* matrix);
+	~Tetrimino_O();
 
 	bool rotateRight();
 	bool rotateLeft();
