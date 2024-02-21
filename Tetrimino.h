@@ -6,6 +6,11 @@
 
 #include "Matrix.h"
 
+enum class Orientation {
+	HORIZONTAL,
+	VERTICAL
+};
+
 class Tetrimino {
 public:
 	Tetrimino();
@@ -25,7 +30,9 @@ protected:
 	std::vector<glm::ivec2> m_otherMinoPos;
 
 	char m_minoSign = ' ';
+	int originMinoIndex = 0;
 	int m_spawnPositionX = 0, m_spawnPositionY = 0;
+	Orientation m_orientation = Orientation::HORIZONTAL;
 
 	Matrix* m_matrix = nullptr;
 
@@ -40,6 +47,8 @@ protected:
 
 	bool isCellPartOfThis(const glm::ivec2& cellPos);
 	bool isMinoInsideMatrix(const glm::ivec2& minoPos);
+
+	void changeOrientation();
 };
 
 class Tetrimino_T : public Tetrimino {
@@ -73,6 +82,15 @@ class Tetrimino_O : public Tetrimino {
 public:
 	Tetrimino_O(int originPositionX, int originPositionY, Matrix* matrix);
 	~Tetrimino_O();
+
+	bool rotateRight();
+	bool rotateLeft();
+};
+
+class Tetrimino_I : public Tetrimino {
+public:
+	Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix);
+	~Tetrimino_I();
 
 	bool rotateRight();
 	bool rotateLeft();

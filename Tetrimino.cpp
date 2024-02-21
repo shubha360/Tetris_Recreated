@@ -256,6 +256,15 @@ bool Tetrimino::isMinoInsideMatrix(const glm::ivec2& minoPos) {
 		(minoPos.y >= 0 && minoPos.y < m_matrix->getHeight());
 }
 
+void Tetrimino::changeOrientation() {
+	if (m_orientation == Orientation::HORIZONTAL) {
+		m_orientation = Orientation::VERTICAL;
+	}
+	else {
+		m_orientation = Orientation::HORIZONTAL;
+	}
+}
+
 Tetrimino_T::Tetrimino_T(int originPositionX, int originPositionY, Matrix* matrix) {
 	m_originPosition = glm::vec2(originPositionX, originPositionY);
 
@@ -268,6 +277,7 @@ Tetrimino_T::Tetrimino_T(int originPositionX, int originPositionY, Matrix* matri
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 1;
+	m_orientation = Orientation::HORIZONTAL;
 }
 
 Tetrimino_T::~Tetrimino_T() {}
@@ -292,6 +302,7 @@ bool Tetrimino_T::rotateRight() {
 		) {
 
 		performTransformation(m_originPosition, newMinoPos);
+		changeOrientation();
 		return true;
 	}
 	return false;
@@ -315,7 +326,9 @@ bool Tetrimino_T::rotateLeft() {
 		isMinoInsideMatrix(newMinoPos[2]) &&
 		(matrix[newMinoPos[2].y][newMinoPos[2].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[2]))
 		) {
+		
 		performTransformation(m_originPosition, newMinoPos);
+		changeOrientation();
 		return true;
 	}
 	return false;
@@ -333,6 +346,7 @@ Tetrimino_L::Tetrimino_L(int originPositionX, int originPositionY, Matrix* matri
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 1;
+	m_orientation = Orientation::HORIZONTAL;
 }
 
 Tetrimino_L::~Tetrimino_L() {}
@@ -357,6 +371,7 @@ bool Tetrimino_L::rotateRight() {
 		) {
 
 		performTransformation(m_originPosition, newMinoPos);
+		changeOrientation();
 		return true;
 	}
 	return false;
@@ -382,6 +397,7 @@ bool Tetrimino_L::rotateLeft() {
 		) {
 
 		performTransformation(m_originPosition, newMinoPos);
+		changeOrientation();
 		return true;
 	}
 	return false;
@@ -399,6 +415,7 @@ Tetrimino_J::Tetrimino_J(int originPositionX, int originPositionY, Matrix* matri
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 1;
+	m_orientation = Orientation::HORIZONTAL;
 }
 
 Tetrimino_J::~Tetrimino_J() {}
@@ -423,6 +440,7 @@ bool Tetrimino_J::rotateRight() {
 		) {
 
 		performTransformation(m_originPosition, newMinoPos);
+		changeOrientation();
 		return true;
 	}
 	return false;
@@ -448,6 +466,7 @@ bool Tetrimino_J::rotateLeft() {
 		) {
 
 		performTransformation(m_originPosition, newMinoPos);
+		changeOrientation();
 		return true;
 	}
 	return false;
@@ -465,6 +484,7 @@ Tetrimino_O::Tetrimino_O(int originPositionX, int originPositionY, Matrix* matri
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 : m_matrix->getWidth() / 2 - 1;
 	m_spawnPositionY = 1;
+	m_orientation = Orientation::HORIZONTAL;
 }
 
 Tetrimino_O::~Tetrimino_O() {}
