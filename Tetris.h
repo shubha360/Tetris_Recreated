@@ -43,8 +43,8 @@ private:
 	GameState m_gameState = GameState::PLAYING;
 
 	Matrix m_matrix;
-	Tetrimino_T m_tempMino = Tetrimino_T (3, 18, m_matrix.getWidth(), m_matrix.getHeight());
-	Tetrimino_L m_tempMino2 = Tetrimino_L(6, 19, m_matrix.getWidth(), m_matrix.getHeight());
+	Tetrimino_T m_tempMino = Tetrimino_T (3, 18, &m_matrix);
+	Tetrimino_L m_tempMino2 = Tetrimino_L(6, 19, &m_matrix);
 
 	// Engine Tools
 	Window m_window;
