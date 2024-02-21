@@ -517,3 +517,268 @@ bool Tetrimino_O::rotateLeft() {
 	// returning false will not trigger a draw update
 	return false;
 }
+
+Tetrimino_I::Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix) {
+	m_originMinoIndex = 2;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
+
+	m_minoPositions[0] = glm::ivec2(originPositionX - 2, originPositionY);
+	m_minoPositions[1] = glm::ivec2(originPositionX - 1, originPositionY);
+	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY);
+
+	m_minoSign = 'I';
+	m_matrix = matrix;
+	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 : m_matrix->getWidth() / 2 - 1;
+	m_spawnPositionY = 0;
+	m_orientation = Orientation::HORIZONTAL;
+}
+
+Tetrimino_I::~Tetrimino_I() {}
+
+bool Tetrimino_I::rotateRight() {
+
+	// origin will be 1 for right rotation
+	m_originMinoIndex = 1;
+
+	glm::ivec2 newMinoPos[4] = {};
+
+	for (int i = 0; i < 4; i++) {
+		if (i == m_originMinoIndex) {
+			newMinoPos[i] = m_minoPositions[i];
+		}
+		else {
+
+			// rotate right if in horizontal orientation
+			if (m_orientation == Orientation::HORIZONTAL) {
+				newMinoPos[i] = rotateMinoRight(m_minoPositions[i]);
+			}
+
+			// rotate left if in vertical orientation
+			else if (m_orientation == Orientation::VERTICAL) {
+				newMinoPos[i] = rotateMinoLeft(m_minoPositions[i]);
+			}
+		}
+	}
+
+	auto& matrix = m_matrix->getMatrix();
+
+	// if all the cells after the rotation are empty or part of this tetrimino
+	if (
+		isMinoInsideMatrix(newMinoPos[0]) &&
+		(matrix[newMinoPos[0].y][newMinoPos[0].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[0])) &&
+		isMinoInsideMatrix(newMinoPos[1]) &&
+		(matrix[newMinoPos[1].y][newMinoPos[1].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[1])) &&
+		isMinoInsideMatrix(newMinoPos[2]) &&
+		(matrix[newMinoPos[2].y][newMinoPos[2].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[2]))
+		) {
+
+		performTransformation(newMinoPos);
+		changeOrientation();
+		return true;
+	}
+	return false;
+}
+
+bool Tetrimino_I::rotateLeft() {
+	
+	// origin will be 1 for right rotation
+	m_originMinoIndex = 2;
+
+	glm::ivec2 newMinoPos[4] = {};
+
+	for (int i = 0; i < 4; i++) {
+		if (i == m_originMinoIndex) {
+			newMinoPos[i] = m_minoPositions[i];
+		}
+		else {
+			// rotate left if in horizontal orientation
+			if (m_orientation == Orientation::HORIZONTAL) {
+				newMinoPos[i] = rotateMinoLeft(m_minoPositions[i]);
+			}
+
+			// rotate right if in vertical orientation
+			else if (m_orientation == Orientation::VERTICAL) {
+				newMinoPos[i] = rotateMinoRight(m_minoPositions[i]);
+			}
+		}
+	}
+
+	auto& matrix = m_matrix->getMatrix();
+
+	// if all the cells after the rotation are empty or part of this tetrimino
+	if (
+		isMinoInsideMatrix(newMinoPos[0]) &&
+		(matrix[newMinoPos[0].y][newMinoPos[0].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[0])) &&
+		isMinoInsideMatrix(newMinoPos[1]) &&
+		(matrix[newMinoPos[1].y][newMinoPos[1].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[1])) &&
+		isMinoInsideMatrix(newMinoPos[2]) &&
+		(matrix[newMinoPos[2].y][newMinoPos[2].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[2]))
+		) {
+
+		performTransformation(newMinoPos);
+		changeOrientation();
+
+		return true;
+	}
+	return false;
+}
+
+Tetrimino_Z::Tetrimino_Z(int originPositionX, int originPositionY, Matrix* matrix) {
+	m_originMinoIndex = 2;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
+
+	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY + 1);
+	m_minoPositions[1] = glm::ivec2(originPositionX, originPositionY + 1);
+	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY);
+
+	m_minoSign = 'Z';
+	m_matrix = matrix;
+	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
+	m_spawnPositionY = 0;
+	m_orientation = Orientation::HORIZONTAL;
+}
+
+Tetrimino_Z::~Tetrimino_Z() {
+}
+
+bool Tetrimino_Z::rotateRight() {
+	glm::ivec2 newMinoPos[4] = {};
+
+	for (int i = 0; i < 4; i++) {
+		if (i == m_originMinoIndex) {
+			newMinoPos[i] = m_minoPositions[i];
+		}
+		else {
+			newMinoPos[i] = rotateMinoRight(m_minoPositions[i]);
+		}
+	}
+
+	auto& matrix = m_matrix->getMatrix();
+
+	// if all the cells after the rotation are empty or part of this tetrimino
+	if (
+		isMinoInsideMatrix(newMinoPos[0]) &&
+		(matrix[newMinoPos[0].y][newMinoPos[0].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[0])) &&
+		isMinoInsideMatrix(newMinoPos[1]) &&
+		(matrix[newMinoPos[1].y][newMinoPos[1].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[1])) &&
+		isMinoInsideMatrix(newMinoPos[2]) &&
+		(matrix[newMinoPos[2].y][newMinoPos[2].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[2]))
+		) {
+
+		performTransformation(newMinoPos);
+		changeOrientation();
+		return true;
+	}
+	return false;
+}
+
+bool Tetrimino_Z::rotateLeft() {
+	glm::ivec2 newMinoPos[4] = {};
+
+	for (int i = 0; i < 4; i++) {
+		if (i == m_originMinoIndex) {
+			newMinoPos[i] = m_minoPositions[i];
+		}
+		else {
+			newMinoPos[i] = rotateMinoLeft(m_minoPositions[i]);
+		}
+	}
+
+	auto& matrix = m_matrix->getMatrix();
+
+	// if all the cells after the rotation are empty or part of this tetrimino
+	if (
+		isMinoInsideMatrix(newMinoPos[0]) &&
+		(matrix[newMinoPos[0].y][newMinoPos[0].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[0])) &&
+		isMinoInsideMatrix(newMinoPos[1]) &&
+		(matrix[newMinoPos[1].y][newMinoPos[1].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[1])) &&
+		isMinoInsideMatrix(newMinoPos[2]) &&
+		(matrix[newMinoPos[2].y][newMinoPos[2].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[2]))
+		) {
+
+		performTransformation(newMinoPos);
+		changeOrientation();
+		return true;
+	}
+	return false;
+}
+
+Tetrimino_S::Tetrimino_S(int originPositionX, int originPositionY, Matrix* matrix) {
+	m_originMinoIndex = 1;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
+
+	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY);
+	m_minoPositions[2] = glm::ivec2(originPositionX, originPositionY + 1);
+	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY + 1);
+
+	m_minoSign = 'S';
+	m_matrix = matrix;
+	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
+	m_spawnPositionY = 0;
+	m_orientation = Orientation::HORIZONTAL;
+}
+
+Tetrimino_S::~Tetrimino_S() {
+}
+
+bool Tetrimino_S::rotateRight() {
+	glm::ivec2 newMinoPos[4] = {};
+
+	for (int i = 0; i < 4; i++) {
+		if (i == m_originMinoIndex) {
+			newMinoPos[i] = m_minoPositions[i];
+		}
+		else {
+			newMinoPos[i] = rotateMinoRight(m_minoPositions[i]);
+		}
+	}
+
+	auto& matrix = m_matrix->getMatrix();
+
+	// if all the cells after the rotation are empty or part of this tetrimino
+	if (
+		isMinoInsideMatrix(newMinoPos[0]) &&
+		(matrix[newMinoPos[0].y][newMinoPos[0].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[0])) &&
+		isMinoInsideMatrix(newMinoPos[1]) &&
+		(matrix[newMinoPos[1].y][newMinoPos[1].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[1])) &&
+		isMinoInsideMatrix(newMinoPos[2]) &&
+		(matrix[newMinoPos[2].y][newMinoPos[2].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[2]))
+		) {
+
+		performTransformation(newMinoPos);
+		changeOrientation();
+		return true;
+	}
+	return false;
+}
+
+bool Tetrimino_S::rotateLeft() {
+	glm::ivec2 newMinoPos[4] = {};
+
+	for (int i = 0; i < 4; i++) {
+		if (i == m_originMinoIndex) {
+			newMinoPos[i] = m_minoPositions[i];
+		}
+		else {
+			newMinoPos[i] = rotateMinoLeft(m_minoPositions[i]);
+		}
+	}
+
+	auto& matrix = m_matrix->getMatrix();
+
+	// if all the cells after the rotation are empty or part of this tetrimino
+	if (
+		isMinoInsideMatrix(newMinoPos[0]) &&
+		(matrix[newMinoPos[0].y][newMinoPos[0].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[0])) &&
+		isMinoInsideMatrix(newMinoPos[1]) &&
+		(matrix[newMinoPos[1].y][newMinoPos[1].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[1])) &&
+		isMinoInsideMatrix(newMinoPos[2]) &&
+		(matrix[newMinoPos[2].y][newMinoPos[2].x] == m_matrix->getEmptyCellSign() || isCellPartOfThis(newMinoPos[2]))
+		) {
+
+		performTransformation(newMinoPos);
+		changeOrientation();
+		return true;
+	}
+	return false;
+}

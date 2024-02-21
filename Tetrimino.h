@@ -86,11 +86,29 @@ public:
 	bool rotateLeft();
 };
 
-//class Tetrimino_I : public Tetrimino {
-//public:
-//	Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix);
-//	~Tetrimino_I();
-//
-//	bool rotateRight();
-//	bool rotateLeft();
-//};
+class Tetrimino_I : public Tetrimino {
+public:
+	Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix);
+	~Tetrimino_I();
+
+	bool rotateRight();
+	bool rotateLeft();
+};
+
+class Tetrimino_Z : public Tetrimino {
+public:
+	Tetrimino_Z(int originPositionX, int originPositionY, Matrix* matrix);
+	~Tetrimino_Z();
+
+	bool rotateRight();
+	bool rotateLeft();
+};
+
+class Tetrimino_S : public Tetrimino {
+public:
+	Tetrimino_S(int originPositionX, int originPositionY, Matrix* matrix);
+	~Tetrimino_S();
+
+	bool rotateRight();
+	bool rotateLeft();
+};

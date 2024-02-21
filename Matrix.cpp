@@ -59,6 +59,18 @@ void Matrix::drawMatrix(TextureRenderer& renderer) const {
 			case 'O':
 				minoColor = MINO_COLOR_YELLOW;
 				break;
+
+			case 'I':
+				minoColor = MINO_COLOR_CYAN;
+				break;
+
+			case 'Z':
+				minoColor = MINO_COLOR_RED;
+				break;
+
+			case 'S':
+				minoColor = MINO_COLOR_GREEN;
+				break;
 			}
 
 			RectDimension minoDimension{ 

@@ -13,10 +13,13 @@ bool Tetris::init() {
 bool Tetris::initGame() {
 	m_matrix.init(m_window.getWindowWidth(), m_window.getWindowHeight());
 	
-	m_tempMinoT.addToMatrix();
+	/*m_tempMinoT.addToMatrix();
 	m_tempMinoL.addToMatrix();
 	m_tempMinoJ.addToMatrix();
-	m_tempMinoO.addToMatrix();
+	m_tempMinoO.addToMatrix();*/
+	//m_tempMinoI.addToMatrix();
+	//m_tempMinoZ.addToMatrix();
+	m_tempMinoS.addToMatrix();
 	return true;
 }
 
@@ -104,7 +107,7 @@ void Tetris::processInput() {
 		}
 	}
 
-	Tetrimino* current = &m_tempMinoL;
+	Tetrimino* current = &m_tempMinoS;
 
 	// move left or right
 	if (m_inputProcessor.isKeyPressed(SDLK_a)) {

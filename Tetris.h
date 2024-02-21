@@ -47,6 +47,9 @@ private:
 	Tetrimino_L m_tempMinoL = Tetrimino_L(5, 17, &m_matrix);
 	Tetrimino_J m_tempMinoJ = Tetrimino_J(6, 3, &m_matrix);
 	Tetrimino_O m_tempMinoO = Tetrimino_O(1, 1, &m_matrix);
+	Tetrimino_I m_tempMinoI = Tetrimino_I(5, 2, &m_matrix);
+	Tetrimino_Z m_tempMinoZ = Tetrimino_Z(1, 4, &m_matrix);
+	Tetrimino_S m_tempMinoS = Tetrimino_S(1, 4, &m_matrix);
 
 	// Engine Tools
 	Window m_window;
