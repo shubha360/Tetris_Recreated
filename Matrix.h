@@ -17,6 +17,8 @@ public:
 	~Matrix();
 
 	bool init(unsigned int screenWidth, unsigned int screenHeight);
+	
+	void checkLineClears();
 
 	void drawMatrix(TextureRenderer& renderer) const;
 
@@ -39,6 +41,7 @@ private:
 	const int NUM_COLUMNS = 10;
 	const int MINO_LENGTH = 32;
 	const char EMPTY_CELL_SIGN = ' ';
+	const std::string EMPTY_LINE = std::string(NUM_COLUMNS, EMPTY_CELL_SIGN);
 
 	glm::ivec2 m_matrixPosTopLeft = glm::ivec2(0);
 	glm::ivec2 m_screenDimension = glm::ivec2(0);

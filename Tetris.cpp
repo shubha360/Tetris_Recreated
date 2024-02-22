@@ -13,9 +13,7 @@ bool Tetris::init() {
 bool Tetris::initGame() {
 	m_matrix.init(m_window.getWindowWidth(), m_window.getWindowHeight());
 	
-	m_current = &m_tempMinoL;
-
-	m_current->spawn();
+	m_current = &m_tempMinoI;
 	return true;
 }
 
@@ -129,72 +127,105 @@ void Tetris::processInput() {
 }
 
 void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
-	static float timeSinceAutoDown = 0;
+	static float timeSinceAutoDown = 0.0f;
 	static float autoDownStepDuration = 60.0f;
 
-	timeSinceAutoDown += deltaTime;
-
-	if (timeSinceAutoDown >= autoDownStepDuration) {
-		m_current->moveDown();
-		timeSinceAutoDown = 0.0f;
-		m_drawUpdateNeeded = true;
-	}
-	
 	static float moveDelayDuration = 5.0f;
 	static float currentMoveDelay = moveDelayDuration;
 
-	if (!inputProcessed) {
-		// move left or right
-		if (m_inputProcessor.isKeyDown(SDLK_a)) {
+	static bool respawn = true;
 
-			currentMoveDelay += deltaTime;
+	if (respawn) {
+		m_matrix.checkLineClears();
 
-			if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
-				m_drawUpdateNeeded = true;
-				inputProcessed = true;
-				currentMoveDelay = 0.0f;
+		m_current->reset();
+		m_current->spawn();
+		
+		m_drawUpdateNeeded = true;
+		currentMoveDelay = moveDelayDuration;
+		timeSinceAutoDown = 0.0f;
+		
+		respawn = false;
+	}
+	else {
+
+		timeSinceAutoDown += deltaTime;
+
+		if (timeSinceAutoDown >= autoDownStepDuration) {
+			if (!m_current->moveDown()) {
+				respawn = true;
 			}
+			
+			timeSinceAutoDown = 0.0f;
+			m_drawUpdateNeeded = true;
 		}
-		else if (m_inputProcessor.isKeyDown(SDLK_d)) {
 
-			currentMoveDelay += deltaTime;
+		if (!inputProcessed) {
+			// move left or right
+			if (m_inputProcessor.isKeyDown(SDLK_a)) {
 
-			if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
-				m_drawUpdateNeeded = true;
-				inputProcessed = true;
-				currentMoveDelay = 0.0f;
+				currentMoveDelay += deltaTime;
+
+				if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+					currentMoveDelay = 0.0f;
+				}
 			}
-		}
-		else if (m_inputProcessor.isKeyDown(SDLK_s)) {
+			else if (m_inputProcessor.isKeyDown(SDLK_d)) {
 
-			currentMoveDelay += deltaTime;
+				currentMoveDelay += deltaTime;
 
-			if (currentMoveDelay >= moveDelayDuration && m_current->moveDown()) {
-				m_drawUpdateNeeded = true;
-				inputProcessed = true;
-				currentMoveDelay = 0.0f;
-				timeSinceAutoDown = 0.0f;
+				if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+					currentMoveDelay = 0.0f;
+				}
 			}
-		}
+			else if (m_inputProcessor.isKeyDown(SDLK_s)) {
 
-		else if (m_inputProcessor.isKeyReleased(SDLK_a) ||
-			m_inputProcessor.isKeyReleased(SDLK_d) ||
-			m_inputProcessor.isKeyReleased(SDLK_s)) {
+				currentMoveDelay += deltaTime;
 
-			currentMoveDelay = moveDelayDuration;
-		}
-
-		// rotate left or right
-		else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
-			if (m_current->rotateLeft()) {
-				m_drawUpdateNeeded = true;
-				inputProcessed = true;
+				if (currentMoveDelay >= moveDelayDuration) {
+					if (m_current->moveDown()) {
+						m_drawUpdateNeeded = true;
+						inputProcessed = true;
+						currentMoveDelay = 0.0f;
+						timeSinceAutoDown = 0.0f;
+					}
+					else {
+						respawn = true;
+					}
+				}
 			}
-		}
-		else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
-			if (m_current->rotateRight()) {
-				m_drawUpdateNeeded = true;
-				inputProcessed = true;
+
+			else if (m_inputProcessor.isKeyReleased(SDLK_a) ||
+				m_inputProcessor.isKeyReleased(SDLK_d) ||
+				m_inputProcessor.isKeyReleased(SDLK_s)) {
+
+				currentMoveDelay = moveDelayDuration;
+			}
+
+			// rotate left or right
+			else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
+				if (m_current->rotateLeft()) {
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+				}
+			}
+			else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
+				if (m_current->rotateRight()) {
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+				}
+			}
+			else if (m_inputProcessor.isKeyPressed(SDLK_SPACE)) {
+				while (true) {
+					if (!m_current->moveDown()) {
+						break;
+					}
+				}
+				respawn = true;
 			}
 		}
 	}

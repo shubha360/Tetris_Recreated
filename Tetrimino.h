@@ -25,7 +25,10 @@ public:
 	bool moveRight();
 	bool moveDown();
 
+	void reset();
+
 protected:
+	glm::ivec2 m_spawnMinoPositions[4] = {};
 	glm::ivec2 m_minoPositions[4] = {};
 	int m_originMinoIndex = 0;
 

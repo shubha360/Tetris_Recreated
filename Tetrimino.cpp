@@ -22,9 +22,11 @@ bool Tetrimino::moveLeft() {
 
 	};
 
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
+	
+	performTransformation(newMinoPos);
 	return true;
 }
 
@@ -37,9 +39,11 @@ bool Tetrimino::moveRight() {
 
 	};
 
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
+
+	performTransformation(newMinoPos);
 	return true;
 }
 
@@ -52,10 +56,18 @@ bool Tetrimino::moveDown() {
 
 	};
 
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
+
+	performTransformation(newMinoPos);
 	return true;
+}
+
+void Tetrimino::reset() {
+	for (int i = 0; i < 4; i++) {
+		m_minoPositions[i] = m_spawnMinoPositions[i];
+	}
 }
 
 glm::ivec2 Tetrimino::rotateMinoRight(const glm::ivec2& minoPostion) const {
@@ -237,11 +249,11 @@ Tetrimino_T::Tetrimino_T(Matrix* matrix) {
 	m_orientation = Orientation::HORIZONTAL;
 
 	m_originMinoIndex = 1;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
-	
-	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
-	m_minoPositions[2] = glm::ivec2(m_spawnPositionX, m_spawnPositionY - 1);
-	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
+	m_spawnMinoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+
+	m_spawnMinoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_spawnMinoPositions[2] = glm::ivec2(m_spawnPositionX, m_spawnPositionY - 1);
+	m_spawnMinoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
 Tetrimino_T::~Tetrimino_T() {}
@@ -258,15 +270,13 @@ bool Tetrimino_T::rotateRight() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 bool Tetrimino_T::rotateLeft() {
@@ -281,15 +291,13 @@ bool Tetrimino_T::rotateLeft() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 Tetrimino_L::Tetrimino_L(Matrix* matrix) {
@@ -300,11 +308,11 @@ Tetrimino_L::Tetrimino_L(Matrix* matrix) {
 	m_orientation = Orientation::HORIZONTAL;
 
 	m_originMinoIndex = 1;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+	m_spawnMinoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
 
-	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
-	m_minoPositions[2] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
-	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY - 1);
+	m_spawnMinoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_spawnMinoPositions[2] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
+	m_spawnMinoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY - 1);
 }
 
 Tetrimino_L::~Tetrimino_L() {}
@@ -321,15 +329,13 @@ bool Tetrimino_L::rotateRight() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 bool Tetrimino_L::rotateLeft() {
@@ -344,15 +350,13 @@ bool Tetrimino_L::rotateLeft() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 Tetrimino_J::Tetrimino_J(Matrix* matrix) {
@@ -363,11 +367,11 @@ Tetrimino_J::Tetrimino_J(Matrix* matrix) {
 	m_orientation = Orientation::HORIZONTAL;
 
 	m_originMinoIndex = 2;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+	m_spawnMinoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
 
-	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY - 1);
-	m_minoPositions[1] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
-	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
+	m_spawnMinoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY - 1);
+	m_spawnMinoPositions[1] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_spawnMinoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
 Tetrimino_J::~Tetrimino_J() {}
@@ -384,15 +388,13 @@ bool Tetrimino_J::rotateRight() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 bool Tetrimino_J::rotateLeft() {
@@ -407,15 +409,13 @@ bool Tetrimino_J::rotateLeft() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 Tetrimino_O::Tetrimino_O(Matrix* matrix) {
@@ -426,11 +426,11 @@ Tetrimino_O::Tetrimino_O(Matrix* matrix) {
 	m_orientation = Orientation::HORIZONTAL;
 
 	m_originMinoIndex = 3;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+	m_spawnMinoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
 
-	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY - 1);
-	m_minoPositions[1] = glm::ivec2(m_spawnPositionX, m_spawnPositionY - 1);
-	m_minoPositions[2] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_spawnMinoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY - 1);
+	m_spawnMinoPositions[1] = glm::ivec2(m_spawnPositionX, m_spawnPositionY - 1);
+	m_spawnMinoPositions[2] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
 }
 
 Tetrimino_O::~Tetrimino_O() {}
@@ -453,11 +453,11 @@ Tetrimino_I::Tetrimino_I(Matrix* matrix) {
 	m_orientation = Orientation::HORIZONTAL;
 
 	m_originMinoIndex = 2;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+	m_spawnMinoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
 
-	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 2, m_spawnPositionY);
-	m_minoPositions[1] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
-	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
+	m_spawnMinoPositions[0] = glm::ivec2(m_spawnPositionX - 2, m_spawnPositionY);
+	m_spawnMinoPositions[1] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_spawnMinoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
 Tetrimino_I::~Tetrimino_I() {}
@@ -485,17 +485,15 @@ bool Tetrimino_I::rotateRight() {
 				newMinoPos[i] = rotateMinoLeft(m_minoPositions[i]);
 			}
 		}
-	}
-
-	auto& matrix = m_matrix->getMatrix();
+	}	
 
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 bool Tetrimino_I::rotateLeft() {
@@ -522,15 +520,13 @@ bool Tetrimino_I::rotateLeft() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 Tetrimino_Z::Tetrimino_Z(Matrix* matrix) {
@@ -541,11 +537,11 @@ Tetrimino_Z::Tetrimino_Z(Matrix* matrix) {
 	m_orientation = Orientation::HORIZONTAL;
 
 	m_originMinoIndex = 2;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+	m_spawnMinoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
 
-	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY + 1);
-	m_minoPositions[1] = glm::ivec2(m_spawnPositionX, m_spawnPositionY + 1);
-	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
+	m_spawnMinoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY + 1);
+	m_spawnMinoPositions[1] = glm::ivec2(m_spawnPositionX, m_spawnPositionY + 1);
+	m_spawnMinoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
 Tetrimino_Z::~Tetrimino_Z() {}
@@ -562,15 +558,13 @@ bool Tetrimino_Z::rotateRight() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 bool Tetrimino_Z::rotateLeft() {
@@ -585,15 +579,13 @@ bool Tetrimino_Z::rotateLeft() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 Tetrimino_S::Tetrimino_S(Matrix* matrix) {
@@ -604,11 +596,11 @@ Tetrimino_S::Tetrimino_S(Matrix* matrix) {
 	m_orientation = Orientation::HORIZONTAL;
 
 	m_originMinoIndex = 1;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+	m_spawnMinoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
 
-	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
-	m_minoPositions[2] = glm::ivec2(m_spawnPositionX, m_spawnPositionY + 1);
-	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY + 1);
+	m_spawnMinoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_spawnMinoPositions[2] = glm::ivec2(m_spawnPositionX, m_spawnPositionY + 1);
+	m_spawnMinoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY + 1);
 }
 
 Tetrimino_S::~Tetrimino_S() {}
@@ -625,15 +617,13 @@ bool Tetrimino_S::rotateRight() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }
 
 bool Tetrimino_S::rotateLeft() {
@@ -648,13 +638,11 @@ bool Tetrimino_S::rotateLeft() {
 		}
 	}
 
-	auto& matrix = m_matrix->getMatrix();
-
 	// if all the cells after the rotation are empty or part of this tetrimino
-	if (canPerformTransformation(newMinoPos)) {
-		performTransformation(newMinoPos);
-		changeOrientation();
-		return true;
+	if (!canPerformTransformation(newMinoPos)) {
+		return false;
 	}
-	return false;
+	performTransformation(newMinoPos);
+	changeOrientation();
+	return true;
 }

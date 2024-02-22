@@ -22,10 +22,50 @@ bool Matrix::init(unsigned int screenWidth, unsigned int screenHeight) {
 	m_matrix.resize(NUM_ROWS);
 
 	for (int i = 0; i < m_matrix.size(); i++) {
-		m_matrix[i] = std::string(NUM_COLUMNS, EMPTY_CELL_SIGN);
+		m_matrix[i] = EMPTY_LINE;
 	}
+	
+	/*m_matrix[16] = "OOOOOOOOO ";
+	m_matrix[17] = "O         ";
+	m_matrix[18] = "O         ";
+	m_matrix[19] = "OOOOOOOOO ";*/
 
 	return true;
+}
+
+void Matrix::checkLineClears() {
+	int lineClears = 0;
+
+	for (int i = NUM_ROWS - 1; i >= 0; i--) {
+
+		// line clear
+		if (m_matrix[i].find(' ') == std::string::npos) {
+			lineClears++;
+			m_matrix[i] = EMPTY_LINE;
+			i++;
+		}
+
+		// found empty line
+		else if (m_matrix[i].compare(EMPTY_LINE) == 0) {
+			int lineToPull = i - lineClears;
+
+			if (lineToPull >= 0) {
+
+				// if line to pull down is also empty
+				if (m_matrix[lineToPull].compare(EMPTY_LINE) == 0) {
+					break;
+				}
+				else { // pull the line down
+					m_matrix[i] = m_matrix[lineToPull];
+					m_matrix[lineToPull] = EMPTY_LINE;
+					i++;
+				}
+			}
+			else { // line to pull is out of bound
+				break;
+			}
+		}
+	}
 }
 
 void Matrix::drawMatrix(TextureRenderer& renderer) const {
