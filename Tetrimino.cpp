@@ -4,14 +4,11 @@ Tetrimino::Tetrimino() {}
 
 Tetrimino::~Tetrimino() {}
 
-void Tetrimino::addToMatrix() {
-	if (m_matrix != nullptr) {
+void Tetrimino::spawn() {
+	auto& matrix = m_matrix->getMatrix();
 
-		auto& matrix = m_matrix->getMatrix();
-
-		for (int i = 0; i < 4; i++) {
-			matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
-		}
+	for (int i = 0; i < 4; i++) {
+		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
 	}
 }
 
@@ -232,19 +229,19 @@ void Tetrimino::changeOrientation() {
 	}
 }
 
-Tetrimino_T::Tetrimino_T(int originPositionX, int originPositionY, Matrix* matrix) {
-	m_originMinoIndex = 1;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
-
-	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY);
-	m_minoPositions[2] = glm::ivec2(originPositionX, originPositionY - 1);
-	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY);
-
+Tetrimino_T::Tetrimino_T(Matrix* matrix) {
 	m_minoSign = 'T';
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
+
+	m_originMinoIndex = 1;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+	
+	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_minoPositions[2] = glm::ivec2(m_spawnPositionX, m_spawnPositionY - 1);
+	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
 Tetrimino_T::~Tetrimino_T() {}
@@ -295,19 +292,19 @@ bool Tetrimino_T::rotateLeft() {
 	return false;
 }
 
-Tetrimino_L::Tetrimino_L(int originPositionX, int originPositionY, Matrix* matrix) {
-	m_originMinoIndex = 1;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
-
-	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY);
-	m_minoPositions[2] = glm::ivec2(originPositionX + 1, originPositionY);
-	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY - 1);
-
+Tetrimino_L::Tetrimino_L(Matrix* matrix) {
 	m_minoSign = 'L';
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
+
+	m_originMinoIndex = 1;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+
+	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_minoPositions[2] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
+	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY - 1);
 }
 
 Tetrimino_L::~Tetrimino_L() {}
@@ -358,19 +355,19 @@ bool Tetrimino_L::rotateLeft() {
 	return false;
 }
 
-Tetrimino_J::Tetrimino_J(int originPositionX, int originPositionY, Matrix* matrix) {
-	m_originMinoIndex = 2;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
-
-	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY - 1);
-	m_minoPositions[1] = glm::ivec2(originPositionX - 1, originPositionY);
-	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY);
-
+Tetrimino_J::Tetrimino_J(Matrix* matrix) {
 	m_minoSign = 'J';
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
+
+	m_originMinoIndex = 2;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+
+	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY - 1);
+	m_minoPositions[1] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
 Tetrimino_J::~Tetrimino_J() {}
@@ -421,19 +418,19 @@ bool Tetrimino_J::rotateLeft() {
 	return false;
 }
 
-Tetrimino_O::Tetrimino_O(int originPositionX, int originPositionY, Matrix* matrix) {
-	m_originMinoIndex = 3;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
-
-	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY - 1);
-	m_minoPositions[1] = glm::ivec2(originPositionX, originPositionY - 1);
-	m_minoPositions[2] = glm::ivec2(originPositionX - 1, originPositionY);
-
+Tetrimino_O::Tetrimino_O(Matrix* matrix) {
 	m_minoSign = 'O';
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 : m_matrix->getWidth() / 2 - 1;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
+
+	m_originMinoIndex = 3;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+
+	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY - 1);
+	m_minoPositions[1] = glm::ivec2(m_spawnPositionX, m_spawnPositionY - 1);
+	m_minoPositions[2] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
 }
 
 Tetrimino_O::~Tetrimino_O() {}
@@ -448,19 +445,19 @@ bool Tetrimino_O::rotateLeft() {
 	return false;
 }
 
-Tetrimino_I::Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix) {
-	m_originMinoIndex = 2;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
-
-	m_minoPositions[0] = glm::ivec2(originPositionX - 2, originPositionY);
-	m_minoPositions[1] = glm::ivec2(originPositionX - 1, originPositionY);
-	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY);
-
+Tetrimino_I::Tetrimino_I(Matrix* matrix) {
 	m_minoSign = 'I';
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 : m_matrix->getWidth() / 2 - 1;
 	m_spawnPositionY = 0;
 	m_orientation = Orientation::HORIZONTAL;
+
+	m_originMinoIndex = 2;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+
+	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 2, m_spawnPositionY);
+	m_minoPositions[1] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
 Tetrimino_I::~Tetrimino_I() {}
@@ -536,23 +533,22 @@ bool Tetrimino_I::rotateLeft() {
 	return false;
 }
 
-Tetrimino_Z::Tetrimino_Z(int originPositionX, int originPositionY, Matrix* matrix) {
-	m_originMinoIndex = 2;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
-
-	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY + 1);
-	m_minoPositions[1] = glm::ivec2(originPositionX, originPositionY + 1);
-	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY);
-
+Tetrimino_Z::Tetrimino_Z(Matrix* matrix) {
 	m_minoSign = 'Z';
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 0;
 	m_orientation = Orientation::HORIZONTAL;
+
+	m_originMinoIndex = 2;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+
+	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY + 1);
+	m_minoPositions[1] = glm::ivec2(m_spawnPositionX, m_spawnPositionY + 1);
+	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY);
 }
 
-Tetrimino_Z::~Tetrimino_Z() {
-}
+Tetrimino_Z::~Tetrimino_Z() {}
 
 bool Tetrimino_Z::rotateRight() {
 	glm::ivec2 newMinoPos[4] = {};
@@ -600,23 +596,22 @@ bool Tetrimino_Z::rotateLeft() {
 	return false;
 }
 
-Tetrimino_S::Tetrimino_S(int originPositionX, int originPositionY, Matrix* matrix) {
-	m_originMinoIndex = 1;
-	m_minoPositions[m_originMinoIndex] = glm::ivec2(originPositionX, originPositionY);
-
-	m_minoPositions[0] = glm::ivec2(originPositionX - 1, originPositionY);
-	m_minoPositions[2] = glm::ivec2(originPositionX, originPositionY + 1);
-	m_minoPositions[3] = glm::ivec2(originPositionX + 1, originPositionY + 1);
-
+Tetrimino_S::Tetrimino_S(Matrix* matrix) {
 	m_minoSign = 'S';
 	m_matrix = matrix;
 	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
 	m_spawnPositionY = 0;
 	m_orientation = Orientation::HORIZONTAL;
+
+	m_originMinoIndex = 1;
+	m_minoPositions[m_originMinoIndex] = glm::ivec2(m_spawnPositionX, m_spawnPositionY);
+
+	m_minoPositions[0] = glm::ivec2(m_spawnPositionX - 1, m_spawnPositionY);
+	m_minoPositions[2] = glm::ivec2(m_spawnPositionX, m_spawnPositionY + 1);
+	m_minoPositions[3] = glm::ivec2(m_spawnPositionX + 1, m_spawnPositionY + 1);
 }
 
-Tetrimino_S::~Tetrimino_S() {
-}
+Tetrimino_S::~Tetrimino_S() {}
 
 bool Tetrimino_S::rotateRight() {
 	glm::ivec2 newMinoPos[4] = {};

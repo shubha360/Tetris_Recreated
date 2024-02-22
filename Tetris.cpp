@@ -13,13 +13,9 @@ bool Tetris::init() {
 bool Tetris::initGame() {
 	m_matrix.init(m_window.getWindowWidth(), m_window.getWindowHeight());
 	
-	m_tempMinoT.addToMatrix();
-	m_tempMinoL.addToMatrix();
-	m_tempMinoJ.addToMatrix();
-	m_tempMinoO.addToMatrix();
-	m_tempMinoI.addToMatrix();
-	m_tempMinoZ.addToMatrix();
-	m_tempMinoS.addToMatrix();
+	m_current = &m_tempMinoL;
+
+	m_current->spawn();
 	return true;
 }
 
@@ -49,6 +45,8 @@ void Tetris::run() {
 
 void Tetris::gameLoop() {
 
+	float previousTicks = (float)SDL_GetTicks();
+
 	while (m_gameState == GameState::PLAYING) {
 
 		m_fps.beginFrame();
@@ -58,22 +56,44 @@ void Tetris::gameLoop() {
 		processInput();
 
 		m_gui.updateGUI(m_inputProcessor, m_camera);
-		updateGame();
+		
+		previousTicks = runGameSimulations(previousTicks);		
 
 		draw();
 
-		float currentFps = m_fps.calculateFps();
-
-		static int frameCount = 0;
-		frameCount++;
-
-		if (frameCount == 100) {
-			printf("%f\n", currentFps);
-			frameCount = 0;
-		}
-
 		m_fps.endFrame();
+
+		printFps();
 	}
+}
+
+float Tetris::runGameSimulations(float previousTicks) {
+	static const float MS_PER_SECOND = 1000.0f;
+	static const float DESIRED_FPS = 60.0f;
+
+	static const float DESIRED_FRAMETIME = MS_PER_SECOND / DESIRED_FPS;
+
+	static const int MAX_PHYSICS_SIMS = 6;
+	static const float MAX_DELTA_TIME = 1.0f;
+
+	float newTicks = (float)SDL_GetTicks();
+	float frameTime = newTicks - previousTicks;
+
+	float totalDeltaTime = frameTime / DESIRED_FRAMETIME;
+
+	bool inputProcessed = false;
+
+	int i = 0;
+	while (totalDeltaTime > 0.0f && i < MAX_PHYSICS_SIMS) {
+		float deltaTime = std::min(totalDeltaTime, MAX_DELTA_TIME);
+
+		updateGame(deltaTime, inputProcessed);
+
+		totalDeltaTime -= deltaTime;
+		i++;
+	}
+
+	return newTicks;
 }
 
 void Tetris::processInput() {
@@ -106,40 +126,79 @@ void Tetris::processInput() {
 			break;
 		}
 	}
+}
 
-	Tetrimino* current = &m_tempMinoI;
+void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
+	static float timeSinceAutoDown = 0;
+	static float autoDownStepDuration = 60.0f;
 
-	// move left or right
-	if (m_inputProcessor.isKeyPressed(SDLK_a)) {
-		if (current->moveLeft()) {
-			m_drawUpdateNeeded = true;
-		}
-	}
-	else if (m_inputProcessor.isKeyPressed(SDLK_d)) {
-		if (current->moveRight()) {
-			m_drawUpdateNeeded = true;
-		}
-	}
-	else if (m_inputProcessor.isKeyPressed(SDLK_s)) {
-		if (current->moveDown()) {
-			m_drawUpdateNeeded = true;
-		}
-	}
+	timeSinceAutoDown += deltaTime;
 
-	// rotate left or right
-	else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
-		if (current->rotateLeft()) {
-			m_drawUpdateNeeded = true;
-		}
+	if (timeSinceAutoDown >= autoDownStepDuration) {
+		m_current->moveDown();
+		timeSinceAutoDown = 0.0f;
+		m_drawUpdateNeeded = true;
 	}
-	else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
-		if (current->rotateRight()) {
-			m_drawUpdateNeeded = true;
+	
+	static float moveDelayDuration = 5.0f;
+	static float currentMoveDelay = moveDelayDuration;
+
+	if (!inputProcessed) {
+		// move left or right
+		if (m_inputProcessor.isKeyDown(SDLK_a)) {
+
+			currentMoveDelay += deltaTime;
+
+			if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
+				m_drawUpdateNeeded = true;
+				inputProcessed = true;
+				currentMoveDelay = 0.0f;
+			}
+		}
+		else if (m_inputProcessor.isKeyDown(SDLK_d)) {
+
+			currentMoveDelay += deltaTime;
+
+			if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
+				m_drawUpdateNeeded = true;
+				inputProcessed = true;
+				currentMoveDelay = 0.0f;
+			}
+		}
+		else if (m_inputProcessor.isKeyDown(SDLK_s)) {
+
+			currentMoveDelay += deltaTime;
+
+			if (currentMoveDelay >= moveDelayDuration && m_current->moveDown()) {
+				m_drawUpdateNeeded = true;
+				inputProcessed = true;
+				currentMoveDelay = 0.0f;
+				timeSinceAutoDown = 0.0f;
+			}
+		}
+
+		else if (m_inputProcessor.isKeyReleased(SDLK_a) ||
+			m_inputProcessor.isKeyReleased(SDLK_d) ||
+			m_inputProcessor.isKeyReleased(SDLK_s)) {
+
+			currentMoveDelay = moveDelayDuration;
+		}
+
+		// rotate left or right
+		else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
+			if (m_current->rotateLeft()) {
+				m_drawUpdateNeeded = true;
+				inputProcessed = true;
+			}
+		}
+		else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
+			if (m_current->rotateRight()) {
+				m_drawUpdateNeeded = true;
+				inputProcessed = true;
+			}
 		}
 	}
 }
-
-void Tetris::updateGame() {}
 
 void Tetris::draw() {
 
@@ -173,6 +232,18 @@ void Tetris::draw() {
 	m_guiRenderer.renderGUI(m_gui, m_camera);
 
 	m_window.swapBuffer();
+}
+
+void Tetris::printFps() {
+	float currentFps = m_fps.calculateFps();
+
+	static int frameCount = 0;
+	frameCount++;
+
+	if (frameCount == 100) {
+		printf("%f\n", currentFps);
+		frameCount = 0;
+	}
 }
 
 void Tetris::freeTetris() {

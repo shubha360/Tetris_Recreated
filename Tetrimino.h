@@ -16,7 +16,7 @@ public:
 	Tetrimino();
 	virtual ~Tetrimino();
 
-	void addToMatrix();
+	void spawn();
 
 	virtual bool rotateRight() = 0;
 	virtual bool rotateLeft() = 0;
@@ -49,7 +49,7 @@ protected:
 
 class Tetrimino_T : public Tetrimino {
 public:
-	Tetrimino_T(int originPositionX, int originPositionY, Matrix* matrix);
+	Tetrimino_T(Matrix* matrix);
 	~Tetrimino_T();
 
 	bool rotateRight();
@@ -58,7 +58,7 @@ public:
 
 class Tetrimino_L : public Tetrimino {
 public:
-	Tetrimino_L(int originPositionX, int originPositionY, Matrix* matrix);
+	Tetrimino_L(Matrix* matrix);
 	~Tetrimino_L();
 
 	bool rotateRight();
@@ -67,7 +67,7 @@ public:
 
 class Tetrimino_J : public Tetrimino {
 public:
-	Tetrimino_J(int originPositionX, int originPositionY, Matrix* matrix);
+	Tetrimino_J(Matrix* matrix);
 	~Tetrimino_J();
 
 	bool rotateRight();
@@ -76,7 +76,7 @@ public:
 
 class Tetrimino_O : public Tetrimino {
 public:
-	Tetrimino_O(int originPositionX, int originPositionY, Matrix* matrix);
+	Tetrimino_O(Matrix* matrix);
 	~Tetrimino_O();
 
 	bool rotateRight();
@@ -85,7 +85,7 @@ public:
 
 class Tetrimino_I : public Tetrimino {
 public:
-	Tetrimino_I(int originPositionX, int originPositionY, Matrix* matrix);
+	Tetrimino_I(Matrix* matrix);
 	~Tetrimino_I();
 
 	bool rotateRight();
@@ -94,7 +94,7 @@ public:
 
 class Tetrimino_Z : public Tetrimino {
 public:
-	Tetrimino_Z(int originPositionX, int originPositionY, Matrix* matrix);
+	Tetrimino_Z(Matrix* matrix);
 	~Tetrimino_Z();
 
 	bool rotateRight();
@@ -103,7 +103,7 @@ public:
 
 class Tetrimino_S : public Tetrimino {
 public:
-	Tetrimino_S(int originPositionX, int originPositionY, Matrix* matrix);
+	Tetrimino_S(Matrix* matrix);
 	~Tetrimino_S();
 
 	bool rotateRight();

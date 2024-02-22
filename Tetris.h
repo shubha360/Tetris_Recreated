@@ -43,13 +43,15 @@ private:
 	GameState m_gameState = GameState::PLAYING;
 
 	Matrix m_matrix;
-	Tetrimino_T m_tempMinoT = Tetrimino_T(3, 10, &m_matrix);
-	Tetrimino_L m_tempMinoL = Tetrimino_L(5, 17, &m_matrix);
-	Tetrimino_J m_tempMinoJ = Tetrimino_J(6, 3, &m_matrix);
-	Tetrimino_O m_tempMinoO = Tetrimino_O(1, 1, &m_matrix);
-	Tetrimino_I m_tempMinoI = Tetrimino_I(5, 2, &m_matrix);
-	Tetrimino_Z m_tempMinoZ = Tetrimino_Z(1, 4, &m_matrix);
-	Tetrimino_S m_tempMinoS = Tetrimino_S(1, 4, &m_matrix);
+	Tetrimino_T m_tempMinoT = Tetrimino_T(&m_matrix);
+	Tetrimino_L m_tempMinoL = Tetrimino_L(&m_matrix);
+	Tetrimino_J m_tempMinoJ = Tetrimino_J(&m_matrix);
+	Tetrimino_O m_tempMinoO = Tetrimino_O(&m_matrix);
+	Tetrimino_I m_tempMinoI = Tetrimino_I(&m_matrix);
+	Tetrimino_Z m_tempMinoZ = Tetrimino_Z(&m_matrix);
+	Tetrimino_S m_tempMinoS = Tetrimino_S(&m_matrix);
+	
+	Tetrimino* m_current = nullptr;
 
 	// Engine Tools
 	Window m_window;
@@ -65,9 +67,22 @@ private:
 
 	bool initGame();
 	bool initEngine();
+
 	void gameLoop();
+	float runGameSimulations(float previousTicks);
 	void processInput();
-	void updateGame();
+	
+	/*
+	This function is called in every simulation of a frame.
+	Input should be processed at most once per frame.
+	The second parameter takes a bool which specifies if input is already processed in this frame.
+	If it is false, the function processes input and sets this to true. 
+	So that the next simulation doesn't process input again.
+	*/
+	void updateGame(float deltaTime, bool& inputProcessed);
+	
 	void draw();
+	
+	void printFps();
 	void freeTetris();
 };
