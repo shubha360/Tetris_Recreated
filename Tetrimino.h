@@ -36,17 +36,14 @@ protected:
 	Matrix* m_matrix = nullptr;
 
 	glm::ivec2 rotateMinoRight(const glm::ivec2& minoPostion) const;
-	glm::ivec2 rotateMinoLeft(const glm::ivec2& minoPostion) const;
+	glm::ivec2 rotateMinoLeft(const glm::ivec2& minoPostion) const;	
 
-	void performTransformation(glm::ivec2 newMinoPos[4]);
-
-	bool canMinoMoveLeft(const glm::ivec2& minoPos);
-	bool canMinoMoveRight(const glm::ivec2& minoPos);
-	bool canMinoMoveDown(const glm::ivec2& minoPos);
+	bool canPerformTransformation(const glm::ivec2 newMinoPos[4]) const;
 
 	bool isCellPartOfThis(const glm::ivec2& cellPos) const;
-	bool isMinoInsideMatrix(const glm::ivec2& minoPos);
+	bool isMinoInsideMatrix(const glm::ivec2& minoPos) const;
 
+	void performTransformation(const glm::ivec2 newMinoPos[4]);
 	void changeOrientation();
 };
 
