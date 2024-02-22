@@ -16,7 +16,7 @@ public:
 	Tetrimino();
 	virtual ~Tetrimino();
 
-	void spawn();
+	bool spawn();
 
 	virtual bool rotateRight() = 0;
 	virtual bool rotateLeft() = 0;

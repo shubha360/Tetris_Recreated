@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <random>
 
 // Engine includes
 #include "Window.h"
@@ -26,6 +27,8 @@
 
 enum class GameState {
 	PLAYING,
+	PAUSED,
+	ENDED,
 	QUIT
 };
 
@@ -43,6 +46,7 @@ private:
 	GameState m_gameState = GameState::PLAYING;
 
 	Matrix m_matrix;
+
 	Tetrimino_T m_tempMinoT = Tetrimino_T(&m_matrix);
 	Tetrimino_L m_tempMinoL = Tetrimino_L(&m_matrix);
 	Tetrimino_J m_tempMinoJ = Tetrimino_J(&m_matrix);
@@ -51,7 +55,21 @@ private:
 	Tetrimino_Z m_tempMinoZ = Tetrimino_Z(&m_matrix);
 	Tetrimino_S m_tempMinoS = Tetrimino_S(&m_matrix);
 	
+	Tetrimino* m_tetriminoes[7] = {
+		&m_tempMinoT,
+		&m_tempMinoL,
+		&m_tempMinoJ,
+		&m_tempMinoO,
+		&m_tempMinoI,
+		&m_tempMinoZ,
+		&m_tempMinoS
+	};
+
 	Tetrimino* m_current = nullptr;
+
+	std::random_device m_seed;
+	std::mt19937 m_randomEngine;
+	std::uniform_int_distribution<int> m_getTetriminoIndex;
 
 	// Engine Tools
 	Window m_window;

@@ -4,12 +4,20 @@ Tetrimino::Tetrimino() {}
 
 Tetrimino::~Tetrimino() {}
 
-void Tetrimino::spawn() {
+bool Tetrimino::spawn() {
 	auto& matrix = m_matrix->getMatrix();
 
+	bool continueGame = true;
+
 	for (int i = 0; i < 4; i++) {
+		if (matrix[m_minoPositions[i].y][m_minoPositions[i].x] != m_matrix->getEmptyCellSign()) {
+			continueGame = false;
+		}
+
 		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
 	}
+
+	return continueGame;
 }
 
 bool Tetrimino::moveLeft() {

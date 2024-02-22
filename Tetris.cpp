@@ -11,9 +11,10 @@ bool Tetris::init() {
 }
 
 bool Tetris::initGame() {
+	m_randomEngine = std::mt19937(m_seed());
+	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
+
 	m_matrix.init(m_window.getWindowWidth(), m_window.getWindowHeight());
-	
-	m_current = &m_tempMinoI;
 	return true;
 }
 
@@ -45,7 +46,7 @@ void Tetris::gameLoop() {
 
 	float previousTicks = (float)SDL_GetTicks();
 
-	while (m_gameState == GameState::PLAYING) {
+	while (m_gameState != GameState::QUIT) {
 
 		m_fps.beginFrame();
 
@@ -55,7 +56,9 @@ void Tetris::gameLoop() {
 
 		m_gui.updateGUI(m_inputProcessor, m_camera);
 		
-		previousTicks = runGameSimulations(previousTicks);		
+		if (m_gameState == GameState::PLAYING) {
+			previousTicks = runGameSimulations(previousTicks);
+		}
 
 		draw();
 
@@ -85,10 +88,15 @@ float Tetris::runGameSimulations(float previousTicks) {
 	while (totalDeltaTime > 0.0f && i < MAX_PHYSICS_SIMS) {
 		float deltaTime = std::min(totalDeltaTime, MAX_DELTA_TIME);
 
-		updateGame(deltaTime, inputProcessed);
-
-		totalDeltaTime -= deltaTime;
-		i++;
+		if (m_gameState == GameState::PLAYING) {
+			updateGame(deltaTime, inputProcessed);
+			totalDeltaTime -= deltaTime;
+			i++;
+		}
+		else if (m_gameState == GameState::ENDED) {
+			totalDeltaTime = 0.0f;
+			i = MAX_PHYSICS_SIMS;
+		}
 	}
 
 	return newTicks;
@@ -124,6 +132,15 @@ void Tetris::processInput() {
 			break;
 		}
 	}
+
+	if (m_inputProcessor.isKeyPressed(SDLK_ESCAPE)) {
+		if (m_gameState == GameState::PLAYING) {
+			m_gameState = GameState::PAUSED;
+		}
+		else if (m_gameState == GameState::PAUSED) {
+			m_gameState = GameState::PLAYING;
+		}
+	}
 }
 
 void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
@@ -135,97 +152,106 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 
 	static bool respawn = true;
 
-	if (respawn) {
-		m_matrix.checkLineClears();
+	if (m_gameState == GameState::PLAYING) {
+		if (respawn) {
 
-		m_current->reset();
-		m_current->spawn();
-		
-		m_drawUpdateNeeded = true;
-		currentMoveDelay = moveDelayDuration;
-		timeSinceAutoDown = 0.0f;
-		
-		respawn = false;
-	}
-	else {
+			m_matrix.checkLineClears();
 
-		timeSinceAutoDown += deltaTime;
+			m_current = m_tetriminoes[m_getTetriminoIndex(m_randomEngine)];
 
-		if (timeSinceAutoDown >= autoDownStepDuration) {
-			if (!m_current->moveDown()) {
-				respawn = true;
+			m_current->reset();
+
+			if (!m_current->spawn()) {
+				// game ended
+				m_gameState = GameState::ENDED;
 			}
-			
-			timeSinceAutoDown = 0.0f;
+
 			m_drawUpdateNeeded = true;
+			currentMoveDelay = moveDelayDuration;
+			timeSinceAutoDown = 0.0f;
+
+			respawn = false;
 		}
+		else {
 
-		if (!inputProcessed) {
-			// move left or right
-			if (m_inputProcessor.isKeyDown(SDLK_a)) {
+			timeSinceAutoDown += deltaTime;
 
-				currentMoveDelay += deltaTime;
-
-				if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
-					m_drawUpdateNeeded = true;
-					inputProcessed = true;
-					currentMoveDelay = 0.0f;
+			if (timeSinceAutoDown >= autoDownStepDuration) {
+				if (!m_current->moveDown()) {
+					respawn = true;
 				}
+
+				timeSinceAutoDown = 0.0f;
+				m_drawUpdateNeeded = true;
 			}
-			else if (m_inputProcessor.isKeyDown(SDLK_d)) {
 
-				currentMoveDelay += deltaTime;
+			if (!inputProcessed) {
+				// move left or right
+				if (m_inputProcessor.isKeyDown(SDLK_a)) {
 
-				if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
-					m_drawUpdateNeeded = true;
-					inputProcessed = true;
-					currentMoveDelay = 0.0f;
-				}
-			}
-			else if (m_inputProcessor.isKeyDown(SDLK_s)) {
+					currentMoveDelay += deltaTime;
 
-				currentMoveDelay += deltaTime;
-
-				if (currentMoveDelay >= moveDelayDuration) {
-					if (m_current->moveDown()) {
+					if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
 						m_drawUpdateNeeded = true;
 						inputProcessed = true;
 						currentMoveDelay = 0.0f;
-						timeSinceAutoDown = 0.0f;
-					}
-					else {
-						respawn = true;
 					}
 				}
-			}
+				else if (m_inputProcessor.isKeyDown(SDLK_d)) {
 
-			else if (m_inputProcessor.isKeyReleased(SDLK_a) ||
-				m_inputProcessor.isKeyReleased(SDLK_d) ||
-				m_inputProcessor.isKeyReleased(SDLK_s)) {
+					currentMoveDelay += deltaTime;
 
-				currentMoveDelay = moveDelayDuration;
-			}
-
-			// rotate left or right
-			else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
-				if (m_current->rotateLeft()) {
-					m_drawUpdateNeeded = true;
-					inputProcessed = true;
-				}
-			}
-			else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
-				if (m_current->rotateRight()) {
-					m_drawUpdateNeeded = true;
-					inputProcessed = true;
-				}
-			}
-			else if (m_inputProcessor.isKeyPressed(SDLK_SPACE)) {
-				while (true) {
-					if (!m_current->moveDown()) {
-						break;
+					if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
+						m_drawUpdateNeeded = true;
+						inputProcessed = true;
+						currentMoveDelay = 0.0f;
 					}
 				}
-				respawn = true;
+				else if (m_inputProcessor.isKeyDown(SDLK_s)) {
+
+					currentMoveDelay += deltaTime;
+
+					if (currentMoveDelay >= moveDelayDuration) {
+						if (m_current->moveDown()) {
+							m_drawUpdateNeeded = true;
+							inputProcessed = true;
+							currentMoveDelay = 0.0f;
+							timeSinceAutoDown = 0.0f;
+						}
+						else {
+							respawn = true;
+						}
+					}
+				}
+
+				else if (m_inputProcessor.isKeyReleased(SDLK_a) ||
+					m_inputProcessor.isKeyReleased(SDLK_d) ||
+					m_inputProcessor.isKeyReleased(SDLK_s)) {
+
+					currentMoveDelay = moveDelayDuration;
+				}
+
+				// rotate left or right
+				else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
+					if (m_current->rotateLeft()) {
+						m_drawUpdateNeeded = true;
+						inputProcessed = true;
+					}
+				}
+				else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
+					if (m_current->rotateRight()) {
+						m_drawUpdateNeeded = true;
+						inputProcessed = true;
+					}
+				}
+				else if (m_inputProcessor.isKeyPressed(SDLK_SPACE)) {
+					while (true) {
+						if (!m_current->moveDown()) {
+							break;
+						}
+					}
+					respawn = true;
+				}
 			}
 		}
 	}
