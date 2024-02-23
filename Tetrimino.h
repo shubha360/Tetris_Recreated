@@ -6,6 +6,8 @@
 
 #include "Matrix.h"
 
+class ExtraMatrix;
+
 enum class Orientation {
 	HORIZONTAL,
 	VERTICAL
@@ -13,6 +15,8 @@ enum class Orientation {
 
 class Tetrimino {
 public:
+	friend class ExtraMatrix;
+
 	Tetrimino();
 	virtual ~Tetrimino();
 
@@ -55,8 +59,8 @@ public:
 	Tetrimino_T(Matrix* matrix);
 	~Tetrimino_T();
 
-	bool rotateRight();
-	bool rotateLeft();
+	bool rotateRight() override;
+	bool rotateLeft() override;
 };
 
 class Tetrimino_L : public Tetrimino {
@@ -64,8 +68,8 @@ public:
 	Tetrimino_L(Matrix* matrix);
 	~Tetrimino_L();
 
-	bool rotateRight();
-	bool rotateLeft();
+	bool rotateRight() override;
+	bool rotateLeft() override;
 };
 
 class Tetrimino_J : public Tetrimino {
@@ -73,8 +77,8 @@ public:
 	Tetrimino_J(Matrix* matrix);
 	~Tetrimino_J();
 
-	bool rotateRight();
-	bool rotateLeft();
+	bool rotateRight() override;
+	bool rotateLeft() override;
 };
 
 class Tetrimino_O : public Tetrimino {
@@ -82,8 +86,8 @@ public:
 	Tetrimino_O(Matrix* matrix);
 	~Tetrimino_O();
 
-	bool rotateRight();
-	bool rotateLeft();
+	bool rotateRight() override;
+	bool rotateLeft() override;
 };
 
 class Tetrimino_I : public Tetrimino {
@@ -91,8 +95,8 @@ public:
 	Tetrimino_I(Matrix* matrix);
 	~Tetrimino_I();
 
-	bool rotateRight();
-	bool rotateLeft();
+	bool rotateRight() override;
+	bool rotateLeft() override;
 };
 
 class Tetrimino_Z : public Tetrimino {
@@ -100,8 +104,8 @@ public:
 	Tetrimino_Z(Matrix* matrix);
 	~Tetrimino_Z();
 
-	bool rotateRight();
-	bool rotateLeft();
+	bool rotateRight() override;
+	bool rotateLeft() override;
 };
 
 class Tetrimino_S : public Tetrimino {
@@ -109,6 +113,6 @@ public:
 	Tetrimino_S(Matrix* matrix);
 	~Tetrimino_S();
 
-	bool rotateRight();
-	bool rotateLeft();
+	bool rotateRight() override;
+	bool rotateLeft() override;
 };

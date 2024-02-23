@@ -14,7 +14,22 @@ bool Tetris::initGame() {
 	m_randomEngine = std::mt19937(m_seed());
 	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
 
-	m_matrix.init(m_window.getWindowWidth(), m_window.getWindowHeight());
+	ImageLoader::LoadTextureFromImage("resources/images/mino.png", m_minoTexture, 4);
+	ImageLoader::BufferTextureData(m_minoTexture);
+	ImageLoader::FreeTexture(m_minoTexture);
+
+	m_matrix.init(glm::ivec2(300, m_window.getWindowHeight() - 200), m_minoTexture.id);
+
+	std::vector<Tetrimino*> nexts;
+	nexts.resize(3);
+
+	for (int i = 0; i < 3; i++) {
+		nexts[i] = m_tetriminoes[m_getTetriminoIndex(m_randomEngine)];
+	}
+
+	m_nextMatrix.init(glm::ivec2(700, m_window.getWindowHeight() - 200), m_minoTexture.id);
+	m_nextMatrix.initTetriminoes(nexts);
+
 	return true;
 }
 
@@ -157,7 +172,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 
 			m_matrix.checkLineClears();
 
-			m_current = m_tetriminoes[m_getTetriminoIndex(m_randomEngine)];
+			m_current = m_nextMatrix.pushAndPop(m_tetriminoes[m_getTetriminoIndex(m_randomEngine)]);
 
 			m_current->reset();
 
@@ -276,6 +291,8 @@ void Tetris::draw() {
 			// DRAW HERE
 			m_matrix.drawMatrix(m_textureRenderer);
 
+			m_nextMatrix.drawMatrix(m_textureRenderer);
+
 			m_textureRenderer.end();
 
 			m_drawUpdateNeeded = false;
@@ -304,6 +321,8 @@ void Tetris::printFps() {
 }
 
 void Tetris::freeTetris() {
+	ImageLoader::DeleteTexture(m_minoTexture);
+
 	m_gui.freeGUI();
 	m_guiRenderer.freeGUIRenderer();
 

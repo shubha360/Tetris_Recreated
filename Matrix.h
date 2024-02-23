@@ -14,20 +14,21 @@
 class Matrix {
 public:
 	Matrix();
-	~Matrix();
+	virtual ~Matrix();
 
-	bool init(unsigned int screenWidth, unsigned int screenHeight);
+	bool init(const glm::ivec2& topLeftPos, GLuint minoTextureId, const int numRows = 20, 
+		const int numColumns = 10, const int minoLength = 32);
 	
 	void checkLineClears();
 
 	void drawMatrix(TextureRenderer& renderer) const;
 
 	std::vector<std::string>& getMatrix() { return m_matrix; }
-	const int getWidth() const { return NUM_COLUMNS; }
-	const int getHeight() const { return NUM_ROWS; }
+	const int getWidth() const { return m_numColumns; }
+	const int getHeight() const { return m_numRows; }
 	const char getEmptyCellSign() const { return EMPTY_CELL_SIGN; }
 
-private:
+protected:
 	const ColorRGBA MINO_COLOR_BLACK {0, 0, 0, 255};
 	const ColorRGBA MINO_COLOR_RED { 255, 0, 0, 255 };
 	const ColorRGBA MINO_COLOR_GREEN { 0, 255, 0, 255 };
@@ -37,16 +38,16 @@ private:
 	const ColorRGBA MINO_COLOR_MAGENTA { 255, 0, 255, 255 };
 	const ColorRGBA MINO_COLOR_ORANGE { 255, 165, 0, 255 };
 
-	const int NUM_ROWS = 20;
-	const int NUM_COLUMNS = 10;
-	const int MINO_LENGTH = 32;
+	int m_numRows = 20;
+	int m_numColumns = 10;
+	int m_minoLength = 32;
+	
 	const char EMPTY_CELL_SIGN = ' ';
-	const std::string EMPTY_LINE = std::string(NUM_COLUMNS, EMPTY_CELL_SIGN);
+	const std::string EMPTY_LINE = std::string(m_numColumns, EMPTY_CELL_SIGN);
 
 	glm::ivec2 m_matrixPosTopLeft = glm::ivec2(0);
-	glm::ivec2 m_screenDimension = glm::ivec2(0);
 
 	std::vector<std::string> m_matrix;
-	TextureData m_minoTexture;
+	GLuint m_minoTextureId = 0;
 };
 

@@ -1,25 +1,19 @@
 #include "Matrix.h"
 
-Matrix::Matrix() {
-}
+Matrix::Matrix() {}
 
-Matrix::~Matrix() {
-	ImageLoader::DeleteTexture(m_minoTexture);
-}
+Matrix::~Matrix() {}
 
-bool Matrix::init(unsigned int screenWidth, unsigned int screenHeight) {
+bool Matrix::init(const glm::ivec2& topLeftPos, GLuint minoTextureId, const int numRows /*= 20*/,
+	const int numColumns /*= 10*/, const int minoLength /*= 32*/) {
 
-	m_screenDimension.x = screenWidth;
-	m_screenDimension.y = screenHeight;
-
-	m_matrixPosTopLeft.x = 200;
-	m_matrixPosTopLeft.y = screenHeight - 200;
-
-	ImageLoader::LoadTextureFromImage("resources/images/mino.png", m_minoTexture, 4);
-	ImageLoader::BufferTextureData(m_minoTexture);
-	ImageLoader::FreeTexture(m_minoTexture);
+	m_matrixPosTopLeft = topLeftPos;
+	m_minoTextureId = minoTextureId;
+	m_numRows = numRows;
+	m_numColumns = numColumns;
+	m_minoLength = minoLength;
 	
-	m_matrix.resize(NUM_ROWS);
+	m_matrix.resize(m_numRows);
 
 	for (int i = 0; i < m_matrix.size(); i++) {
 		m_matrix[i] = EMPTY_LINE;
@@ -36,7 +30,7 @@ bool Matrix::init(unsigned int screenWidth, unsigned int screenHeight) {
 void Matrix::checkLineClears() {
 	int lineClears = 0;
 
-	for (int i = NUM_ROWS - 1; i >= 0; i--) {
+	for (int i = m_numRows - 1; i >= 0; i--) {
 
 		// line clear
 		if (m_matrix[i].find(' ') == std::string::npos) {
@@ -74,8 +68,8 @@ void Matrix::drawMatrix(TextureRenderer& renderer) const {
 	
 	ColorRGBA minoColor {};
 
-	for (int row = 0; row < NUM_ROWS; row++) {
-		for (int column = 0; column < NUM_COLUMNS; column++) {
+	for (int row = 0; row < m_numRows; row++) {
+		for (int column = 0; column < m_numColumns; column++) {
 			
 			// determine color
 			switch (m_matrix[row][column]) {
@@ -114,16 +108,16 @@ void Matrix::drawMatrix(TextureRenderer& renderer) const {
 			}
 
 			RectDimension minoDimension{ 
-				m_matrixPosTopLeft.x + column * MINO_LENGTH,
-				m_matrixPosTopLeft.y - row * MINO_LENGTH, 
-				MINO_LENGTH, MINO_LENGTH };
+				m_matrixPosTopLeft.x + column * m_minoLength,
+				m_matrixPosTopLeft.y - row * m_minoLength, 
+				m_minoLength, m_minoLength };
 
 
 			renderer.draw(
 				GlyphOrigin::TOP_LEFT,
 				minoDimension,
 				minoUV,
-				m_minoTexture.id,
+				m_minoTextureId,
 				minoColor
 			);
 		}

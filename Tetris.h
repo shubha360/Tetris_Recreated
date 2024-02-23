@@ -24,6 +24,7 @@
 // Tetris includes
 #include "Matrix.h"
 #include "Tetrimino.h"
+#include "ExtraMatrix.h"
 
 enum class GameState {
 	PLAYING,
@@ -44,8 +45,10 @@ private:
 	const ColorRGBA CLEAR_COLOR { 0,50,120,255 };
 	const float MAX_FPS = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
+	TextureData m_minoTexture = {};
 
 	Matrix m_matrix;
+	ExtraMatrix m_nextMatrix;
 
 	Tetrimino_T m_tempMinoT = Tetrimino_T(&m_matrix);
 	Tetrimino_L m_tempMinoL = Tetrimino_L(&m_matrix);
