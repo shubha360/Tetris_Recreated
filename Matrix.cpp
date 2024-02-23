@@ -27,7 +27,7 @@ bool Matrix::init(const glm::ivec2& topLeftPos, GLuint minoTextureId, const int 
 	return true;
 }
 
-void Matrix::checkLineClears() {
+int Matrix::checkLineClears() {
 	int lineClears = 0;
 
 	for (int i = m_numRows - 1; i >= 0; i--) {
@@ -60,6 +60,8 @@ void Matrix::checkLineClears() {
 			}
 		}
 	}
+
+	return lineClears;
 }
 
 void Matrix::drawMatrix(TextureRenderer& renderer) const {
@@ -104,6 +106,10 @@ void Matrix::drawMatrix(TextureRenderer& renderer) const {
 
 			case 'S':
 				minoColor = MINO_COLOR_GREEN;
+				break;
+
+			case 'G':
+				minoColor = MINO_COLOR_GHOST;
 				break;
 			}
 

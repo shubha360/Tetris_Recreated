@@ -34,6 +34,7 @@ public:
 protected:
 	glm::ivec2 m_spawnMinoPositions[4] = {};
 	glm::ivec2 m_minoPositions[4] = {};
+	glm::ivec2 m_ghostMinoPositions[4] = {};
 	int m_originMinoIndex = 0;
 
 	char m_minoSign = ' ';
@@ -52,6 +53,8 @@ protected:
 
 	void performTransformation(const glm::ivec2 newMinoPos[4]);
 	void changeOrientation();
+
+	void updateGhost();
 };
 
 class Tetrimino_T : public Tetrimino {

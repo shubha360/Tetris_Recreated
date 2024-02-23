@@ -160,17 +160,33 @@ void Tetris::processInput() {
 
 void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	static float timeSinceAutoDown = 0.0f;
-	static float autoDownStepDuration = 60.0f;
+	static float autoDownDuration = 50.0f;
+	static float lowestAutoDownDuration = 10.0f;
+
+	static float eachLevelSpeedIncrease = 5.0f;
+	static int currentLevel = 1;
+	static int lineClearsForLevelUp = 10;
 
 	static float moveDelayDuration = 5.0f;
 	static float currentMoveDelay = moveDelayDuration;
 
 	static bool respawn = true;
 
+	static int linesCleared = 0;
+
 	if (m_gameState == GameState::PLAYING) {
 		if (respawn) {
 
-			m_matrix.checkLineClears();
+			linesCleared += m_matrix.checkLineClears();
+
+			if (autoDownDuration > lowestAutoDownDuration) {
+				int newLevel = linesCleared / lineClearsForLevelUp + 1;
+
+				if (newLevel > currentLevel) {
+					currentLevel = newLevel;
+					autoDownDuration -= (currentLevel - 1) * eachLevelSpeedIncrease;
+				}
+			}
 
 			m_current = m_nextMatrix.pushAndPop(m_tetriminoes[m_getTetriminoIndex(m_randomEngine)]);
 
@@ -191,7 +207,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 
 			timeSinceAutoDown += deltaTime;
 
-			if (timeSinceAutoDown >= autoDownStepDuration) {
+			if (timeSinceAutoDown >= autoDownDuration) {
 				if (!m_current->moveDown()) {
 					respawn = true;
 				}

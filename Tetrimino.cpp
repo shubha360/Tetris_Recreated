@@ -10,7 +10,10 @@ bool Tetrimino::spawn() {
 	bool continueGame = true;
 
 	for (int i = 0; i < 4; i++) {
-		if (matrix[m_minoPositions[i].y][m_minoPositions[i].x] != m_matrix->getEmptyCellSign()) {
+		if (
+			matrix[m_minoPositions[i].y][m_minoPositions[i].x] != m_matrix->getEmptyCellSign() &&
+			matrix[m_minoPositions[i].y][m_minoPositions[i].x] != m_matrix->getGhostCellSign()
+			) {
 			continueGame = false;
 		}
 
@@ -75,6 +78,7 @@ bool Tetrimino::moveDown() {
 void Tetrimino::reset() {
 	for (int i = 0; i < 4; i++) {
 		m_minoPositions[i] = m_spawnMinoPositions[i];
+		m_ghostMinoPositions[i] = m_spawnMinoPositions[i];
 	}
 }
 
@@ -204,6 +208,8 @@ void Tetrimino::performTransformation(const glm::ivec2 newMinoPos[4]) {
 		m_minoPositions[i] = newMinoPos[i];
 	}
 
+	updateGhost();
+
 	// fill up the new cells in the matrix
 	for (int i = 0; i < 4; i++) {
 		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
@@ -216,7 +222,8 @@ bool Tetrimino::canPerformTransformation(const glm::ivec2 newMinoPos[4]) const {
 
 	for (int i = 0; i < 4; i++) {
 		if ( !isMinoInsideMatrix(newMinoPos[i]) ||
-			!( matrix[newMinoPos[i].y][newMinoPos[i].x] == m_matrix->getEmptyCellSign() || 
+			!( matrix[newMinoPos[i].y][newMinoPos[i].x] == m_matrix->getEmptyCellSign() ||
+				matrix[newMinoPos[i].y][newMinoPos[i].x] == m_matrix->getGhostCellSign() ||
 				isCellPartOfThis(newMinoPos[i]) ) )
 		{
 			return false;
@@ -246,6 +253,36 @@ void Tetrimino::changeOrientation() {
 	}
 	else {
 		m_orientation = Orientation::HORIZONTAL;
+	}
+}
+
+void Tetrimino::updateGhost() {
+	
+	auto& matrix = m_matrix->getMatrix();
+
+	for (int i = 0; i < 4; i++) {
+		
+		// empty the previous cells first
+		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getEmptyCellSign();
+		
+		m_ghostMinoPositions[i] = m_minoPositions[i];
+	}
+
+	while (true) {
+		for (int i = 0; i < 4; i++) {
+			m_ghostMinoPositions[i].y = m_ghostMinoPositions[i].y + 1;
+		}
+
+		if (!canPerformTransformation(m_ghostMinoPositions)) {
+			for (int i = 0; i < 4; i++) {
+				m_ghostMinoPositions[i].y = m_ghostMinoPositions[i].y - 1;
+			}
+			break;
+		}
+	}	
+
+	for (int i = 0; i < 4; i++) {
+		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getGhostCellSign();
 	}
 }
 
