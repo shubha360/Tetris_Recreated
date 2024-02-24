@@ -24,8 +24,9 @@ public:
 	void drawMatrix(TextureRenderer& renderer) const;
 
 	std::vector<std::string>& getMatrix() { return m_matrix; }
-	const int getWidth() const { return m_numColumns; }
-	const int getHeight() const { return m_numRows; }
+	const int getColumns() const { return m_numColumns; }
+	const int getRows() const { return m_numRows; }
+	const int getMinoLength() const { return m_minoLength; }
 	const char getEmptyCellSign() const { return EMPTY_CELL_SIGN; }
 	const char getGhostCellSign() const { return GHOST_CELL_SIGN; }
 
@@ -38,7 +39,7 @@ protected:
 	const ColorRGBA MINO_COLOR_CYAN { 0, 255, 255, 255 };
 	const ColorRGBA MINO_COLOR_MAGENTA { 255, 0, 255, 255 };
 	const ColorRGBA MINO_COLOR_ORANGE { 255, 165, 0, 255 };
-	const ColorRGBA MINO_COLOR_GHOST { 255, 255, 255, 50 };
+	const ColorRGBA MINO_COLOR_GHOST { 0, 0, 0, 100 };
 
 	int m_numRows = 20;
 	int m_numColumns = 10;

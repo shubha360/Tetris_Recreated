@@ -243,8 +243,8 @@ bool Tetrimino::isCellPartOfThis(const glm::ivec2& cellPos) const {
 
 bool Tetrimino::isMinoInsideMatrix(const glm::ivec2& minoPos) const {
 
-	return (minoPos.x >= 0 && minoPos.x < m_matrix->getWidth()) && 
-		(minoPos.y >= 0 && minoPos.y < m_matrix->getHeight());
+	return (minoPos.x >= 0 && minoPos.x < m_matrix->getColumns()) && 
+		(minoPos.y >= 0 && minoPos.y < m_matrix->getRows());
 }
 
 void Tetrimino::changeOrientation() {
@@ -289,7 +289,7 @@ void Tetrimino::updateGhost() {
 Tetrimino_T::Tetrimino_T(Matrix* matrix) {
 	m_minoSign = 'T';
 	m_matrix = matrix;
-	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
+	m_spawnPositionX = m_matrix->getColumns() % 2 == 0 ? m_matrix->getColumns() / 2 - 1 : m_matrix->getColumns() / 2;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
 
@@ -348,7 +348,7 @@ bool Tetrimino_T::rotateLeft() {
 Tetrimino_L::Tetrimino_L(Matrix* matrix) {
 	m_minoSign = 'L';
 	m_matrix = matrix;
-	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
+	m_spawnPositionX = m_matrix->getColumns() % 2 == 0 ? m_matrix->getColumns() / 2 - 1 : m_matrix->getColumns() / 2;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
 
@@ -407,7 +407,7 @@ bool Tetrimino_L::rotateLeft() {
 Tetrimino_J::Tetrimino_J(Matrix* matrix) {
 	m_minoSign = 'J';
 	m_matrix = matrix;
-	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
+	m_spawnPositionX = m_matrix->getColumns() % 2 == 0 ? m_matrix->getColumns() / 2 - 1 : m_matrix->getColumns() / 2;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
 
@@ -466,7 +466,7 @@ bool Tetrimino_J::rotateLeft() {
 Tetrimino_O::Tetrimino_O(Matrix* matrix) {
 	m_minoSign = 'O';
 	m_matrix = matrix;
-	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 : m_matrix->getWidth() / 2 - 1;
+	m_spawnPositionX = m_matrix->getColumns() % 2 == 0 ? m_matrix->getColumns() / 2 : m_matrix->getColumns() / 2 - 1;
 	m_spawnPositionY = 1;
 	m_orientation = Orientation::HORIZONTAL;
 
@@ -493,7 +493,7 @@ bool Tetrimino_O::rotateLeft() {
 Tetrimino_I::Tetrimino_I(Matrix* matrix) {
 	m_minoSign = 'I';
 	m_matrix = matrix;
-	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 : m_matrix->getWidth() / 2 - 1;
+	m_spawnPositionX = m_matrix->getColumns() % 2 == 0 ? m_matrix->getColumns() / 2 : m_matrix->getColumns() / 2 - 1;
 	m_spawnPositionY = 0;
 	m_orientation = Orientation::HORIZONTAL;
 
@@ -577,7 +577,7 @@ bool Tetrimino_I::rotateLeft() {
 Tetrimino_Z::Tetrimino_Z(Matrix* matrix) {
 	m_minoSign = 'Z';
 	m_matrix = matrix;
-	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
+	m_spawnPositionX = m_matrix->getColumns() % 2 == 0 ? m_matrix->getColumns() / 2 - 1 : m_matrix->getColumns() / 2;
 	m_spawnPositionY = 0;
 	m_orientation = Orientation::HORIZONTAL;
 
@@ -636,7 +636,7 @@ bool Tetrimino_Z::rotateLeft() {
 Tetrimino_S::Tetrimino_S(Matrix* matrix) {
 	m_minoSign = 'S';
 	m_matrix = matrix;
-	m_spawnPositionX = m_matrix->getWidth() % 2 == 0 ? m_matrix->getWidth() / 2 - 1 : m_matrix->getWidth() / 2;
+	m_spawnPositionX = m_matrix->getColumns() % 2 == 0 ? m_matrix->getColumns() / 2 - 1 : m_matrix->getColumns() / 2;
 	m_spawnPositionY = 0;
 	m_orientation = Orientation::HORIZONTAL;
 

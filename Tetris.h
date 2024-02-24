@@ -28,6 +28,7 @@
 
 enum class GameState {
 	PLAYING,
+	MAIN_MENU,
 	PAUSED,
 	ENDED,
 	QUIT
@@ -46,6 +47,11 @@ private:
 	const float MAX_FPS = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
 	TextureData m_minoTexture = {};
+
+	long long m_score = 0;
+	int m_linesCleared = 0;
+	int m_currentLevel = 1;
+	float m_autoDownDuration = 60.0f;
 
 	Matrix m_matrix;
 	ExtraMatrix m_nextMatrix;
@@ -83,11 +89,12 @@ private:
 	TextureRenderer m_textureRenderer;
 	GUI m_gui;
 	GUIRenderer m_guiRenderer;
+	Font m_font;
 
 	bool m_drawUpdateNeeded = true;
 
-	bool initGame();
 	bool initEngine();
+	bool initGame();
 
 	void gameLoop();
 	float runGameSimulations(float previousTicks);
