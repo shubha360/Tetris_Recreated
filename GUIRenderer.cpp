@@ -19,7 +19,7 @@ bool GUIRenderer::init() {
 	ImageLoader::BufferTextureData(m_roundedRectButtonTexture);
 	ImageLoader::FreeTexture(m_roundedRectButtonTexture);
 
-	if (!m_font.initFromFontFile("gui_resource/fonts/Quicksand-Regular.otf", 64)) {
+	if (!m_font.initFromFontFile("Quicksand", "gui_resource/fonts/Quicksand-Regular.otf", 64)) {
 		REPORT_ERROR("Failed to initialize font for GUI.", init);
 		return false;
 	}

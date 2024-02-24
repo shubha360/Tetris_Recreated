@@ -6,13 +6,14 @@ Font::~Font() {
 	deleteFont();
 }
 
-bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontScale /*= 1.0f*/,
-	const int letterSpacing /*= 5*/, const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
+bool Font::initFromBitmap16x16(const std::string& fontName, const std::string& bmpFilePath, 
+	const float fontScale /*= 1.0f*/, const int letterSpacing /*= 5*/, 
+	const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
 
 	ImageLoader::LoadTextureFromImage(bmpFilePath, m_fontTexture, 1);
 
 	if (m_fontTexture.data == nullptr) {
-		REPORT_ERROR("Failed to load image at " + bmpFilePath + " for bitmap font.", initFontBitmap16x16);
+		REPORT_ERROR("Failed to load image at " + bmpFilePath + " for bitmap font.", initFromBitmap16x16);
 		return false;
 	}
 
@@ -154,6 +155,8 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 		m_uvDimensions[i].height = (float)m_lineHeight / (float)m_fontTexture.height;
 	}
 
+	m_fontName = fontName;
+
 	m_fontScale = fontScale;
 	m_letterSpacing = letterSpacing;
 	m_lineSpacing = lineSpacing;
@@ -162,7 +165,8 @@ bool Font::initFontBitmap16x16(const std::string& bmpFilePath, const float fontS
 	return true;
 }
 
-bool Font::initFromFontFile(const std::string& fontFilePath, const unsigned int fontSize /*= 32*/,
+bool Font::initFromFontFile(const std::string& fontName, const std::string& fontFilePath, 
+	const unsigned int fontSize /*= 32*/,
 	const float fontScale /*= 1.0f*/, const int letterSpacing /*= 5*/, 
 	const int lineSpacing /*= 5*/, const int addToSpaceLength /*= 0*/) {
 
@@ -323,6 +327,8 @@ bool Font::initFromFontFile(const std::string& fontFilePath, const unsigned int 
 	for (int i = 0; i < 256; i++) {
 		m_uvDimensions[i].height = (float)m_lineHeight / (float)m_fontTexture.height;
 	}
+
+	m_fontName = fontName;
 
 	m_letterSpacing = letterSpacing;
 	m_lineSpacing = lineSpacing;

@@ -18,7 +18,7 @@ bool Tetris::initEngine() {
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
 		m_gui.init() &&
 		m_guiRenderer.init() &&
-		m_font.initFromFontFile("resources/fonts/Quicksand.otf");
+		m_font.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf");
 }
 
 bool Tetris::initGame() {

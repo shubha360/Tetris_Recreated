@@ -19,10 +19,11 @@ public:
 	~Font();
 
 	// only font bitmap that has 16 rows and 16 colummn
-	bool initFontBitmap16x16(const std::string& bmpFilePath, const float fontScale = 1.0f, 
-		const int letterSpacing = 0, const int lineSpacing = 0, const int addToSpaceLength = 0);
+	bool initFromBitmap16x16(const std::string& fontName, const std::string& bmpFilePath, 
+		const float fontScale = 1.0f, const int letterSpacing = 0, 
+		const int lineSpacing = 0, const int addToSpaceLength = 0);
 
-	bool initFromFontFile(const std::string& fontFilePath, const unsigned int fontSize = 32, 
+	bool initFromFontFile(const std::string& fontName, const std::string& fontFilePath, const unsigned int fontSize = 32,
 		const float fontScale = 1.0f, const int letterSpacing = 0, 
 		const int lineSpacing = 0, const int addToSpaceLength = 0);
 
@@ -41,6 +42,8 @@ public:
 	void deleteFont();
 
 private:
+	std::string m_fontName;
+
 	unsigned int m_spaceSize = 0;
 	unsigned int m_newLine = 0;
 	unsigned int m_lineHeight = 0;
