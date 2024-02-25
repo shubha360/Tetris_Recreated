@@ -89,9 +89,11 @@ private:
 	TextureRenderer m_textureRenderer;
 	GUI m_gui;
 	GUIRenderer m_guiRenderer;
-	Font m_font;
+	Font m_quicksandFont;
 
-	/*unsigned int m_guiFontId = -1;*/
+	int m_guiQuicksandFontId = 0;
+	int m_guiExitButtonId = -1;
+	int m_guiTextId = -1;
 
 	bool m_drawUpdateNeeded = true;
 

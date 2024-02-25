@@ -35,14 +35,12 @@ void GUIRenderer::renderGUI(GUI& gui, Camera& camera) {
 	m_renderer.begin();
 
 	for (auto& comp : gui.m_components) {
-		
+
 		if (comp->m_isVisible) {
 			
-			switch (comp->m_type) {
-			
-			case GUI::Component::ComponentType::BUTTON:
-				
-				GUI::Button* button = (GUI::Button*) comp.get();
+			if (comp->m_type == GUI::Component::ComponentType::BUTTON) {
+
+				GUI::Button* button = (GUI::Button*)comp.get();
 				Font* font = gui.m_fonts[button->m_fontId];
 
 				m_renderer.draw(
@@ -51,12 +49,12 @@ void GUIRenderer::renderGUI(GUI& gui, Camera& camera) {
 					UVDimension{ 0.0f, 0.0f, 1.0f, 1.0f },
 					m_roundedRectButtonTexture.id,
 					button->m_buttonColor
-					);
-				
+				);
+
 				font->setFontScale(button->m_labelScale);
 
 				if (!button->m_labelCoordinatesFound) {
-					getLabelCoordinates(button->m_labelTopLeftX, button->m_labelTopLeftY, 
+					getLabelCoordinates(button->m_labelTopLeftX, button->m_labelTopLeftY,
 						button->m_label, button->m_centerX, button->m_centerY, *font);
 
 					button->m_labelCoordinatesFound = true;
@@ -64,8 +62,17 @@ void GUIRenderer::renderGUI(GUI& gui, Camera& camera) {
 
 				font->drawTextToRenderer(button->m_label, button->m_labelTopLeftX,
 					button->m_labelTopLeftY, button->m_primaryColor, m_renderer);
+			}
 
-				break;
+			else if (comp->m_type == GUI::Component::ComponentType::PLAIN_TEXT) {
+
+				GUI::PlainText* plainText = (GUI::PlainText*)comp.get();
+				Font* font = gui.m_fonts[plainText->m_fontId];
+
+				font->setFontScale(plainText->m_labelScale);
+
+				font->drawTextToRenderer(plainText->m_label, plainText->m_dimension.x,
+					plainText->m_dimension.y, plainText->m_primaryColor, m_renderer);
 			}
 		}
 	}

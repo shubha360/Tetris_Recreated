@@ -29,13 +29,20 @@ public:
 
 	bool init(Font& font);
 
-	// will return the font id in this GUI
-	unsigned int addFont(Font& font);
+	// returns the font id in this GUI
+	int addFont(Font& font);
 
+	// returns the id of the component
 	// pass 0 to fontId to use the default font
-	bool addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
+	unsigned int addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
 		const ColorRGBA& textColor, const ColorRGBA& buttonColor,
 		const GlyphOrigin& renderOrigin, const RectDimension& dimension, std::function<void()> buttonFunction);
+
+	// pass 0 to fontId to use the default font
+	unsigned int addPlainText(const std::string& text, const unsigned int fontId, float scale,
+		const ColorRGBA& color, const glm::ivec2& topLeftPosition);
+
+	void setComponentLabel(const int id, const std::string& text);
 
 	void updateGUI(InputProcessor& inputProcessor, Camera& camera);
 
@@ -47,7 +54,7 @@ private:
 		friend class GUI;
 		friend class GUIRenderer;
 
-		enum class ComponentType { NONE, BUTTON };
+		enum class ComponentType { NONE, BUTTON, PLAIN_TEXT };
 
 		Component();
 		virtual ~Component();
@@ -87,6 +94,16 @@ private:
 		ColorRGBA m_buttonColor;
 		std::function<void()> m_buttonFunc;
 	};
+	
+	class PlainText : public Component {
+	public:
+		friend class GUI;
+		friend class GUIRenderer;
+
+		PlainText(const std::string& text, const unsigned int fontId, float scale,
+			const ColorRGBA& color, const RectDimension& position);
+	};
+
 
 	std::vector<std::unique_ptr<Component>> m_components;
 

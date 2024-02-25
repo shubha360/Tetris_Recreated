@@ -25,7 +25,7 @@ bool GUI::init(Font& font) {
 	return true;
 }
 
-unsigned int GUI::addFont(Font& font) {
+int GUI::addFont(Font& font) {
 	
 	if (!font.isInitialized()) {
 		REPORT_ERROR("Font adding to GUI is not initailized.", init);
@@ -36,20 +36,44 @@ unsigned int GUI::addFont(Font& font) {
 	return m_fonts.size() - 1;
 }
 
-bool GUI::addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
+unsigned int GUI::addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
 	const ColorRGBA& textColor, const ColorRGBA& buttonColor,
 	const GlyphOrigin& renderOrigin, const RectDimension& dimension, std::function<void()> buttonFunction) {
 
-	if (fontId >= m_fonts.size()) {
+	if (fontId < 0 || fontId >= m_fonts.size()) {
 		REPORT_ERROR("Invalid font ID used.", addTextButton);
-		return false;
+		return 0;
 	}
 
 	m_components.push_back(std::unique_ptr<Component>(
 		new Button(label, fontId, labelScale, textColor, buttonColor, renderOrigin, dimension, buttonFunction)
 	));
 	
-	return true;
+	return m_components.size() - 1;
+}
+
+unsigned int GUI::addPlainText(const std::string& text, const unsigned int fontId, float scale,
+	const ColorRGBA& color, const glm::ivec2& topLeftPosition) {
+
+	if (fontId < 0 || fontId >= m_fonts.size()) {
+		REPORT_ERROR("Invalid font ID used.", addTextButton);
+		return -1;
+	}
+
+	m_components.push_back(std::unique_ptr<Component>(
+		new PlainText(text, fontId, scale, color, RectDimension{ topLeftPosition.x, topLeftPosition.y, 0, 0 })
+	));
+
+	return m_components.size() - 1;
+}
+
+void GUI::setComponentLabel(const int id, const std::string& text) {
+
+	if (id < 0 || id >= m_components.size()) {
+		REPORT_ERROR("Invalid component ID used.", addTextButton);
+	}
+
+	m_components[id]->m_label = text;
 }
 
 void GUI::updateGUI(InputProcessor& inputProcessor, Camera& camera) {
@@ -110,10 +134,6 @@ void GUI::freeGUI() {
 		SDL_FreeCursor(m_indexPointerCursor);
 		m_indexPointerCursor = nullptr;
 	}
-
-	/*for (auto& font : m_fonts) {
-		font->deleteFont();
-	}*/
 }
 
 bool GUI::isMouseInsideComponent(const glm::ivec2& mouseScreenCoords, Component& component) {
@@ -189,4 +209,18 @@ GUI::Button::Button(const std::string& label, const unsigned int fontId, float l
 	m_isVisible = true;
 
 	findComponentCenter();
+}
+
+GUI::PlainText::PlainText(const std::string& text, const unsigned int fontId, float scale, 
+	const ColorRGBA& color, const RectDimension& position) {
+	
+	m_label = text;
+	m_type = ComponentType::PLAIN_TEXT;
+	m_fontId = fontId;
+	m_labelScale = scale;
+	m_primaryColor = color;
+	m_dimension = position;
+
+	m_isFunctional = false;
+	m_isVisible = true;
 }

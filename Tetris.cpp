@@ -16,8 +16,8 @@ bool Tetris::initEngine() {
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_FPS) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
-		m_font.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf") &&
-		m_gui.init(m_font) &&
+		m_quicksandFont.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf") &&
+		m_gui.init(m_quicksandFont) &&
 		m_guiRenderer.init();
 }
 
@@ -49,9 +49,9 @@ bool Tetris::initGame() {
 
 	m_nextMatrix.initTetriminoes(nexts);
 
-	m_gui.addTextButton(
+	m_guiExitButtonId = m_gui.addTextButton(
 		"Exit",
-		0,
+		m_guiQuicksandFontId,
 		1.0f,
 		ColorRGBA{ 255, 255, 255, 255 },
 		ColorRGBA{ 0, 0, 0, 255 },
@@ -59,6 +59,13 @@ bool Tetris::initGame() {
 		RectDimension{ (int)m_window.getWindowWidth() - 10, (int)m_window.getWindowHeight() - 10, 80, 40 },
 		[&]() { m_gameState = GameState::QUIT; }
 	);
+
+	m_guiTextId = m_gui.addPlainText(
+		"", 
+		m_guiQuicksandFontId,
+		1.0f, 
+		ColorRGBA{ 255, 255, 255, 255 },
+		glm::ivec2(0, (int)m_window.getWindowHeight()));
 
 	return true;
 }
@@ -343,25 +350,12 @@ void Tetris::draw() {
 
 	{
 		if (m_drawUpdateNeeded) {
-
-			std::string scoreText = "Score: " + std::to_string(m_score) + "\n" +
-				"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
-				"Level: " + std::to_string(m_currentLevel) + "\n" +
-				"Down duration: " + std::to_string(m_autoDownDuration);
-
-			
 			m_textureRenderer.begin();
 
 			// DRAW HERE
 			m_matrix.drawMatrix(m_textureRenderer);
 
 			m_nextMatrix.drawMatrix(m_textureRenderer);
-
-			m_font.drawTextToRenderer(
-				scoreText, 0, m_window.getWindowHeight(), ColorRGBA{ 255, 255, 255, 255 }, m_textureRenderer);
-
-			/*m_font2.drawTextToRenderer(
-				scoreText, 0, m_window.getWindowHeight() - 500, ColorRGBA{ 255, 255, 255, 255 }, m_textureRenderer);*/
 
 			m_textureRenderer.end();
 
@@ -372,6 +366,13 @@ void Tetris::draw() {
 	}
 
 	m_shaderProgram.unuseProgram();
+
+	std::string scoreText = "Score: " + std::to_string(m_score) + "\n" +
+		"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
+		"Level: " + std::to_string(m_currentLevel) + "\n" +
+		"Down duration: " + std::to_string(m_autoDownDuration);
+
+	m_gui.setComponentLabel(m_guiTextId, scoreText);
 
 	m_guiRenderer.renderGUI(m_gui, m_camera);
 
@@ -393,7 +394,7 @@ void Tetris::printFps() {
 void Tetris::freeTetris() {
 	ImageLoader::DeleteTexture(m_minoTexture);
 
-	m_font.deleteFont();
+	m_quicksandFont.deleteFont();
 
 	m_gui.freeGUI();
 	m_guiRenderer.freeGUIRenderer();
