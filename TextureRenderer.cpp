@@ -1,7 +1,11 @@
 #include "TextureRenderer.h"
 
-TextureRenderer::Glyph::Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect,
-	GLuint textureID, const ColorRGBA& color) {
+TextureRenderer::Glyph::Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, 
+	const UVDimension& uvRect, GLuint textureID, 
+	const ColorRGBA& color, int depth) :
+	
+	m_textureID(textureID), m_depth(depth)
+{
 	
 	this->m_textureID = textureID;
 
@@ -83,11 +87,11 @@ void TextureRenderer::begin() {
 }
 
 void TextureRenderer::draw(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect, 
-	GLuint textureID, const ColorRGBA& color) {
-	m_glyphs.emplace_back(renderOrigin, destRect, uvRect, textureID, color);
+	GLuint textureID, const ColorRGBA& color, int depth /*= 1*/) {
+	m_glyphs.emplace_back(renderOrigin, destRect, uvRect, textureID, color, depth);
 }
 
-void TextureRenderer::end() {
+void TextureRenderer::end(const GlyphSortType& sortType /*= GlyphSortType::BY_TEXTURE_ID_INCREMENTAL*/) {
 	if (!m_glyphs.empty()) {
 		m_glyphPointers.resize(m_glyphs.size());
 
@@ -95,7 +99,24 @@ void TextureRenderer::end() {
 			m_glyphPointers[i] = &m_glyphs[i];
 		}
 
-		std::stable_sort(m_glyphPointers.begin(), m_glyphPointers.end(), compareByTextureID);
+		switch (sortType) {
+		
+		case GlyphSortType::BY_TEXTURE_ID_INCREMENTAL:
+			std::stable_sort(m_glyphPointers.begin(), m_glyphPointers.end(), compareByTextureIdIncremental);
+			break;
+
+		case GlyphSortType::BY_TEXTURE_ID_DECREMENTAL:
+			std::stable_sort(m_glyphPointers.begin(), m_glyphPointers.end(), compareByTextureIdDecremental);
+			break;
+
+		case GlyphSortType::BY_DEPTH_INCREMENTAL:
+			std::stable_sort(m_glyphPointers.begin(), m_glyphPointers.end(), compareByDepthIncremental);
+			break;
+
+		case GlyphSortType::BY_DEPTH_DECREMENTAL:
+			std::stable_sort(m_glyphPointers.begin(), m_glyphPointers.end(), compareByDepthDecremental);
+			break;
+		}
 
 		setupRenderBatches();
 	}
@@ -255,6 +276,18 @@ void TextureRenderer::addIndicesToBuffer(std::vector<GLuint>& indices,
 	currentVertex += 4;
 }
 
-bool TextureRenderer::compareByTextureID(Glyph* a, Glyph* b) {
+bool TextureRenderer::compareByTextureIdIncremental(Glyph* a, Glyph* b) {
 	return (a->m_textureID < b->m_textureID);
+}
+
+bool TextureRenderer::compareByTextureIdDecremental(Glyph* a, Glyph* b) {
+	return (a->m_textureID > b->m_textureID);
+}
+
+bool TextureRenderer::compareByDepthIncremental(Glyph* a, Glyph* b) {
+	return (a->m_depth < b->m_depth);
+}
+
+bool TextureRenderer::compareByDepthDecremental(Glyph* a, Glyph* b) {
+	return (a->m_depth > b->m_depth);
 }

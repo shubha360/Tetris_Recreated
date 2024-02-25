@@ -19,10 +19,6 @@ bool GUIRenderer::init() {
 	ImageLoader::BufferTextureData(m_roundedRectButtonTexture);
 	ImageLoader::FreeTexture(m_roundedRectButtonTexture);
 
-	if (!m_font.initFromFontFile("Quicksand", "gui_resource/fonts/Quicksand-Regular.otf", 64)) {
-		REPORT_ERROR("Failed to initialize font for GUI.", init);
-		return false;
-	}
 	return true;
 }
 
@@ -47,6 +43,7 @@ void GUIRenderer::renderGUI(GUI& gui, Camera& camera) {
 			case GUI::Component::ComponentType::BUTTON:
 				
 				GUI::Button* button = (GUI::Button*) comp.get();
+				Font* font = gui.m_fonts[button->m_fontId];
 
 				m_renderer.draw(
 					button->m_renderOrigin,
@@ -56,41 +53,41 @@ void GUIRenderer::renderGUI(GUI& gui, Camera& camera) {
 					button->m_buttonColor
 					);
 				
-				m_font.setFontScale(button->m_labelScale);
+				font->setFontScale(button->m_labelScale);
 
 				if (!button->m_labelCoordinatesFound) {
 					getLabelCoordinates(button->m_labelTopLeftX, button->m_labelTopLeftY, 
-						button->m_label, button->m_centerX, button->m_centerY);
+						button->m_label, button->m_centerX, button->m_centerY, *font);
 
 					button->m_labelCoordinatesFound = true;
 				}
 
-				m_font.drawTextToRenderer(button->m_label, button->m_labelTopLeftX, button->m_labelTopLeftY, 
-					button->m_primaryColor, m_renderer);
+				font->drawTextToRenderer(button->m_label, button->m_labelTopLeftX,
+					button->m_labelTopLeftY, button->m_primaryColor, m_renderer);
 
 				break;
 			}
 		}
 	}
 
-	m_renderer.end();
+	m_renderer.end(GlyphSortType::BY_TEXTURE_ID_DECREMENTAL);
 
 	m_renderer.renderTextures();
 }
 
 void GUIRenderer::freeGUIRenderer() {
 	ImageLoader::DeleteTexture(m_roundedRectButtonTexture);
-	m_font.deleteFont();
+	//m_font.deleteFont();
 
 	m_renderer.freeTextureRenderer();
 	m_glslProgram.freeProgram();
 }
 
 void GUIRenderer::getLabelCoordinates(int& x, int& y, const std::string& label, 
-	const int componentCenterX, const int componentCenterY) {	
+	const int componentCenterX, const int componentCenterY, Font& font) {
 	
-	unsigned int labelWidth = m_font.getLineWidth(label);
-	unsigned int labelHeight = m_font.getLineHeight();
+	unsigned int labelWidth = font.getLineWidth(label);
+	unsigned int labelHeight = font.getLineHeight();
 
 	x = componentCenterX - labelWidth / 2;
 	y = componentCenterY + labelHeight / 2;

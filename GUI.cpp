@@ -8,22 +8,48 @@ GUI::~GUI() {
 	freeGUI();
 }
 
-bool GUI::init() {
+bool GUI::init(Font& font) {
+
+	if (!font.isInitialized()) {
+		REPORT_ERROR("The font being added to GUI is not initailized.", init);
+		return false;
+	}
+
+	addFont(font);
+
 	m_arrowCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 	m_indexPointerCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
 
-	m_currentCursor = m_arrowCursor;
+	m_currentCursor = m_arrowCursor;	
 
 	return true;
 }
 
-void GUI::addTextButton(const std::string& label, float labelScale,
+unsigned int GUI::addFont(Font& font) {
+	
+	if (!font.isInitialized()) {
+		REPORT_ERROR("Font adding to GUI is not initailized.", init);
+		return -1;
+	}
+
+	m_fonts.push_back(&font);
+	return m_fonts.size() - 1;
+}
+
+bool GUI::addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
 	const ColorRGBA& textColor, const ColorRGBA& buttonColor,
 	const GlyphOrigin& renderOrigin, const RectDimension& dimension, std::function<void()> buttonFunction) {
 
+	if (fontId >= m_fonts.size()) {
+		REPORT_ERROR("Invalid font ID used.", addTextButton);
+		return false;
+	}
+
 	m_components.push_back(std::unique_ptr<Component>(
-		new Button(label, labelScale, textColor, buttonColor, renderOrigin, dimension, buttonFunction)
+		new Button(label, fontId, labelScale, textColor, buttonColor, renderOrigin, dimension, buttonFunction)
 	));
+	
+	return true;
 }
 
 void GUI::updateGUI(InputProcessor& inputProcessor, Camera& camera) {
@@ -49,17 +75,21 @@ void GUI::updateGUI(InputProcessor& inputProcessor, Camera& camera) {
 							Button* button = (Button*)comp.get();
 
 							button->m_buttonFunc();
-							break;
 						}
-					}
+					}					
 				}
+				// is not functional, set normal cursor
 				else {
 					if (m_currentCursor != m_arrowCursor) {
 						m_currentCursor = m_arrowCursor;
 						SDL_SetCursor(m_currentCursor);
+						break;
 					}
 				}
+				// do not check other components if cursor is inside this component
+				break;
 			}
+			// not inside component, set normal cursor
 			else {
 				if (m_currentCursor != m_arrowCursor) {
 					m_currentCursor = m_arrowCursor;
@@ -80,6 +110,10 @@ void GUI::freeGUI() {
 		SDL_FreeCursor(m_indexPointerCursor);
 		m_indexPointerCursor = nullptr;
 	}
+
+	/*for (auto& font : m_fonts) {
+		font->deleteFont();
+	}*/
 }
 
 bool GUI::isMouseInsideComponent(const glm::ivec2& mouseScreenCoords, Component& component) {
@@ -136,8 +170,8 @@ void GUI::Component::findComponentCenter() {
 	}
 }
 
-GUI::Button::Button(const std::string& label, float labelScale, const ColorRGBA& textColor,
-	const ColorRGBA& buttonColor, const GlyphOrigin& renderOrigin, 
+GUI::Button::Button(const std::string& label, const unsigned int fontId, float labelScale,
+	const ColorRGBA& textColor, const ColorRGBA& buttonColor, const GlyphOrigin& renderOrigin, 
 	const RectDimension& dimension, std::function<void()> buttonFunction) :
 	 
 	m_buttonColor(buttonColor),
@@ -149,6 +183,7 @@ GUI::Button::Button(const std::string& label, float labelScale, const ColorRGBA&
 	m_dimension = dimension;
 	m_labelScale = labelScale;
 	m_primaryColor = textColor;
+	m_fontId = fontId;
 
 	m_isFunctional = true;
 	m_isVisible = true;

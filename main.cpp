@@ -2,7 +2,8 @@
 
 int main(int args, char** argv) {
 	Tetris tetrisGame;
-	tetrisGame.init();
-	tetrisGame.run();
+	if (tetrisGame.init()) {
+		tetrisGame.run();
+	}
 	return 0;
 }

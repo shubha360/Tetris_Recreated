@@ -7,6 +7,7 @@
 #include "ColorRGBA.h"
 #include "InputProcessor.h"
 #include "Camera.h"
+#include "Font.h"
 
 #include <vector>
 #include <iostream>
@@ -26,9 +27,13 @@ public:
 	GUI();
 	~GUI();
 
-	bool init();
+	bool init(Font& font);
 
-	void addTextButton(const std::string& label, float labelScale, 
+	// will return the font id in this GUI
+	unsigned int addFont(Font& font);
+
+	// pass 0 to fontId to use the default font
+	bool addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
 		const ColorRGBA& textColor, const ColorRGBA& buttonColor,
 		const GlyphOrigin& renderOrigin, const RectDimension& dimension, std::function<void()> buttonFunction);
 
@@ -57,6 +62,7 @@ private:
 		RectDimension m_dimension = {};
 		float m_labelScale = 0;
 		ColorRGBA m_primaryColor = {};
+		unsigned int m_fontId = 0;
 
 		int m_centerX = 0, m_centerY = 0;
 		int m_labelTopLeftX = 0, m_labelTopLeftY = 0;
@@ -68,15 +74,13 @@ private:
 		void findComponentCenter();
 	};
 
-	
-	
 	class Button : public Component {
 	public:
 		friend class GUI;
 		friend class GUIRenderer;
 
-		Button(const std::string& label, float labelScale, const ColorRGBA& textColor,
-			const ColorRGBA& buttonColor, const GlyphOrigin& renderOrigin, 
+		Button(const std::string& label, const unsigned int fontId, float labelScale,
+			const ColorRGBA& textColor, const ColorRGBA& buttonColor, const GlyphOrigin& renderOrigin, 
 			const RectDimension& dimension, std::function<void()> buttonFunction);
 
 	private:
@@ -85,6 +89,8 @@ private:
 	};
 
 	std::vector<std::unique_ptr<Component>> m_components;
+
+	std::vector<Font*> m_fonts;
 
 	SDL_Cursor* m_arrowCursor = nullptr;
 	SDL_Cursor* m_indexPointerCursor = nullptr;

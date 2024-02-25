@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <SDL/SDL.h>
 
 #define REPORT_ERROR(error, func) printError(error, #func, __FILE__, __LINE__);
 

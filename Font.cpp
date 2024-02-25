@@ -156,6 +156,7 @@ bool Font::initFromBitmap16x16(const std::string& fontName, const std::string& b
 	}
 
 	m_fontName = fontName;
+	m_initialized = true;
 
 	m_fontScale = fontScale;
 	m_letterSpacing = letterSpacing;
@@ -329,6 +330,7 @@ bool Font::initFromFontFile(const std::string& fontName, const std::string& font
 	}
 
 	m_fontName = fontName;
+	m_initialized = true;
 
 	m_letterSpacing = letterSpacing;
 	m_lineSpacing = lineSpacing;

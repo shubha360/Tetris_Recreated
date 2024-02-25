@@ -91,6 +91,8 @@ private:
 	GUIRenderer m_guiRenderer;
 	Font m_font;
 
+	/*unsigned int m_guiFontId = -1;*/
+
 	bool m_drawUpdateNeeded = true;
 
 	bool initEngine();

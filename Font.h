@@ -34,6 +34,10 @@ public:
 
 	unsigned int getLineHeight() const { return m_lineHeight * m_fontScale; }
 
+	std::string getFontName() const { return m_fontName; }
+
+	bool isInitialized() const { return m_initialized; }
+
 	void setLetterSpacing(const int letterSpacing) { m_letterSpacing = letterSpacing; }
 	void setLineSpacing(const int lineSpacing) { m_lineSpacing = lineSpacing; }
 	void setAddToSpaceLength(const int addToSpaceLength) { m_addToSpaceLength = addToSpaceLength; }
@@ -43,6 +47,7 @@ public:
 
 private:
 	std::string m_fontName;
+	bool m_initialized = false;
 
 	unsigned int m_spaceSize = 0;
 	unsigned int m_newLine = 0;

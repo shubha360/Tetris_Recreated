@@ -22,10 +22,10 @@ public:
 private:
 	GLSLProgram m_glslProgram;
 	TextureRenderer m_renderer;
-	Font m_font;
+	//Font m_font;
 
 	TextureData m_roundedRectButtonTexture;
 
 	void getLabelCoordinates(int& x, int& y, const std::string& label,
-		const int componentCenterX, const int componentCenterY);
+		const int componentCenterX, const int componentCenterY, Font& font);
 };

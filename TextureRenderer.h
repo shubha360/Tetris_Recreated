@@ -17,6 +17,13 @@ enum class GlyphOrigin {
 	CENTER
 };
 
+enum class GlyphSortType {
+	BY_TEXTURE_ID_INCREMENTAL,
+	BY_TEXTURE_ID_DECREMENTAL,
+	BY_DEPTH_INCREMENTAL,
+	BY_DEPTH_DECREMENTAL,
+};
+
 class TextureRenderer {
 public:
 	TextureRenderer();
@@ -25,9 +32,9 @@ public:
 	void begin();
 
 	void draw(const GlyphOrigin renderOrigin,  const RectDimension& destRect, const UVDimension& uvRect, 
-		GLuint textureID, const ColorRGBA& color);
+		GLuint textureID, const ColorRGBA& color, int depth = 1);
 
-	void end();
+	void end(const GlyphSortType& sortType = GlyphSortType::BY_TEXTURE_ID_INCREMENTAL);
 
 	void renderTextures();
 
@@ -40,10 +47,11 @@ private:
 		friend class RenderBatch;
 
 		Glyph(const GlyphOrigin renderOrigin, const RectDimension& destRect, const UVDimension& uvRect,
-			GLuint textureID, const ColorRGBA& color);
+			GLuint textureID, const ColorRGBA& color, int depth);
 
 	private:
 		GLuint m_textureID = 0;
+		int m_depth = 1;
 
 		Vertex2D m_vertices[4] = {};
 	};
@@ -74,5 +82,8 @@ private:
 	void setupRenderBatches();
 	void addIndicesToBuffer(std::vector<GLuint>& indices, unsigned int& currentIndex, unsigned int& currentVertex);
 
-	static bool compareByTextureID(Glyph* a, Glyph* b);
+	static bool compareByTextureIdIncremental(Glyph* a, Glyph* b);
+	static bool compareByTextureIdDecremental(Glyph* a, Glyph* b);
+	static bool compareByDepthIncremental(Glyph* a, Glyph* b);
+	static bool compareByDepthDecremental(Glyph* a, Glyph* b);
 };

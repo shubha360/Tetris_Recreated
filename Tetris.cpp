@@ -16,12 +16,13 @@ bool Tetris::initEngine() {
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_FPS) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
-		m_gui.init() &&
-		m_guiRenderer.init() &&
-		m_font.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf");
+		m_font.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf") &&
+		m_gui.init(m_font) &&
+		m_guiRenderer.init();
 }
 
 bool Tetris::initGame() {
+
 	m_randomEngine = std::mt19937(m_seed());
 	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
 
@@ -50,7 +51,8 @@ bool Tetris::initGame() {
 
 	m_gui.addTextButton(
 		"Exit",
-		0.5f,
+		0,
+		1.0f,
 		ColorRGBA{ 255, 255, 255, 255 },
 		ColorRGBA{ 0, 0, 0, 255 },
 		GlyphOrigin::TOP_RIGHT,
@@ -358,6 +360,9 @@ void Tetris::draw() {
 			m_font.drawTextToRenderer(
 				scoreText, 0, m_window.getWindowHeight(), ColorRGBA{ 255, 255, 255, 255 }, m_textureRenderer);
 
+			/*m_font2.drawTextToRenderer(
+				scoreText, 0, m_window.getWindowHeight() - 500, ColorRGBA{ 255, 255, 255, 255 }, m_textureRenderer);*/
+
 			m_textureRenderer.end();
 
 			m_drawUpdateNeeded = false;
@@ -387,6 +392,8 @@ void Tetris::printFps() {
 
 void Tetris::freeTetris() {
 	ImageLoader::DeleteTexture(m_minoTexture);
+
+	m_font.deleteFont();
 
 	m_gui.freeGUI();
 	m_guiRenderer.freeGUIRenderer();
