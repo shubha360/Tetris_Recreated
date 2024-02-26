@@ -33,26 +33,26 @@ int GUI::addFont(Font& font) {
 	}
 
 	m_fonts.push_back(&font);
-	return m_fonts.size() - 1;
+	return (int) (m_fonts.size() - 1);
 }
 
-unsigned int GUI::addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
+int GUI::addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
 	const ColorRGBA& textColor, const ColorRGBA& buttonColor,
 	const GlyphOrigin& renderOrigin, const RectDimension& dimension, std::function<void()> buttonFunction) {
 
 	if (fontId < 0 || fontId >= m_fonts.size()) {
 		REPORT_ERROR("Invalid font ID used.", addTextButton);
-		return 0;
+		return -1;
 	}
 
 	m_components.push_back(std::unique_ptr<Component>(
 		new Button(label, fontId, labelScale, textColor, buttonColor, renderOrigin, dimension, buttonFunction)
 	));
 	
-	return m_components.size() - 1;
+	return (int) (m_components.size() - 1);
 }
 
-unsigned int GUI::addPlainText(const std::string& text, const unsigned int fontId, float scale,
+int GUI::addPlainText(const std::string& text, const unsigned int fontId, float scale,
 	const ColorRGBA& color, const glm::ivec2& topLeftPosition) {
 
 	if (fontId < 0 || fontId >= m_fonts.size()) {
@@ -64,7 +64,7 @@ unsigned int GUI::addPlainText(const std::string& text, const unsigned int fontI
 		new PlainText(text, fontId, scale, color, RectDimension{ topLeftPosition.x, topLeftPosition.y, 0, 0 })
 	));
 
-	return m_components.size() - 1;
+	return (int) (m_components.size() - 1);
 }
 
 void GUI::setComponentLabel(const int id, const std::string& text) {

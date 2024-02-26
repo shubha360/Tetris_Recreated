@@ -32,7 +32,7 @@ public:
 
 	unsigned int getLineWidth(const std::string& text);
 
-	unsigned int getLineHeight() const { return m_lineHeight * m_fontScale; }
+	unsigned int getLineHeight() const { return (unsigned int) (m_lineHeight * m_fontScale); }
 
 	std::string getFontName() const { return m_fontName; }
 

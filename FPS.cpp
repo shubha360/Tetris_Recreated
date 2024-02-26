@@ -13,7 +13,7 @@ void FPS::beginFrame() {
 	this->frameStartTicks = (float)SDL_GetTicks();
 }
 
-const bool FPS::endFrame() {
+const bool FPS::endFrame() const {
 	float frameTick = (float)SDL_GetTicks() - frameStartTicks;
 
 	float desiredFrameTime = 1000.0f / desiredFps;
@@ -25,7 +25,7 @@ const bool FPS::endFrame() {
 	}
 
 	else if (frameTick < desiredFrameTime) {
-		SDL_Delay(desiredFrameTime - frameTick);
+		SDL_Delay((Uint32) (desiredFrameTime - frameTick));
 	}
 
 	return true;

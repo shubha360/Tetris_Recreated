@@ -81,7 +81,7 @@ void TextureRenderer::begin() {
 	m_renderBatches.clear();
 
 	if (!m_iboIDs.empty()) {
-		glDeleteBuffers(m_iboIDs.size(), m_iboIDs.data());
+		glDeleteBuffers((GLsizei) m_iboIDs.size(), m_iboIDs.data());
 		m_iboIDs.clear();
 	}
 }
@@ -151,7 +151,7 @@ void TextureRenderer::renderTextures() {
 void TextureRenderer::freeTextureRenderer() {
 	
 	if (!m_iboIDs.empty()) {
-		glDeleteBuffers(m_iboIDs.size(), m_iboIDs.data());
+		glDeleteBuffers((GLsizei) m_iboIDs.size(), m_iboIDs.data());
 	}
 
 	if (m_vboID != 0) {
@@ -242,7 +242,7 @@ void TextureRenderer::setupRenderBatches() {
 
 			m_iboIDs.resize(m_renderBatches.size());
 
-			glGenBuffers(m_iboIDs.size(), m_iboIDs.data());
+			glGenBuffers((GLsizei) m_iboIDs.size(), m_iboIDs.data());
 
 			for (int i = 0; i < m_iboIDs.size(); i++) {
 

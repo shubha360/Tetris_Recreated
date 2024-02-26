@@ -54,8 +54,8 @@ bool Font::initFromBitmap16x16(const std::string& fontName, const std::string& b
 			);
 
 			// Calculate the top
-			for (int i = 0; i < CELL_HEIGHT; i++) {
-				for (int j = 0; j < CELL_WIDTH; j++) {
+			for (unsigned int i = 0; i < CELL_HEIGHT; i++) {
+				for (unsigned int j = 0; j < CELL_WIDTH; j++) {
 					
 					currentPixelX = currentCellX + j;
 					currentPixelY = currentCellY + i;
@@ -74,8 +74,8 @@ bool Font::initFromBitmap16x16(const std::string& fontName, const std::string& b
 			}
 
 			// Calculate the bottom
-			for (int i = CELL_HEIGHT - 1; i >= 0; i--) {
-				for (int j = 0; j < CELL_WIDTH; j++) {
+			for (unsigned int i = CELL_HEIGHT - 1; i >= 0; i--) {
+				for (unsigned int j = 0; j < CELL_WIDTH; j++) {
 
 					currentPixelX = currentCellX + j;
 					currentPixelY = currentCellY + i;
@@ -98,8 +98,8 @@ bool Font::initFromBitmap16x16(const std::string& fontName, const std::string& b
 			}
 
 			// Calculate the left
-			for (int j = 0; j < CELL_WIDTH; j++) {
-				for (int i = 0; i < CELL_HEIGHT; i++) {
+			for (unsigned int j = 0; j < CELL_WIDTH; j++) {
+				for (unsigned int i = 0; i < CELL_HEIGHT; i++) {
 					currentPixelX = currentCellX + j;
 					currentPixelY = currentCellY + i;
 
@@ -119,8 +119,8 @@ bool Font::initFromBitmap16x16(const std::string& fontName, const std::string& b
 
 
 			// Calculate the right
-			for (int j = CELL_WIDTH - 1; j >= 0; j--) {
-				for (int i = 0; i < CELL_HEIGHT; i++) {
+			for (unsigned int j = CELL_WIDTH - 1; j >= 0; j--) {
+				for (unsigned int i = 0; i < CELL_HEIGHT; i++) {
 					currentPixelX = currentCellX + j;
 					currentPixelY = currentCellY + i;
 
@@ -180,8 +180,8 @@ bool Font::initFromFontFile(const std::string& fontName, const std::string& font
 		return false;
 	}
 
-	unsigned int maxCellWidth = 0;
-	unsigned int maxCellHeight = 0;
+	int maxCellWidth = 0;
+	int maxCellHeight = 0;
 	int maxBearing = 0;
 	int maxHang = 0;
 
@@ -362,11 +362,11 @@ void Font::drawTextToRenderer(const std::string& text, const int topLeftX, const
 
 	for (int i = 0; i < text.length(); i++) {
 		if (text[i] == ' ') {
-			drawX += (m_spaceSize + m_addToSpaceLength) * m_fontScale;
+			drawX += (int) ((m_spaceSize + m_addToSpaceLength) * m_fontScale);
 		}
 		else if (text[i] == '\n') {
 			drawX = topLeftX;
-			drawY -= (m_newLine + m_lineSpacing) * m_fontScale;
+			drawY -= (int) ((m_newLine + m_lineSpacing) * m_fontScale);
 		}
 		else {
 			unsigned int ASCII = (unsigned char) text[i];
@@ -374,8 +374,8 @@ void Font::drawTextToRenderer(const std::string& text, const int topLeftX, const
 			currentDims.set(
 				drawX,
 				drawY,
-				m_characterWidths[ASCII] * m_fontScale,
-				m_lineHeight * m_fontScale
+				(unsigned int) (m_characterWidths[ASCII] * m_fontScale),
+				(unsigned int) (m_lineHeight * m_fontScale)
 			);
 
 			textureRenderer.draw(
@@ -386,24 +386,24 @@ void Font::drawTextToRenderer(const std::string& text, const int topLeftX, const
 				color
 			);
 
-			drawX += (m_characterWidths[ASCII] + m_letterSpacing) * m_fontScale;
+			drawX += (int) ((m_characterWidths[ASCII] + m_letterSpacing) * m_fontScale);
 		}
 	}
 }
 
 unsigned int Font::getLineWidth(const std::string& text) {
 
-	unsigned int width = 0;
+	int width = 0;
 
 	for (int i = 0; i < text.length(); i++) {
 		if (text[i] == '\n') {
 			break;
 		}
 		else if (text[i] == ' ') {
-			width += (m_spaceSize + m_addToSpaceLength) * m_fontScale;
+			width += (int) ((m_spaceSize + m_addToSpaceLength) * m_fontScale);
 		}
 		else {
-			width += (m_characterWidths[(unsigned char)text[i]] + m_letterSpacing) * m_fontScale;
+			width += (int) ((m_characterWidths[(unsigned char)text[i]] + m_letterSpacing) * m_fontScale);
 		}
 	}
 	return width;

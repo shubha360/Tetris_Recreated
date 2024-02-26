@@ -34,12 +34,12 @@ public:
 
 	// returns the id of the component
 	// pass 0 to fontId to use the default font
-	unsigned int addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
+	int addTextButton(const std::string& label, const unsigned int fontId, float labelScale,
 		const ColorRGBA& textColor, const ColorRGBA& buttonColor,
 		const GlyphOrigin& renderOrigin, const RectDimension& dimension, std::function<void()> buttonFunction);
 
 	// pass 0 to fontId to use the default font
-	unsigned int addPlainText(const std::string& text, const unsigned int fontId, float scale,
+	int addPlainText(const std::string& text, const unsigned int fontId, float scale,
 		const ColorRGBA& color, const glm::ivec2& topLeftPosition);
 
 	void setComponentLabel(const int id, const std::string& text);

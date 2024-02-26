@@ -10,7 +10,7 @@ public:
 
 	bool init(float fps);
 	void beginFrame();
-	const bool endFrame();
+	const bool endFrame() const;
 
 	float calculateFps();
 
