@@ -10,16 +10,16 @@
 
 // Engine includes
 #include "Window.h"
-#include "GLSLProgram.h"
+#include "GlslProgram.h"
 #include "Vertex2D.h"
-#include "FPS.h"
+#include "Fps.h"
 #include "InputProcessor.h"
 #include "ImageLoader.h"
 #include "Camera.h"
 #include "TextureRenderer.h"
 #include "Font.h"
-#include "GUI.h"
-#include "GUIRenderer.h"
+#include "Gui.h"
+#include "GuiRenderer.h"
 
 // Tetris includes
 #include "Matrix.h"
@@ -43,8 +43,8 @@ public:
 	void run();	
 
 private:
-	const ColorRGBA CLEAR_COLOR { 0,50,120,255 };
-	const float MAX_FPS = 60.0f;
+	const ColorRgba CLEAR_COLOR { 0,50,120,255 };
+	const float MAX_Fps = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
 	TextureData m_minoTexture = {};
 
@@ -82,13 +82,13 @@ private:
 
 	// Engine Tools
 	Window m_window;
-	GLSLProgram m_shaderProgram;
-	FPS m_fps;
+	GlslProgram m_shaderProgram;
+	Fps m_fps;
 	InputProcessor m_inputProcessor;
 	Camera m_camera;
 	TextureRenderer m_textureRenderer;
-	GUI m_gui;
-	GUIRenderer m_guiRenderer;
+	Gui m_gui;
+	GuiRenderer m_guiRenderer;
 	Font m_quicksandFont;
 
 	int m_guiQuicksandFontId = 0;

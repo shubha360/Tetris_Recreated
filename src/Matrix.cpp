@@ -66,9 +66,9 @@ int Matrix::checkLineClears() {
 
 void Matrix::drawMatrix(TextureRenderer& renderer) const {
 
-	static UVDimension minoUV { 0.0f, 0.0f, 1.0f, 1.0f };
+	static UvDimension minoUV { 0.0f, 0.0f, 1.0f, 1.0f };
 	
-	ColorRGBA minoColor {};
+	ColorRgba minoColor {};
 
 	for (int row = 0; row < m_numRows; row++) {
 		for (int column = 0; column < m_numColumns; column++) {

@@ -14,7 +14,7 @@ bool Tetris::initEngine() {
 	return
 		m_window.init(true, 1720, 980, CLEAR_COLOR) &&
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
-		m_fps.init(MAX_FPS) &&
+		m_fps.init(MAX_Fps) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
 		m_quicksandFont.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf") &&
 		m_gui.init(m_quicksandFont) &&
@@ -53,8 +53,8 @@ bool Tetris::initGame() {
 		"Exit",
 		m_guiQuicksandFontId,
 		1.0f,
-		ColorRGBA{ 255, 255, 255, 255 },
-		ColorRGBA{ 0, 0, 0, 255 },
+		ColorRgba{ 255, 255, 255, 255 },
+		ColorRgba{ 0, 0, 0, 255 },
 		GlyphOrigin::TOP_RIGHT,
 		RectDimension{ (int)m_window.getWindowWidth() - 10, (int)m_window.getWindowHeight() - 10, 80, 40 },
 		[&]() { m_gameState = GameState::QUIT; }
@@ -64,7 +64,7 @@ bool Tetris::initGame() {
 		"", 
 		m_guiQuicksandFontId,
 		1.0f, 
-		ColorRGBA{ 255, 255, 255, 255 },
+		ColorRgba{ 255, 255, 255, 255 },
 		glm::ivec2(0, (int)m_window.getWindowHeight()));
 
 	return true;
@@ -86,7 +86,7 @@ void Tetris::gameLoop() {
 
 		processInput();
 
-		m_gui.updateGUI(m_inputProcessor, m_camera);
+		m_gui.updateGui(m_inputProcessor, m_camera);
 		
 		if (m_gameState == GameState::PLAYING) {
 			previousTicks = runGameSimulations(previousTicks);
@@ -102,9 +102,9 @@ void Tetris::gameLoop() {
 
 float Tetris::runGameSimulations(float previousTicks) {
 	static const float MS_PER_SECOND = 1000.0f;
-	static const float DESIRED_FPS = 60.0f;
+	static const float DESIRED_Fps = 60.0f;
 
-	static const float DESIRED_FRAMETIME = MS_PER_SECOND / DESIRED_FPS;
+	static const float DESIRED_FRAMETIME = MS_PER_SECOND / DESIRED_Fps;
 
 	static const int MAX_PHYSICS_SIMS = 6;
 	static const float MAX_DELTA_TIME = 1.0f;
@@ -374,7 +374,7 @@ void Tetris::draw() {
 
 	m_gui.setComponentLabel(m_guiTextId, scoreText);
 
-	m_guiRenderer.renderGUI(m_gui, m_camera);
+	m_guiRenderer.renderGui(m_gui, m_camera);
 
 	m_window.swapBuffer();
 }
@@ -396,8 +396,8 @@ void Tetris::freeTetris() {
 
 	m_quicksandFont.deleteFont();
 
-	m_gui.freeGUI();
-	m_guiRenderer.freeGUIRenderer();
+	m_gui.freeGui();
+	m_guiRenderer.freeGuiRenderer();
 
 	m_textureRenderer.freeTextureRenderer();
 
