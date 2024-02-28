@@ -1,4 +1,4 @@
-#include "Tetrimino.h"
+#include "../include/Tetrimino.h"
 
 Tetrimino::Tetrimino() {}
 

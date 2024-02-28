@@ -1,4 +1,4 @@
-#include "Tetris.h"
+#include "../include/Tetris.h"
 
 int main(int args, char** argv) {
 	Tetris tetrisGame;

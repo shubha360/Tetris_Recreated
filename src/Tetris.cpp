@@ -1,4 +1,4 @@
-#include "Tetris.h"
+#include "../include/Tetris.h"
 
 Tetris::Tetris() {}
 
@@ -18,7 +18,7 @@ bool Tetris::initEngine() {
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
 		m_quicksandFont.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf") &&
 		m_gui.init(m_quicksandFont) &&
-		m_guiRenderer.init("engine-assets");
+		m_guiRenderer.init("../Evolve-Engine/engine-assets");
 }
 
 bool Tetris::initGame() {
