@@ -21,7 +21,7 @@ public:
 	
 	int checkLineClears();
 
-	void drawMatrix(TextureRenderer& renderer) const;
+	void drawMatrix(Evolve::TextureRenderer& renderer) const;
 
 	std::vector<std::string>& getMatrix() { return m_matrix; }
 	const int getColumns() const { return m_numColumns; }
@@ -31,15 +31,15 @@ public:
 	const char getGhostCellSign() const { return GHOST_CELL_SIGN; }
 
 protected:
-	const ColorRgba MINO_COLOR_BLACK {0, 0, 0, 255};
-	const ColorRgba MINO_COLOR_RED { 255, 0, 0, 255 };
-	const ColorRgba MINO_COLOR_GREEN { 0, 255, 0, 255 };
-	const ColorRgba MINO_COLOR_BLUE { 0, 0, 255, 255 };
-	const ColorRgba MINO_COLOR_YELLOW { 255, 255, 0, 255 };
-	const ColorRgba MINO_COLOR_CYAN { 0, 255, 255, 255 };
-	const ColorRgba MINO_COLOR_MAGENTA { 255, 0, 255, 255 };
-	const ColorRgba MINO_COLOR_ORANGE { 255, 165, 0, 255 };
-	const ColorRgba MINO_COLOR_GHOST { 0, 0, 0, 100 };
+	const Evolve::ColorRgba MINO_COLOR_BLACK {0, 0, 0, 255};
+	const Evolve::ColorRgba MINO_COLOR_RED { 255, 0, 0, 255 };
+	const Evolve::ColorRgba MINO_COLOR_GREEN { 0, 255, 0, 255 };
+	const Evolve::ColorRgba MINO_COLOR_BLUE { 0, 0, 255, 255 };
+	const Evolve::ColorRgba MINO_COLOR_YELLOW { 255, 255, 0, 255 };
+	const Evolve::ColorRgba MINO_COLOR_CYAN { 0, 255, 255, 255 };
+	const Evolve::ColorRgba MINO_COLOR_MAGENTA { 255, 0, 255, 255 };
+	const Evolve::ColorRgba MINO_COLOR_ORANGE { 255, 165, 0, 255 };
+	const Evolve::ColorRgba MINO_COLOR_GHOST { 0, 0, 0, 100 };
 
 	int m_numRows = 20;
 	int m_numColumns = 10;

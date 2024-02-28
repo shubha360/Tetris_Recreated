@@ -43,10 +43,10 @@ public:
 	void run();	
 
 private:
-	const ColorRgba CLEAR_COLOR { 0,50,120,255 };
+	const Evolve::ColorRgba CLEAR_COLOR { 0,50,120,255 };
 	const float MAX_Fps = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
-	TextureData m_minoTexture = {};
+	Evolve::TextureData m_minoTexture = {};
 
 	long long m_score = 0;
 	int m_linesCleared = 0;
@@ -81,15 +81,15 @@ private:
 	std::uniform_int_distribution<int> m_getTetriminoIndex;
 
 	// Engine Tools
-	Window m_window;
-	GlslProgram m_shaderProgram;
-	Fps m_fps;
-	InputProcessor m_inputProcessor;
-	Camera m_camera;
-	TextureRenderer m_textureRenderer;
-	Gui m_gui;
-	GuiRenderer m_guiRenderer;
-	Font m_quicksandFont;
+	Evolve::Window m_window;
+	Evolve::GlslProgram m_shaderProgram;
+	Evolve::Fps m_fps;
+	Evolve::InputProcessor m_inputProcessor;
+	Evolve::Camera m_camera;
+	Evolve::TextureRenderer m_textureRenderer;
+	Evolve::Gui m_gui;
+	Evolve::GuiRenderer m_guiRenderer;
+	Evolve::Font m_quicksandFont;
 
 	int m_guiQuicksandFontId = 0;
 	int m_guiExitButtonId = -1;

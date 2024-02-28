@@ -64,11 +64,11 @@ int Matrix::checkLineClears() {
 	return lineClears;
 }
 
-void Matrix::drawMatrix(TextureRenderer& renderer) const {
+void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 
 	static UvDimension minoUV { 0.0f, 0.0f, 1.0f, 1.0f };
 	
-	ColorRgba minoColor {};
+	Evolve::ColorRgba minoColor {};
 
 	for (int row = 0; row < m_numRows; row++) {
 		for (int column = 0; column < m_numColumns; column++) {
@@ -113,14 +113,14 @@ void Matrix::drawMatrix(TextureRenderer& renderer) const {
 				break;
 			}
 
-			RectDimension minoDimension{ 
+			Evolve::RectDimension minoDimension{
 				m_matrixPosTopLeft.x + column * m_minoLength,
 				m_matrixPosTopLeft.y - row * m_minoLength, 
 				m_minoLength, m_minoLength };
 
 
 			renderer.draw(
-				GlyphOrigin::TOP_LEFT,
+				Evolve::GlyphOrigin::TOP_LEFT,
 				minoDimension,
 				minoUV,
 				m_minoTextureId,

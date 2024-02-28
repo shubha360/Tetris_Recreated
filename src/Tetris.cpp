@@ -26,9 +26,9 @@ bool Tetris::initGame() {
 	m_randomEngine = std::mt19937(m_seed());
 	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
 
-	ImageLoader::LoadTextureFromImage("resources/images/mino.png", m_minoTexture, 4);
-	ImageLoader::BufferTextureData(m_minoTexture);
-	ImageLoader::FreeTexture(m_minoTexture);
+	Evolve::ImageLoader::LoadTextureFromImage("resources/images/mino.png", m_minoTexture, 4);
+	Evolve::ImageLoader::BufferTextureData(m_minoTexture);
+	Evolve::ImageLoader::FreeTexture(m_minoTexture);
 
 	glm::ivec2 mainMatrixPos(m_window.getWindowWidth() / 6, m_window.getWindowHeight() / 10 * 9);
 	
@@ -53,10 +53,10 @@ bool Tetris::initGame() {
 		"Exit",
 		m_guiQuicksandFontId,
 		1.0f,
-		ColorRgba{ 255, 255, 255, 255 },
-		ColorRgba{ 0, 0, 0, 255 },
-		GlyphOrigin::TOP_RIGHT,
-		RectDimension{ (int)m_window.getWindowWidth() - 10, (int)m_window.getWindowHeight() - 10, 80, 40 },
+		Evolve::ColorRgba{ 255, 255, 255, 255 },
+		Evolve::ColorRgba{ 0, 0, 0, 255 },
+		Evolve::GlyphOrigin::TOP_RIGHT,
+		Evolve::RectDimension{ (int)m_window.getWindowWidth() - 10, (int)m_window.getWindowHeight() - 10, 80, 40 },
 		[&]() { m_gameState = GameState::QUIT; }
 	);
 
@@ -64,7 +64,7 @@ bool Tetris::initGame() {
 		"", 
 		m_guiQuicksandFontId,
 		1.0f, 
-		ColorRgba{ 255, 255, 255, 255 },
+		Evolve::ColorRgba{ 255, 255, 255, 255 },
 		glm::ivec2(0, (int)m_window.getWindowHeight()));
 
 	return true;
@@ -392,7 +392,7 @@ void Tetris::printFps() {
 }
 
 void Tetris::freeTetris() {
-	ImageLoader::DeleteTexture(m_minoTexture);
+	Evolve::ImageLoader::DeleteTexture(m_minoTexture);
 
 	m_quicksandFont.deleteFont();
 
