@@ -4,15 +4,18 @@ ExtraMatrix::ExtraMatrix() {}
 
 ExtraMatrix::~ExtraMatrix() {}
 
-void ExtraMatrix::initTetriminoes(std::vector<Tetrimino*> tetriminoes) {
-	m_tetriminoes = tetriminoes;
+void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const glm::ivec2& topLeftPos, 
+	GLuint minoTextureId, const int minoLength /*= 16*/) {
 
-	m_minoLength = 16;
-	m_numColumns = 8;
-	m_numRows = m_tetriminoes.size() * m_tetriminoMaxHeight;
+	m_tetriminoes = tetriminoes;
+	int numRows = m_tetriminoes.size() * m_tetriminoMaxHeight;
+
+	Matrix::init(topLeftPos, minoTextureId, numRows, 8, minoLength);
 
 	for (int i = 0; i < m_tetriminoes.size(); i++) {
-		addTetrimino(i, m_tetriminoes[i]);
+		if (m_tetriminoes[i] != nullptr) {
+			addTetrimino(i, m_tetriminoes[i]);
+		}
 	}
 }
 
@@ -20,14 +23,22 @@ Tetrimino* ExtraMatrix::pushAndPop(Tetrimino* newTetrimino) {
 
 	Tetrimino* pop = m_tetriminoes[0];
 
-	m_tetriminoes[0] = m_tetriminoes[1];
+	for (int i = 0; i < m_tetriminoes.size() - 1; i++) {
+		m_tetriminoes[i] = m_tetriminoes[i + 1];
+	}
+
+	m_tetriminoes[m_tetriminoes.size() - 1] = newTetrimino;
+
+	/*m_tetriminoes[0] = m_tetriminoes[1];
 	m_tetriminoes[1] = m_tetriminoes[2];
-	m_tetriminoes[2] = newTetrimino;
+	m_tetriminoes[2] = newTetrimino;*/
 
 	emptyMatrix();
 
 	for (int i = 0; i < m_tetriminoes.size(); i++) {
-		addTetrimino(i, m_tetriminoes[i]);
+		if (m_tetriminoes[i] != nullptr) {
+			addTetrimino(i, m_tetriminoes[i]);
+		}
 	}
 
 	return pop;

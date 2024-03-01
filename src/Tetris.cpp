@@ -12,7 +12,7 @@ bool Tetris::init() {
 
 bool Tetris::initEngine() {
 	return
-		m_window.init(true, 1720, 980, CLEAR_COLOR) &&
+		m_window.init(false, 1720, 980, CLEAR_COLOR) &&
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_Fps) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
@@ -23,6 +23,8 @@ bool Tetris::initEngine() {
 
 bool Tetris::initGame() {
 
+	m_winowDims = glm::ivec2 { m_window.getWindowWidth(), m_window.getWindowHeight() };
+
 	m_randomEngine = std::mt19937(m_seed());
 	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
 
@@ -30,14 +32,24 @@ bool Tetris::initGame() {
 	Evolve::ImageLoader::BufferTextureData(m_minoTexture);
 	Evolve::ImageLoader::FreeTexture(m_minoTexture);
 
-	glm::ivec2 mainMatrixPos(m_window.getWindowWidth() / 6, m_window.getWindowHeight() / 10 * 9);
-	
-	int mainMatrixWidth = m_matrix.getColumns() * m_matrix.getMinoLength();
+	//{ // Positioning the main game components
 
-	glm::ivec2 nextMatrixPos(mainMatrixPos.x + mainMatrixWidth + 50, mainMatrixPos.y);
+		//int top = m_winowDims.y / 10 * 9, left = m_winowDims.x / 20;
 
-	m_matrix.init(mainMatrixPos, m_minoTexture.id);
-	m_nextMatrix.init(nextMatrixPos, m_minoTexture.id);
+		glm::ivec2 mainMatrixPos { m_window.getWindowWidth() / 6, m_window.getWindowHeight() / 10 * 9 };
+
+		int mainMatrixWidth = m_matrix.getColumns() * m_matrix.getMinoLength();
+
+		glm::ivec2 nextMatrixPos { mainMatrixPos.x + mainMatrixWidth + 50, mainMatrixPos.y };
+
+		glm::ivec2 holdMatrixPos { nextMatrixPos.x, mainMatrixPos.y - 500 };
+
+		m_matrix.init(mainMatrixPos, m_minoTexture.id);
+	//}
+
+	std::vector<Tetrimino*> hold;
+	hold.push_back(nullptr);
+	m_holdMatrix.init(hold, holdMatrixPos, m_minoTexture.id);
 
 	std::vector<Tetrimino*> nexts;
 	nexts.resize(3);
@@ -47,7 +59,7 @@ bool Tetris::initGame() {
 		nexts[i] = m_tetriminoes[m_getTetriminoIndex(m_randomEngine)];
 	}
 
-	m_nextMatrix.initTetriminoes(nexts);
+	m_nextMatrix.init(nexts, nextMatrixPos, m_minoTexture.id);
 
 	m_guiExitButtonId = m_gui.addTextButton(
 		"Exit",
@@ -56,7 +68,7 @@ bool Tetris::initGame() {
 		Evolve::ColorRgba{ 255, 255, 255, 255 },
 		Evolve::ColorRgba{ 0, 0, 0, 255 },
 		Evolve::GlyphOrigin::TOP_RIGHT,
-		Evolve::RectDimension{ (int)m_window.getWindowWidth() - 10, (int)m_window.getWindowHeight() - 10, 80, 40 },
+		Evolve::RectDimension{ (int) m_winowDims.x - 10, (int) m_winowDims.y - 10, 128, 64 },
 		[&]() { m_gameState = GameState::QUIT; }
 	);
 
@@ -186,50 +198,57 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	static float moveDelayDuration = 5.0f;
 	static float currentMoveDelay = moveDelayDuration;
 
+	// can hold only once before respawing
+	static bool canHold = true;
 	static bool respawn = true;
+	static bool checkLines = false;
 
 	if (m_gameState == GameState::PLAYING) {
 		if (respawn) {
 
-			int currentLinesCleared = m_matrix.checkLineClears();
+			if (checkLines) {
+				int currentLinesCleared = m_matrix.checkLineClears();
 
-			switch (currentLinesCleared) {
-			
-			case 1:
-				m_score += (long long) (100 * m_currentLevel);
-				break;
-			
-			case 2:
-				m_score += (long long) (300 * m_currentLevel);
-				break;
-			
-			case 3:
-				m_score += (long long) (600 * m_currentLevel);
-				break;
+				switch (currentLinesCleared) {
 
-			case 4:
-				m_score += (long long) (1000 * m_currentLevel);
-				break;
-			}
+				case 1:
+					m_score += (long long)(100 * m_currentLevel);
+					break;
 
-			m_linesCleared += currentLinesCleared;
+				case 2:
+					m_score += (long long)(300 * m_currentLevel);
+					break;
 
-			// check if level up possible
-			if (m_autoDownDuration > lowestAutoDownDuration) {
-				
-				// if, linesCleared = 57,
-				// then 57 / 10 + 1 = 5 + 1 = 6
-				int newLevel = m_linesCleared / lineClearsForLevelUp + 1;
+				case 3:
+					m_score += (long long)(600 * m_currentLevel);
+					break;
 
-				// level up
-				if (newLevel > m_currentLevel) {
-					m_currentLevel = newLevel;
-					m_autoDownDuration -= eachLevelSpeedIncrease;
+				case 4:
+					m_score += (long long)(1000 * m_currentLevel);
+					break;
+				}
 
-					if (m_autoDownDuration < lowestAutoDownDuration) {
-						m_autoDownDuration = lowestAutoDownDuration;
+				m_linesCleared += currentLinesCleared;
+
+				// check if level up possible
+				if (m_autoDownDuration > lowestAutoDownDuration) {
+
+					// if, linesCleared = 57,
+					// then 57 / 10 + 1 = 5 + 1 = 6
+					int newLevel = m_linesCleared / lineClearsForLevelUp + 1;
+
+					// level up
+					if (newLevel > m_currentLevel) {
+						m_currentLevel = newLevel;
+						m_autoDownDuration -= eachLevelSpeedIncrease;
+
+						if (m_autoDownDuration < lowestAutoDownDuration) {
+							m_autoDownDuration = lowestAutoDownDuration;
+						}
 					}
 				}
+
+				checkLines = false;
 			}
 
 			//m_current = m_nextMatrix.pushAndPop(m_tetriminoes[4]);
@@ -298,6 +317,8 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 						}
 						else {
 							respawn = true;
+							canHold = true;
+							checkLines = true;
 						}
 					}
 				}
@@ -309,19 +330,23 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 					currentMoveDelay = moveDelayDuration;
 				}
 
-				// rotate left or right
+				// rotate left
 				else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
 					if (m_current->rotateLeft()) {
 						m_drawUpdateNeeded = true;
 						inputProcessed = true;
 					}
 				}
+				
+				// rotate right
 				else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
 					if (m_current->rotateRight()) {
 						m_drawUpdateNeeded = true;
 						inputProcessed = true;
 					}
 				}
+				
+				// hard drop
 				else if (m_inputProcessor.isKeyPressed(SDLK_SPACE)) {
 					while (true) {
 						if (!m_current->moveDown()) {
@@ -330,6 +355,26 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 						m_score += (long long) (2 * m_currentLevel);
 					}
 					respawn = true;
+					canHold = true;
+					checkLines = true;
+				}
+
+				// hold
+				else if (m_inputProcessor.isKeyPressed(SDLK_w) && canHold) {
+					m_current->removeFromMatrix(true);
+					m_current = m_holdMatrix.pushAndPop(m_current);
+
+					if (m_current == nullptr) {
+						respawn = true;
+					}
+					else {
+						m_current->reset();
+						m_current->spawn();
+					}
+
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+					canHold = false;
 				}
 			}
 		}
@@ -356,6 +401,8 @@ void Tetris::draw() {
 			m_matrix.drawMatrix(m_textureRenderer);
 
 			m_nextMatrix.drawMatrix(m_textureRenderer);
+
+			m_holdMatrix.drawMatrix(m_textureRenderer);
 
 			m_textureRenderer.end();
 

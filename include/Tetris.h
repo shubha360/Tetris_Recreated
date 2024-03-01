@@ -43,10 +43,10 @@ public:
 	void run();	
 
 private:
-	const Evolve::ColorRgba CLEAR_COLOR { 0,50,120,255 };
+	const Evolve::ColorRgba CLEAR_COLOR { 14,18,28,255 };
 	const float MAX_Fps = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
-	Evolve::TextureData m_minoTexture = {};
+	Evolve::TextureData m_minoTexture {};
 
 	long long m_score = 0;
 	int m_linesCleared = 0;
@@ -54,7 +54,7 @@ private:
 	float m_autoDownDuration = 60.0f;
 
 	Matrix m_matrix;
-	ExtraMatrix m_nextMatrix;
+	ExtraMatrix m_nextMatrix, m_holdMatrix;
 
 	Tetrimino_T m_tempMinoT = Tetrimino_T(&m_matrix);
 	Tetrimino_L m_tempMinoL = Tetrimino_L(&m_matrix);
@@ -64,7 +64,7 @@ private:
 	Tetrimino_Z m_tempMinoZ = Tetrimino_Z(&m_matrix);
 	Tetrimino_S m_tempMinoS = Tetrimino_S(&m_matrix);
 	
-	Tetrimino* m_tetriminoes[7] = {
+	Tetrimino* m_tetriminoes[7] {
 		&m_tempMinoT,
 		&m_tempMinoL,
 		&m_tempMinoJ,
@@ -90,6 +90,8 @@ private:
 	Evolve::Gui m_gui;
 	Evolve::GuiRenderer m_guiRenderer;
 	Evolve::Font m_quicksandFont;
+
+	glm::ivec2 m_winowDims { 0, 0 };
 
 	int m_guiQuicksandFontId = 0;
 	int m_guiExitButtonId = -1;

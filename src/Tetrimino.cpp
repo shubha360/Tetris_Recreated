@@ -5,6 +5,7 @@ Tetrimino::Tetrimino() {}
 Tetrimino::~Tetrimino() {}
 
 bool Tetrimino::spawn() {
+
 	auto& matrix = m_matrix->getMatrix();
 
 	bool continueGame = true;
@@ -18,6 +19,10 @@ bool Tetrimino::spawn() {
 		}
 
 		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
+	}
+
+	if (continueGame) {
+		updateGhost();
 	}
 
 	return continueGame;
@@ -71,7 +76,7 @@ bool Tetrimino::moveDown() {
 		return false;
 	}
 
-	performTransformation(newMinoPos);
+	performTransformation(newMinoPos, false);
 	return true;
 }
 
@@ -194,25 +199,23 @@ glm::ivec2 Tetrimino::rotateMinoLeft(const glm::ivec2& minoPostion) const {
 	return newPos;
 }
 
-void Tetrimino::performTransformation(const glm::ivec2 newMinoPos[4]) {
+void Tetrimino::performTransformation(const glm::ivec2 newMinoPos[4], const bool ghostUpdate /*= true*/) {
 
-	auto& matrix = m_matrix->getMatrix();
-
-	// empty the old cells in the matrix
-	for (int i = 0; i < 4; i++) {
-		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_matrix->getEmptyCellSign();
-	}
+	// first empty the old position cells
+	removeFromMatrix(ghostUpdate);
 
 	// setting the new mino positions
 	for (int i = 0; i < 4; i++) {
 		m_minoPositions[i] = newMinoPos[i];
 	}
 
-	updateGhost();
+	if (ghostUpdate) {
+		updateGhost();
+	}
 
 	// fill up the new cells in the matrix
 	for (int i = 0; i < 4; i++) {
-		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
+		m_matrix->getMatrix()[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
 	}
 }
 
@@ -261,10 +264,8 @@ void Tetrimino::updateGhost() {
 	auto& matrix = m_matrix->getMatrix();
 
 	for (int i = 0; i < 4; i++) {
-		
-		// empty the previous cells first
 		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getEmptyCellSign();
-		
+
 		m_ghostMinoPositions[i] = m_minoPositions[i];
 	}
 
@@ -283,6 +284,23 @@ void Tetrimino::updateGhost() {
 
 	for (int i = 0; i < 4; i++) {
 		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getGhostCellSign();
+	}
+}
+
+void Tetrimino::removeFromMatrix(const bool removeGhost) {
+	auto& matrix = m_matrix->getMatrix();
+
+	// empty the old cells in the matrix
+	for (int i = 0; i < 4; i++) {
+		
+		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_matrix->getEmptyCellSign();
+
+		if (removeGhost) {
+			// remove ghost too
+			matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getEmptyCellSign();
+
+			m_ghostMinoPositions[i] = m_minoPositions[i];
+		}
 	}
 }
 

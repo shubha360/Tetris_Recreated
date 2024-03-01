@@ -39,7 +39,7 @@ protected:
 	const Evolve::ColorRgba MINO_COLOR_CYAN { 0, 255, 255, 255 };
 	const Evolve::ColorRgba MINO_COLOR_MAGENTA { 255, 0, 255, 255 };
 	const Evolve::ColorRgba MINO_COLOR_ORANGE { 255, 165, 0, 255 };
-	const Evolve::ColorRgba MINO_COLOR_GHOST { 0, 0, 0, 100 };
+	const Evolve::ColorRgba MINO_COLOR_GHOST { 0, 0, 0, 0 };
 
 	int m_numRows = 20;
 	int m_numColumns = 10;

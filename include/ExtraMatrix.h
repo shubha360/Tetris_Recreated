@@ -9,7 +9,8 @@ public:
 	ExtraMatrix();
 	~ExtraMatrix();
 
-	void initTetriminoes(std::vector<Tetrimino*> tetriminoes);
+	void init(std::vector<Tetrimino*> tetriminoes, const glm::ivec2& topLeftPos, 
+		GLuint minoTextureId, const int minoLength = 16);
 
 	Tetrimino* pushAndPop(Tetrimino* newTetrimino);
 

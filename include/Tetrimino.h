@@ -29,6 +29,7 @@ public:
 	bool moveRight();
 	bool moveDown();
 
+	void removeFromMatrix(const bool removeGhost);
 	void reset();
 
 protected:
@@ -51,7 +52,7 @@ protected:
 	bool isCellPartOfThis(const glm::ivec2& cellPos) const;
 	bool isMinoInsideMatrix(const glm::ivec2& minoPos) const;
 
-	void performTransformation(const glm::ivec2 newMinoPos[4]);
+	void performTransformation(const glm::ivec2 newMinoPos[4], const bool ghostUpdate = true);
 	void changeOrientation();
 
 	void updateGhost();
