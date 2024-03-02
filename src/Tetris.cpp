@@ -351,7 +351,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 
 			// hold
 			else if (m_inputProcessor.isKeyPressed(SDLK_w) && !inputProcessed && canHold) {
-				m_current->removeFromMatrix();
+				m_current->removeFromMatrix(true);
 				m_current = m_holdMatrix.pushAndPop(m_current);
 
 				if (m_current == nullptr) {

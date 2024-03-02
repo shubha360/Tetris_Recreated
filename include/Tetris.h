@@ -43,7 +43,7 @@ public:
 	void run();	
 
 private:
-	const Evolve::ColorRgba CLEAR_COLOR { 14,18,28,255 };
+	const Evolve::ColorRgba CLEAR_COLOR { 28,36,56,255 };
 	const float MAX_Fps = 60.0f;
 	GameState m_gameState = GameState::PLAYING;
 	Evolve::TextureData m_minoTexture {};

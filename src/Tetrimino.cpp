@@ -16,9 +16,14 @@ bool Tetrimino::spawn() {
 			) {
 			continueGame = false;
 		}
-
-		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
 	}
+
+	if (continueGame) {
+		calculateGhost();
+		addGhostToMatrix();
+	}
+
+	addToMatrix();
 
 	return continueGame;
 }
@@ -38,6 +43,10 @@ bool Tetrimino::moveLeft() {
 	}
 	
 	performTransformation(newMinoPos);
+
+	// chnange ghost
+
+
 	return true;
 }
 
@@ -71,7 +80,7 @@ bool Tetrimino::moveDown() {
 		return false;
 	}
 
-	performTransformation(newMinoPos);
+	performTransformation(newMinoPos, false);
 	return true;
 }
 
@@ -90,7 +99,6 @@ bool Tetrimino::canMoveDown() {
 void Tetrimino::reset() {
 	for (int i = 0; i < 4; i++) {
 		m_minoPositions[i] = m_spawnMinoPositions[i];
-		//m_ghostMinoPositions[i] = m_spawnMinoPositions[i];
 	}
 }
 
@@ -206,20 +214,21 @@ glm::ivec2 Tetrimino::rotateMinoLeft(const glm::ivec2& minoPostion) const {
 	return newPos;
 }
 
-void Tetrimino::performTransformation(const glm::ivec2 newMinoPos[4]) {
+void Tetrimino::performTransformation(const glm::ivec2 newMinoPos[4], bool updateGhost /*= true*/) {
 
 	// first empty the old position cells
-	removeFromMatrix();
+	removeFromMatrix(updateGhost);
 
 	// setting the new mino positions
-	for (int i = 0; i < 4; i++) {
-		m_minoPositions[i] = newMinoPos[i];
+	updateMinoPositions(newMinoPos);
+
+	if (updateGhost) {
+		calculateGhost();
+		addGhostToMatrix();
 	}
 
 	// fill up the new cells in the matrix
-	for (int i = 0; i < 4; i++) {
-		m_matrix->getMatrix()[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
-	}
+	addToMatrix();
 }
 
 bool Tetrimino::canPerformTransformation(const glm::ivec2 newMinoPos[4]) const {
@@ -229,6 +238,7 @@ bool Tetrimino::canPerformTransformation(const glm::ivec2 newMinoPos[4]) const {
 	for (int i = 0; i < 4; i++) {
 		if ( !isMinoInsideMatrix(newMinoPos[i]) ||
 			!( matrix[newMinoPos[i].y][newMinoPos[i].x] == m_matrix->getEmptyCellSign() ||
+				matrix[newMinoPos[i].y][newMinoPos[i].x] == m_matrix->getGhostCellSign() ||
 				isCellPartOfThis(newMinoPos[i]) ) )
 		{
 			return false;
@@ -261,13 +271,80 @@ void Tetrimino::changeOrientation() {
 	}
 }
 
-void Tetrimino::removeFromMatrix() {
+void Tetrimino::updateMinoPositions(const glm::ivec2 newMinoPos[4]) {
+	for (int i = 0; i < 4; i++) {
+		m_minoPositions[i] = newMinoPos[i];
+	}
+}
+
+void Tetrimino::addToMatrix() {
+	for (int i = 0; i < 4; i++) {
+		m_matrix->getMatrix()[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
+	}
+}
+
+void Tetrimino::calculateGhost() {
+	glm::ivec2 newMinoPos[4]{};
+
+	for (int i = 0; i < 4; i++) {
+		m_ghostMinoPositions[i] = m_minoPositions[i];
+		newMinoPos[i] = { m_ghostMinoPositions[i].x, m_ghostMinoPositions[i].y };
+	}
+
+	/*glm::ivec2 newMinoPos[4] {
+		glm::ivec2(m_ghostMinoPositions[0].x, m_ghostMinoPositions[0].y),
+		glm::ivec2(m_ghostMinoPositions[1].x, m_ghostMinoPositions[1].y),
+		glm::ivec2(m_ghostMinoPositions[2].x, m_ghostMinoPositions[2].y),
+		glm::ivec2(m_ghostMinoPositions[3].x, m_ghostMinoPositions[3].y),
+	};*/
+
+	while (true) {
+
+		for (int i = 0; i < 4; i++) {
+			newMinoPos[i] = { newMinoPos[i].x, newMinoPos[i].y + 1 };
+		}
+
+		if (!canPerformTransformation(newMinoPos)) {
+
+			for (int i = 0; i < 4; i++) {
+				m_ghostMinoPositions[i] = { newMinoPos[i].x, newMinoPos[i].y - 1 };
+			}
+			break;
+		}
+	}
+}
+
+void Tetrimino::addGhostToMatrix() {
+	auto& matrix = m_matrix->getMatrix();
+
+	for (int i = 0; i < 4; i++) {
+		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getGhostCellSign();
+	}
+}
+
+//void Tetrimino::deleteGhost() {
+//	auto& matrix = m_matrix->getMatrix();
+//
+//	for (int i = 0; i < 4; i++) {
+//		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getEmptyCellSign();
+//	}
+//}
+
+void Tetrimino::removeFromMatrix(const bool deleteGhost /*= false*/) {
 	auto& matrix = m_matrix->getMatrix();
 
 	// empty the old cells in the matrix
 	for (int i = 0; i < 4; i++) {
 		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_matrix->getEmptyCellSign();
+
+		if (deleteGhost) {
+			matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getEmptyCellSign();
+		}
 	}
+
+	/*if (deleteGhost) {
+		this->deleteGhost();
+	}*/
 }
 
 Tetrimino_T::Tetrimino_T(Matrix* matrix) {
@@ -303,6 +380,7 @@ bool Tetrimino_T::rotateRight() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;
@@ -324,6 +402,7 @@ bool Tetrimino_T::rotateLeft() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;
@@ -362,6 +441,7 @@ bool Tetrimino_L::rotateRight() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;
@@ -383,6 +463,7 @@ bool Tetrimino_L::rotateLeft() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;
@@ -421,6 +502,7 @@ bool Tetrimino_J::rotateRight() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;
@@ -442,6 +524,7 @@ bool Tetrimino_J::rotateLeft() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;
@@ -520,8 +603,10 @@ bool Tetrimino_I::rotateRight() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
+
 	return true;
 }
 
@@ -553,6 +638,7 @@ bool Tetrimino_I::rotateLeft() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+	
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;
@@ -591,8 +677,11 @@ bool Tetrimino_Z::rotateRight() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
+
 	performTransformation(newMinoPos);
 	changeOrientation();
+
 	return true;
 }
 
@@ -612,8 +701,10 @@ bool Tetrimino_Z::rotateLeft() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+	
 	performTransformation(newMinoPos);
 	changeOrientation();
+
 	return true;
 }
 
@@ -650,8 +741,10 @@ bool Tetrimino_S::rotateRight() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
+
 	return true;
 }
 
@@ -671,6 +764,7 @@ bool Tetrimino_S::rotateLeft() {
 	if (!canPerformTransformation(newMinoPos)) {
 		return false;
 	}
+
 	performTransformation(newMinoPos);
 	changeOrientation();
 	return true;

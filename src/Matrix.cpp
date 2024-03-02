@@ -108,9 +108,9 @@ void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 				minoColor = MINO_COLOR_GREEN;
 				break;
 
-			/*case 'G':
+			case 'G':
 				minoColor = MINO_COLOR_GHOST;
-				break;*/
+				break;
 			}
 
 			Evolve::RectDimension minoDimension{

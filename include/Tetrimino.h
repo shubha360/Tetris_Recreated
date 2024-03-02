@@ -31,13 +31,14 @@ public:
 
 	bool canMoveDown();
 
-	void removeFromMatrix();
+	void removeFromMatrix(const bool deleteGhost = false);
 	void reset();
 
 protected:
 	glm::ivec2 m_spawnMinoPositions[4] = {};
 	glm::ivec2 m_minoPositions[4] = {};
-	
+	glm::ivec2 m_ghostMinoPositions[4] = {};
+
 	int m_originMinoIndex = 0;
 
 	char m_minoSign = ' ';
@@ -54,8 +55,15 @@ protected:
 	bool isCellPartOfThis(const glm::ivec2& cellPos) const;
 	bool isMinoInsideMatrix(const glm::ivec2& minoPos) const;
 
-	void performTransformation(const glm::ivec2 newMinoPos[4]);
+	void performTransformation(const glm::ivec2 newMinoPos[4], bool updateGhost = true);
 	void changeOrientation();
+	
+	void updateMinoPositions(const glm::ivec2 newMinoPos[4]);
+	void addToMatrix();
+
+	// ghost
+	void calculateGhost();
+	void addGhostToMatrix();
 };
 
 class Tetrimino_T : public Tetrimino {
