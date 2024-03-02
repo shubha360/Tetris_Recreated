@@ -90,7 +90,7 @@ private:
 	Evolve::GuiRenderer m_guiRenderer;
 	Evolve::Font m_quicksandFont;
 
-	glm::ivec2 m_winowDims { 0, 0 };
+	glm::ivec2 m_windowDims { 0, 0 };
 
 	int m_guiQuicksandFontId = 0;
 	int m_guiExitButtonId = -1;

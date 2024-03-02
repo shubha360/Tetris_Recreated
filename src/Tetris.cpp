@@ -12,18 +12,18 @@ bool Tetris::init() {
 
 bool Tetris::initEngine() {
 	return
-		m_window.init(false, 1720, 980, CLEAR_COLOR) &&
+		m_window.init(true, 1720, 980, CLEAR_COLOR) &&
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_Fps) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
-		m_quicksandFont.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf") &&
+		m_quicksandFont.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf", 32, 1.0f, 1) &&
 		m_gui.init(m_quicksandFont) &&
 		m_guiRenderer.init("../Evolve-Engine/engine-assets");
 }
 
 bool Tetris::initGame() {
 
-	m_winowDims = glm::ivec2 { m_window.getWindowWidth(), m_window.getWindowHeight() };
+	m_windowDims = glm::ivec2 { m_window.getWindowWidth(), m_window.getWindowHeight() };
 
 	m_randomEngine = std::mt19937(m_seed());
 	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
@@ -32,24 +32,46 @@ bool Tetris::initGame() {
 	Evolve::ImageLoader::BufferTextureData(m_minoTexture);
 	Evolve::ImageLoader::FreeTexture(m_minoTexture);
 
-	//{ // Positioning the main game components
+	glm::ivec2 mainMatrixPos {};
+	glm::ivec2 nextMatrixPos {};
+	glm::ivec2 holdMatrixPos {};
+	glm::ivec2 scorePos {};
+	glm::ivec2 legendPos {};
 
-		//int top = m_winowDims.y / 10 * 9, left = m_winowDims.x / 20;
+	{ // Positioning the main game components
 
-		glm::ivec2 mainMatrixPos { m_window.getWindowWidth() / 6, m_window.getWindowHeight() / 10 * 9 };
+		int mainMatrixWidth = 10 * 32;
+		int mainMatrxiHeight = 20 * 32;
 
-		int mainMatrixWidth = m_matrix.getColumns() * m_matrix.getMinoLength();
+		int extraMatrixWidth = 8 * 16;
 
-		glm::ivec2 nextMatrixPos { mainMatrixPos.x + mainMatrixWidth + 50, mainMatrixPos.y };
+		int top = m_windowDims.y / 2 + mainMatrxiHeight / 2;
+		int horizontalMargin = 50;
+		
+		mainMatrixPos = { m_windowDims.x / 2 -  mainMatrixWidth / 2, top };
 
-		glm::ivec2 holdMatrixPos { nextMatrixPos.x, mainMatrixPos.y - 500 };
+		nextMatrixPos = { mainMatrixPos.x - horizontalMargin - extraMatrixWidth, top };
 
-		m_matrix.init(mainMatrixPos, m_minoTexture.id);
-	//}
+		holdMatrixPos = { nextMatrixPos.x, top - 350 };
+
+		scorePos = { mainMatrixPos.x + mainMatrixWidth + horizontalMargin , top };
+
+		legendPos = { scorePos.x, top - 200};
+	}
+
+	m_matrix.init(mainMatrixPos, m_minoTexture.id);
 
 	std::vector<Tetrimino*> hold;
 	hold.push_back(nullptr);
-	m_holdMatrix.init(hold, holdMatrixPos, m_minoTexture.id);
+	m_holdMatrix.init(
+		hold, 
+		"HOLD", 
+		m_quicksandFont, 
+		1.0f,
+		Evolve::ColorRgba { 255, 255, 255, 255 },
+		holdMatrixPos, 
+		m_minoTexture.id
+	);
 
 	std::vector<Tetrimino*> nexts;
 	nexts.resize(3);
@@ -59,7 +81,15 @@ bool Tetris::initGame() {
 		nexts[i] = m_tetriminoes[m_getTetriminoIndex(m_randomEngine)];
 	}
 
-	m_nextMatrix.init(nexts, nextMatrixPos, m_minoTexture.id);
+	m_nextMatrix.init(
+		nexts, 
+		"NEXT",
+		m_quicksandFont,
+		1.0f,
+		Evolve::ColorRgba{ 255, 255, 255, 255 },
+		nextMatrixPos, 
+		m_minoTexture.id
+	);
 
 	m_guiExitButtonId = m_gui.addTextButton(
 		"Exit",
@@ -68,7 +98,7 @@ bool Tetris::initGame() {
 		Evolve::ColorRgba{ 255, 255, 255, 255 },
 		Evolve::ColorRgba{ 0, 0, 0, 255 },
 		Evolve::GlyphOrigin::TOP_RIGHT,
-		Evolve::RectDimension{ (int) m_winowDims.x - 10, (int) m_winowDims.y - 10, 128, 64 },
+		Evolve::RectDimension{ (int) m_windowDims.x - 10, (int) m_windowDims.y - 10, 128, 64 },
 		[&]() { m_gameState = GameState::QUIT; }
 	);
 
@@ -77,7 +107,23 @@ bool Tetris::initGame() {
 		m_guiQuicksandFontId,
 		1.0f, 
 		Evolve::ColorRgba{ 255, 255, 255, 255 },
-		glm::ivec2(0, (int)m_window.getWindowHeight()));
+		scorePos
+	);
+
+	std::string legend =
+		"A, D - Move left, right\n\n"
+		"Q, E - Rotate left, right\n\n"
+		"S - Soft drop\n\n"
+		"Space - Hard drop\n"
+		"W - Hold\n\n";
+
+	m_gui.addPlainText(
+		legend,
+		m_guiQuicksandFontId,
+		1.0f,
+		Evolve::ColorRgba{ 255, 255, 255, 255 },
+		legendPos
+	);
 
 	return true;
 }
@@ -440,7 +486,11 @@ void Tetris::draw() {
 
 			m_nextMatrix.drawMatrix(m_textureRenderer);
 
+			m_nextMatrix.drawName(m_textureRenderer);
+
 			m_holdMatrix.drawMatrix(m_textureRenderer);
+
+			m_holdMatrix.drawName(m_textureRenderer);
 
 			m_textureRenderer.end();
 
