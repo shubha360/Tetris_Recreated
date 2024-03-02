@@ -12,17 +12,12 @@ bool Tetrimino::spawn() {
 
 	for (int i = 0; i < 4; i++) {
 		if (
-			matrix[m_minoPositions[i].y][m_minoPositions[i].x] != m_matrix->getEmptyCellSign() &&
-			matrix[m_minoPositions[i].y][m_minoPositions[i].x] != m_matrix->getGhostCellSign()
+			matrix[m_minoPositions[i].y][m_minoPositions[i].x] != m_matrix->getEmptyCellSign()
 			) {
 			continueGame = false;
 		}
 
 		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_minoSign;
-	}
-
-	if (continueGame) {
-		updateGhost();
 	}
 
 	return continueGame;
@@ -76,14 +71,26 @@ bool Tetrimino::moveDown() {
 		return false;
 	}
 
-	performTransformation(newMinoPos, false);
+	performTransformation(newMinoPos);
 	return true;
+}
+
+bool Tetrimino::canMoveDown() {
+	glm::ivec2 newMinoPos[4] = {
+		glm::ivec2(m_minoPositions[0].x, m_minoPositions[0].y + 1),
+		glm::ivec2(m_minoPositions[1].x, m_minoPositions[1].y + 1),
+		glm::ivec2(m_minoPositions[2].x, m_minoPositions[2].y + 1),
+		glm::ivec2(m_minoPositions[3].x, m_minoPositions[3].y + 1),
+
+	};
+
+	return canPerformTransformation(newMinoPos);
 }
 
 void Tetrimino::reset() {
 	for (int i = 0; i < 4; i++) {
 		m_minoPositions[i] = m_spawnMinoPositions[i];
-		m_ghostMinoPositions[i] = m_spawnMinoPositions[i];
+		//m_ghostMinoPositions[i] = m_spawnMinoPositions[i];
 	}
 }
 
@@ -199,18 +206,14 @@ glm::ivec2 Tetrimino::rotateMinoLeft(const glm::ivec2& minoPostion) const {
 	return newPos;
 }
 
-void Tetrimino::performTransformation(const glm::ivec2 newMinoPos[4], const bool ghostUpdate /*= true*/) {
+void Tetrimino::performTransformation(const glm::ivec2 newMinoPos[4]) {
 
 	// first empty the old position cells
-	removeFromMatrix(ghostUpdate);
+	removeFromMatrix();
 
 	// setting the new mino positions
 	for (int i = 0; i < 4; i++) {
 		m_minoPositions[i] = newMinoPos[i];
-	}
-
-	if (ghostUpdate) {
-		updateGhost();
 	}
 
 	// fill up the new cells in the matrix
@@ -226,7 +229,6 @@ bool Tetrimino::canPerformTransformation(const glm::ivec2 newMinoPos[4]) const {
 	for (int i = 0; i < 4; i++) {
 		if ( !isMinoInsideMatrix(newMinoPos[i]) ||
 			!( matrix[newMinoPos[i].y][newMinoPos[i].x] == m_matrix->getEmptyCellSign() ||
-				matrix[newMinoPos[i].y][newMinoPos[i].x] == m_matrix->getGhostCellSign() ||
 				isCellPartOfThis(newMinoPos[i]) ) )
 		{
 			return false;
@@ -259,48 +261,12 @@ void Tetrimino::changeOrientation() {
 	}
 }
 
-void Tetrimino::updateGhost() {
-	
-	auto& matrix = m_matrix->getMatrix();
-
-	for (int i = 0; i < 4; i++) {
-		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getEmptyCellSign();
-
-		m_ghostMinoPositions[i] = m_minoPositions[i];
-	}
-
-	while (true) {
-		for (int i = 0; i < 4; i++) {
-			m_ghostMinoPositions[i].y = m_ghostMinoPositions[i].y + 1;
-		}
-
-		if (!canPerformTransformation(m_ghostMinoPositions)) {
-			for (int i = 0; i < 4; i++) {
-				m_ghostMinoPositions[i].y = m_ghostMinoPositions[i].y - 1;
-			}
-			break;
-		}
-	}	
-
-	for (int i = 0; i < 4; i++) {
-		matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getGhostCellSign();
-	}
-}
-
-void Tetrimino::removeFromMatrix(const bool removeGhost) {
+void Tetrimino::removeFromMatrix() {
 	auto& matrix = m_matrix->getMatrix();
 
 	// empty the old cells in the matrix
 	for (int i = 0; i < 4; i++) {
-		
 		matrix[m_minoPositions[i].y][m_minoPositions[i].x] = m_matrix->getEmptyCellSign();
-
-		if (removeGhost) {
-			// remove ghost too
-			matrix[m_ghostMinoPositions[i].y][m_ghostMinoPositions[i].x] = m_matrix->getEmptyCellSign();
-
-			m_ghostMinoPositions[i] = m_minoPositions[i];
-		}
 	}
 }
 

@@ -189,11 +189,7 @@ void Tetris::processInput() {
 
 void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	static float timeSinceAutoDown = 0.0f;
-	//static float autoDownDuration = 60.0f;
-	static float lowestAutoDownDuration = 10.0f;
-
-	static float eachLevelSpeedIncrease = 10.0f;
-	static int lineClearsForLevelUp = 10;
+	static float autoDownDuration = 60.0f;
 
 	static float moveDelayDuration = 5.0f;
 	static float currentMoveDelay = moveDelayDuration;
@@ -207,47 +203,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 		if (respawn) {
 
 			if (checkLines) {
-				int currentLinesCleared = m_matrix.checkLineClears();
-
-				switch (currentLinesCleared) {
-
-				case 1:
-					m_score += (long long)(100 * m_currentLevel);
-					break;
-
-				case 2:
-					m_score += (long long)(300 * m_currentLevel);
-					break;
-
-				case 3:
-					m_score += (long long)(600 * m_currentLevel);
-					break;
-
-				case 4:
-					m_score += (long long)(1000 * m_currentLevel);
-					break;
-				}
-
-				m_linesCleared += currentLinesCleared;
-
-				// check if level up possible
-				if (m_autoDownDuration > lowestAutoDownDuration) {
-
-					// if, linesCleared = 57,
-					// then 57 / 10 + 1 = 5 + 1 = 6
-					int newLevel = m_linesCleared / lineClearsForLevelUp + 1;
-
-					// level up
-					if (newLevel > m_currentLevel) {
-						m_currentLevel = newLevel;
-						m_autoDownDuration -= eachLevelSpeedIncrease;
-
-						if (m_autoDownDuration < lowestAutoDownDuration) {
-							m_autoDownDuration = lowestAutoDownDuration;
-						}
-					}
-				}
-
+				updateScoreAndLevel(autoDownDuration);
 				checkLines = false;
 			}
 
@@ -270,112 +226,194 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 		else {
 
 			timeSinceAutoDown += deltaTime;
+			currentMoveDelay += deltaTime;
 
-			if (timeSinceAutoDown >= m_autoDownDuration) {
+			if (timeSinceAutoDown >= autoDownDuration) {
+
+				// moveDown returns false if can't move down anymore
+				// that's why respawn is true
 				if (!m_current->moveDown()) {
 					respawn = true;
+					canHold = true;
+					checkLines = true;
 				}
 
 				timeSinceAutoDown = 0.0f;
 				m_drawUpdateNeeded = true;
 			}
 
-			if (!inputProcessed) {
-				// move left or right
-				if (m_inputProcessor.isKeyDown(SDLK_a)) {
+			// move left
+			if (m_inputProcessor.isKeyDown(SDLK_a) && !inputProcessed) {
 
-					currentMoveDelay += deltaTime;
-
-					if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
-						m_drawUpdateNeeded = true;
-						inputProcessed = true;
-						currentMoveDelay = 0.0f;
-					}
-				}
-				else if (m_inputProcessor.isKeyDown(SDLK_d)) {
-
-					currentMoveDelay += deltaTime;
-
-					if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
-						m_drawUpdateNeeded = true;
-						inputProcessed = true;
-						currentMoveDelay = 0.0f;
-					}
-				}
-				else if (m_inputProcessor.isKeyDown(SDLK_s)) {
-
-					currentMoveDelay += deltaTime;
-
-					if (currentMoveDelay >= moveDelayDuration) {
-						if (m_current->moveDown()) {
-							m_drawUpdateNeeded = true;
-							inputProcessed = true;
-							currentMoveDelay = 0.0f;
-							timeSinceAutoDown = 0.0f;
-
-							m_score += (long long) (1 * m_currentLevel);
-						}
-						else {
-							respawn = true;
-							canHold = true;
-							checkLines = true;
-						}
-					}
-				}
-
-				else if (m_inputProcessor.isKeyReleased(SDLK_a) ||
-					m_inputProcessor.isKeyReleased(SDLK_d) ||
-					m_inputProcessor.isKeyReleased(SDLK_s)) {
-
-					currentMoveDelay = moveDelayDuration;
-				}
-
-				// rotate left
-				else if (m_inputProcessor.isKeyPressed(SDLK_q)) {
-					if (m_current->rotateLeft()) {
-						m_drawUpdateNeeded = true;
-						inputProcessed = true;
-					}
-				}
-				
-				// rotate right
-				else if (m_inputProcessor.isKeyPressed(SDLK_e)) {
-					if (m_current->rotateRight()) {
-						m_drawUpdateNeeded = true;
-						inputProcessed = true;
-					}
-				}
-				
-				// hard drop
-				else if (m_inputProcessor.isKeyPressed(SDLK_SPACE)) {
-					while (true) {
-						if (!m_current->moveDown()) {
-							break;
-						}
-						m_score += (long long) (2 * m_currentLevel);
-					}
-					respawn = true;
-					canHold = true;
-					checkLines = true;
-				}
-
-				// hold
-				else if (m_inputProcessor.isKeyPressed(SDLK_w) && canHold) {
-					m_current->removeFromMatrix(true);
-					m_current = m_holdMatrix.pushAndPop(m_current);
-
-					if (m_current == nullptr) {
-						respawn = true;
-					}
-					else {
-						m_current->reset();
-						m_current->spawn();
-					}
-
+				if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
 					m_drawUpdateNeeded = true;
 					inputProcessed = true;
-					canHold = false;
+					currentMoveDelay = 0.0f;
+
+					// can only make one move if can't move down
+					if (!m_current->canMoveDown()) {
+						respawn = true;
+						canHold = true;
+						checkLines = true;
+					}
 				}
+			}
+
+			// move right
+			else if (m_inputProcessor.isKeyDown(SDLK_d) && !inputProcessed) {
+
+				if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+					currentMoveDelay = 0.0f;
+
+					// can only make one move if can't move down
+					if (!m_current->canMoveDown()) {
+						respawn = true;
+						canHold = true;
+						checkLines = true;
+					}
+				}
+			}
+				
+			// soft drop
+			else if (m_inputProcessor.isKeyDown(SDLK_s) && !inputProcessed) {
+
+				if (currentMoveDelay >= moveDelayDuration) {
+					if (m_current->moveDown()) {
+						m_drawUpdateNeeded = true;
+						inputProcessed = true;
+						currentMoveDelay = 0.0f;
+						timeSinceAutoDown = 0.0f;
+
+						m_score += (long long) (1 * m_currentLevel);
+					}
+					else {
+						respawn = true;
+						canHold = true;
+						checkLines = true;
+					}
+				}
+			}
+
+			// if any moving key is released, next key press should not delay
+			else if (
+				m_inputProcessor.isKeyReleased(SDLK_a) ||
+				m_inputProcessor.isKeyReleased(SDLK_d) ||
+				m_inputProcessor.isKeyReleased(SDLK_s)
+				) {
+
+				currentMoveDelay = moveDelayDuration;
+			}
+
+			// rotate left
+			else if (m_inputProcessor.isKeyPressed(SDLK_q) && !inputProcessed) {
+				if (m_current->rotateLeft()) {
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+					
+					// can only make one move if can't move down
+					if (!m_current->canMoveDown()) {
+						respawn = true;
+						canHold = true;
+						checkLines = true;
+					}
+				}
+			}
+				
+			// rotate right
+			else if (m_inputProcessor.isKeyPressed(SDLK_e) && !inputProcessed) {
+				if (m_current->rotateRight()) {
+					m_drawUpdateNeeded = true;
+					inputProcessed = true;
+
+					// can only make one move if can't move down
+					if (!m_current->canMoveDown()) {
+						respawn = true;
+						canHold = true;
+						checkLines = true;
+					}
+				}
+			}
+				
+			// hard drop
+			else if (m_inputProcessor.isKeyPressed(SDLK_SPACE) && !inputProcessed) {
+				while (true) {
+					if (!m_current->moveDown()) {
+						break;
+					}
+					m_score += (long long) (2 * m_currentLevel);
+				}
+				respawn = true;
+				canHold = true;
+				checkLines = true;
+			}
+
+			// hold
+			else if (m_inputProcessor.isKeyPressed(SDLK_w) && !inputProcessed && canHold) {
+				m_current->removeFromMatrix();
+				m_current = m_holdMatrix.pushAndPop(m_current);
+
+				if (m_current == nullptr) {
+					respawn = true;
+				}
+				else {
+					m_current->reset();
+					m_current->spawn();
+				}
+
+				m_drawUpdateNeeded = true;
+				inputProcessed = true;
+				canHold = false;
+			}
+		}
+	}
+}
+
+void Tetris::updateScoreAndLevel(float& autoDownDuration) {
+	
+	static float lowestAutoDownDuration = 10.0f;
+
+	static float eachLevelSpeedIncrease = 10.0f;
+	static int lineClearsForLevelUp = 10;
+
+	int currentLinesCleared = m_matrix.checkLineClears();
+
+	switch (currentLinesCleared) {
+
+	case 1:
+		m_score += (long long)(100 * m_currentLevel);
+		break;
+
+	case 2:
+		m_score += (long long)(300 * m_currentLevel);
+		break;
+
+	case 3:
+		m_score += (long long)(600 * m_currentLevel);
+		break;
+
+	case 4:
+		m_score += (long long)(1000 * m_currentLevel);
+		break;
+	}
+
+	m_linesCleared += currentLinesCleared;
+
+	// check if level up possible
+	if (autoDownDuration > lowestAutoDownDuration) {
+
+		// if, linesCleared = 57,
+		// then 57 / 10 + 1 = 5 + 1 = 6
+		int newLevel = m_linesCleared / lineClearsForLevelUp + 1;
+
+		// level up
+		if (newLevel > m_currentLevel) {
+			m_currentLevel = newLevel;
+			autoDownDuration -= eachLevelSpeedIncrease;
+
+			if (autoDownDuration < lowestAutoDownDuration) {
+				autoDownDuration = lowestAutoDownDuration;
 			}
 		}
 	}
@@ -416,8 +454,7 @@ void Tetris::draw() {
 
 	std::string scoreText = "Score: " + std::to_string(m_score) + "\n" +
 		"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
-		"Level: " + std::to_string(m_currentLevel) + "\n" +
-		"Down duration: " + std::to_string(m_autoDownDuration);
+		"Level: " + std::to_string(m_currentLevel) + "\n";
 
 	m_gui.setComponentLabel(m_guiTextId, scoreText);
 

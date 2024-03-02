@@ -28,7 +28,7 @@ public:
 	const int getRows() const { return m_numRows; }
 	const int getMinoLength() const { return m_minoLength; }
 	const char getEmptyCellSign() const { return EMPTY_CELL_SIGN; }
-	const char getGhostCellSign() const { return GHOST_CELL_SIGN; }
+	//const char getGhostCellSign() const { return GHOST_CELL_SIGN; }
 
 protected:
 	const Evolve::ColorRgba MINO_COLOR_BLACK {0, 0, 0, 255};
@@ -39,14 +39,14 @@ protected:
 	const Evolve::ColorRgba MINO_COLOR_CYAN { 0, 255, 255, 255 };
 	const Evolve::ColorRgba MINO_COLOR_MAGENTA { 255, 0, 255, 255 };
 	const Evolve::ColorRgba MINO_COLOR_ORANGE { 255, 165, 0, 255 };
-	const Evolve::ColorRgba MINO_COLOR_GHOST { 0, 0, 0, 0 };
+	//const Evolve::ColorRgba MINO_COLOR_GHOST { 0, 0, 0, 0 };
 
 	int m_numRows = 20;
 	int m_numColumns = 10;
 	int m_minoLength = 32;
 	
 	const char EMPTY_CELL_SIGN = ' ';
-	const char GHOST_CELL_SIGN = 'G';
+	//const char GHOST_CELL_SIGN = 'G';
 	const std::string EMPTY_LINE = std::string(m_numColumns, EMPTY_CELL_SIGN);
 
 	glm::ivec2 m_matrixPosTopLeft = glm::ivec2(0);

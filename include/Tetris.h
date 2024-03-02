@@ -51,7 +51,6 @@ private:
 	long long m_score = 0;
 	int m_linesCleared = 0;
 	int m_currentLevel = 1;
-	float m_autoDownDuration = 60.0f;
 
 	Matrix m_matrix;
 	ExtraMatrix m_nextMatrix, m_holdMatrix;
@@ -115,6 +114,9 @@ private:
 	*/
 	void updateGame(float deltaTime, bool& inputProcessed);
 	
+
+	void updateScoreAndLevel(float& autoDownDuration);
+
 	void draw();
 	
 	void printFps();
