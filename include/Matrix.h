@@ -31,15 +31,17 @@ public:
 	const char getGhostCellSign() const { return GHOST_CELL_SIGN; }
 
 protected:
-	const Evolve::ColorRgba MINO_COLOR_BLACK	{   0,   0,   0, 255 };
-	const Evolve::ColorRgba MINO_COLOR_RED		{ 255,   0,   0, 255 };
-	const Evolve::ColorRgba MINO_COLOR_GREEN	{   0, 255,   0, 255 };
-	const Evolve::ColorRgba MINO_COLOR_BLUE		{   0,   0, 255, 255 };
-	const Evolve::ColorRgba MINO_COLOR_YELLOW	{ 255, 255,   0, 255 };
-	const Evolve::ColorRgba MINO_COLOR_CYAN		{   0, 255, 255, 255 };
-	const Evolve::ColorRgba MINO_COLOR_MAGENTA	{ 255,   0, 255, 255 };
-	const Evolve::ColorRgba MINO_COLOR_ORANGE	{ 255, 165,   0, 255 };
-	const Evolve::ColorRgba MINO_COLOR_GHOST	{   0,   0,   0, 100 };
+	const Evolve::UvDimension MINO_UV_BLACK		{ 0.0f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_RED		{ 0.1f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_GREEN		{ 0.2f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_BLUE		{ 0.3f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_YELLOW	{ 0.4f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_CYAN		{ 0.5f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_MAGENTA	{ 0.6f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_ORANGE	{ 0.7f, 0.0f, 0.1f, 1.0f };
+	const Evolve::UvDimension MINO_UV_GHOST		{ 0.8f, 0.0f, 0.1f, 1.0f };
+
+	const Evolve::ColorRgba MINO_COLOR { 255, 255, 255, 255 };
 
 	int m_numRows = 20;
 	int m_numColumns = 10;

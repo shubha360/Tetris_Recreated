@@ -66,9 +66,7 @@ int Matrix::checkLineClears() {
 
 void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 
-	static UvDimension minoUV { 0.0f, 0.0f, 1.0f, 1.0f };
-	
-	Evolve::ColorRgba minoColor {};
+	static Evolve::UvDimension minoUV = {};
 
 	for (int row = 0; row < m_numRows; row++) {
 		for (int column = 0; column < m_numColumns; column++) {
@@ -77,39 +75,39 @@ void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 			switch (m_matrix[row][column]) {
 			
 			case ' ':
-				minoColor = MINO_COLOR_BLACK;
+				minoUV = MINO_UV_BLACK;
 				break;
 
 			case 'T':
-				minoColor = MINO_COLOR_MAGENTA;
+				minoUV = MINO_UV_MAGENTA;
 				break;
 
 			case 'L':
-				minoColor = MINO_COLOR_ORANGE;
+				minoUV = MINO_UV_ORANGE;
 				break;
 
 			case 'J':
-				minoColor = MINO_COLOR_BLUE;
+				minoUV = MINO_UV_BLUE;
 				break;
 
 			case 'O':
-				minoColor = MINO_COLOR_YELLOW;
+				minoUV = MINO_UV_YELLOW;
 				break;
 
 			case 'I':
-				minoColor = MINO_COLOR_CYAN;
+				minoUV = MINO_UV_CYAN;
 				break;
 
 			case 'Z':
-				minoColor = MINO_COLOR_RED;
+				minoUV = MINO_UV_RED;
 				break;
 
 			case 'S':
-				minoColor = MINO_COLOR_GREEN;
+				minoUV = MINO_UV_GREEN;
 				break;
 
 			case 'G':
-				minoColor = MINO_COLOR_GHOST;
+				minoUV = MINO_UV_GHOST;
 				break;
 			}
 
@@ -124,7 +122,7 @@ void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 				minoDimension,
 				minoUV,
 				m_minoTextureId,
-				minoColor
+				MINO_COLOR
 			);
 		}
 	}

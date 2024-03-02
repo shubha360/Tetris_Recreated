@@ -48,6 +48,12 @@ private:
 	GameState m_gameState = GameState::PLAYING;
 	Evolve::TextureData m_minoTexture {};
 
+	std::string m_pauseText = "PAUSED", m_endText = "GAME ENDED!";
+	
+	// these will be defined after font is initialized
+	int m_pauseTextX = 0, m_endTextX = 0;
+	glm::ivec2 m_gameStateTextPos {};
+
 	long long m_score = 0;
 	int m_linesCleared = 0;
 	int m_currentLevel = 1;
@@ -95,6 +101,8 @@ private:
 	int m_guiQuicksandFontId = 0;
 	int m_guiExitButtonId = -1;
 	int m_guiTextId = -1;
+	int m_guiLegendId = -1;
+	int m_guiGameStateTextId = -1;
 
 	bool m_drawUpdateNeeded = true;
 

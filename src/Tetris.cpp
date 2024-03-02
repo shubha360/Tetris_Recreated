@@ -28,7 +28,7 @@ bool Tetris::initGame() {
 	m_randomEngine = std::mt19937(m_seed());
 	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
 
-	Evolve::ImageLoader::LoadTextureFromImage("resources/images/mino.png", m_minoTexture, 4);
+	Evolve::ImageLoader::LoadTextureFromImage("resources/images/minos.png", m_minoTexture, 4);
 	Evolve::ImageLoader::BufferTextureData(m_minoTexture);
 	Evolve::ImageLoader::FreeTexture(m_minoTexture);
 
@@ -57,73 +57,95 @@ bool Tetris::initGame() {
 		scorePos = { mainMatrixPos.x + mainMatrixWidth + horizontalMargin , top };
 
 		legendPos = { scorePos.x, top - 200};
+
+		m_pauseTextX = mainMatrixPos.x + mainMatrixWidth / 2 - m_quicksandFont.getLineWidth(m_pauseText) / 2;
+		m_endTextX = mainMatrixPos.x + mainMatrixWidth / 2 - m_quicksandFont.getLineWidth(m_endText) / 2;
+
+		m_gameStateTextPos = { m_pauseTextX, mainMatrixPos.y - mainMatrxiHeight - 20 };
 	}
 
-	m_matrix.init(mainMatrixPos, m_minoTexture.id);
+	{ // initialize the matrices
 
-	std::vector<Tetrimino*> hold;
-	hold.push_back(nullptr);
-	m_holdMatrix.init(
-		hold, 
-		"HOLD", 
-		m_quicksandFont, 
-		1.0f,
-		Evolve::ColorRgba { 255, 255, 255, 255 },
-		holdMatrixPos, 
-		m_minoTexture.id
-	);
+		m_matrix.init(mainMatrixPos, m_minoTexture.id);
 
-	std::vector<Tetrimino*> nexts;
-	nexts.resize(3);
+		std::vector<Tetrimino*> hold;
+		hold.push_back(nullptr);
+		m_holdMatrix.init(
+			hold,
+			"HOLD",
+			m_quicksandFont,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			holdMatrixPos,
+			m_minoTexture.id
+		);
 
-	for (int i = 0; i < 3; i++) {
-		//nexts[i] = m_tetriminoes[4];
-		nexts[i] = m_tetriminoes[m_getTetriminoIndex(m_randomEngine)];
+		std::vector<Tetrimino*> nexts;
+		nexts.resize(3);
+
+		for (int i = 0; i < 3; i++) {
+			//nexts[i] = m_tetriminoes[4];
+			nexts[i] = m_tetriminoes[m_getTetriminoIndex(m_randomEngine)];
+		}
+
+		m_nextMatrix.init(
+			nexts,
+			"NEXT",
+			m_quicksandFont,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			nextMatrixPos,
+			m_minoTexture.id
+		);
 	}
 
-	m_nextMatrix.init(
-		nexts, 
-		"NEXT",
-		m_quicksandFont,
-		1.0f,
-		Evolve::ColorRgba{ 255, 255, 255, 255 },
-		nextMatrixPos, 
-		m_minoTexture.id
-	);
+	{ // Initialize the Gui compoments
 
-	m_guiExitButtonId = m_gui.addTextButton(
-		"Exit",
-		m_guiQuicksandFontId,
-		1.0f,
-		Evolve::ColorRgba{ 255, 255, 255, 255 },
-		Evolve::ColorRgba{ 0, 0, 0, 255 },
-		Evolve::GlyphOrigin::TOP_RIGHT,
-		Evolve::RectDimension{ (int) m_windowDims.x - 10, (int) m_windowDims.y - 10, 128, 64 },
-		[&]() { m_gameState = GameState::QUIT; }
-	);
+		m_guiExitButtonId = m_gui.addTextButton(
+			"Exit",
+			m_guiQuicksandFontId,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			Evolve::ColorRgba{ 0, 0, 20, 255 },
+			Evolve::GlyphOrigin::TOP_RIGHT,
+			Evolve::RectDimension{ (int)m_windowDims.x - 10, (int)m_windowDims.y - 10, 128, 64 },
+			[&]() { m_gameState = GameState::QUIT; }
+		);
 
-	m_guiTextId = m_gui.addPlainText(
-		"", 
-		m_guiQuicksandFontId,
-		1.0f, 
-		Evolve::ColorRgba{ 255, 255, 255, 255 },
-		scorePos
-	);
+		m_guiTextId = m_gui.addPlainText(
+			"",
+			m_guiQuicksandFontId,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			scorePos
+		);
 
-	std::string legend =
-		"A, D - Move left, right\n\n"
-		"Q, E - Rotate left, right\n\n"
-		"S - Soft drop\n\n"
-		"Space - Hard drop\n"
-		"W - Hold\n\n";
+		std::string legend =
+			"A, D - Move left, right\n\n"
+			"Q, E - Rotate left, right\n\n"
+			"S - Soft drop\n\n"
+			"Space - Hard drop\n\n"
+			"W - Hold\n\n"
+			"Esc - Pause / Resume";
 
-	m_gui.addPlainText(
-		legend,
-		m_guiQuicksandFontId,
-		1.0f,
-		Evolve::ColorRgba{ 255, 255, 255, 255 },
-		legendPos
-	);
+		m_guiLegendId = m_gui.addPlainText(
+			legend,
+			m_guiQuicksandFontId,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			legendPos
+		);
+
+		m_guiGameStateTextId = m_gui.addPlainText(
+			m_pauseText,
+			m_guiQuicksandFontId,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			m_gameStateTextPos
+		);
+
+		m_gui.hideComponent(m_guiGameStateTextId);
+	}
 
 	return true;
 }
@@ -226,9 +248,11 @@ void Tetris::processInput() {
 	if (m_inputProcessor.isKeyPressed(SDLK_ESCAPE)) {
 		if (m_gameState == GameState::PLAYING) {
 			m_gameState = GameState::PAUSED;
+			m_gui.showComponent(m_guiGameStateTextId);
 		}
 		else if (m_gameState == GameState::PAUSED) {
 			m_gameState = GameState::PLAYING;
+			m_gui.hideComponent(m_guiGameStateTextId);
 		}
 	}
 }
@@ -261,6 +285,12 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			if (!m_current->spawn()) {
 				// game ended
 				m_gameState = GameState::ENDED;
+
+				m_gui.setComponentLabel(m_guiGameStateTextId, m_endText);
+
+				m_gameStateTextPos.x = m_endTextX;
+				m_gui.setComponentPosition(m_guiGameStateTextId, m_gameStateTextPos);
+				m_gui.showComponent(m_guiGameStateTextId);
 			}
 
 			m_drawUpdateNeeded = true;
