@@ -48,15 +48,21 @@ private:
 	GameState m_gameState = GameState::MAIN_MENU;
 	Evolve::TextureData m_minoTexture {};
 
-	std::string m_pauseText = "PAUSED", m_endText = "GAME ENDED!";
+	// game play variables
 	
-	// these will be defined after font is initialized
-	int m_pauseTextX = 0, m_endTextX = 0;
-	glm::ivec2 m_gameStateTextPos {};
-
 	long long m_score = 0;
 	int m_linesCleared = 0;
 	int m_currentLevel = 1;
+
+	float m_timeSinceAutoDown = 0.0f;
+	float m_autoDownDuration = 60.0f;
+
+	bool m_canHold = true;
+	bool m_respawn = true;
+	bool m_checkLines = false;
+	bool m_lastMoveMade = false;
+
+	//
 
 	Matrix m_matrix;
 	ExtraMatrix m_nextMatrix, m_holdMatrix;
@@ -98,22 +104,31 @@ private:
 
 	glm::ivec2 m_windowDims { 0, 0 };
 
-	int m_guiQuicksandFontId = 0;
-	int m_guiStartButtonId = -1;
-	int m_guiExitButtonId = -1;
-	int m_guiScoreTextId = -1;
-	int m_guiLegendId = -1;
-	int m_guiGameStateTextId = -1;
+	int m_gui_QuicksandFont_Id = 0;
+	
+	int m_gui_StartButton_Id = -1;
+	int m_gui_ExitButton_Id = -1;
+	int m_gui_RestartButton_Id = -1;
+	int m_gui_PauseBgText_Id = -1;
+
+	int m_gui_ScoreText_Id = -1;
+	int m_gui_Legend_Id = -1;
+	int m_gui_gameOverText_Id = -1;
 
 	bool m_drawUpdateNeeded = true;
 
 	bool initEngine();
 	bool initGame();
 
+	std::vector<Tetrimino*> initNexts();
+	std::vector<Tetrimino*> initHold();
+
 	void gameLoop();
 	float runGameSimulations(float previousTicks);
 	void processInput();
 	
+	void restart();
+
 	/*
 	This function is called in every simulation of a frame.
 	Input should be processed at most once per frame.
@@ -123,8 +138,7 @@ private:
 	*/
 	void updateGame(float deltaTime, bool& inputProcessed);
 	
-
-	void updateScoreAndLevel(float& autoDownDuration);
+	void updateScoreAndLevel();
 
 	void draw();
 	

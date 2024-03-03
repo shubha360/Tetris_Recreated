@@ -8,9 +8,7 @@ void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const std::string& n
 	const float nameScale, const Evolve::ColorRgba nameColor,
 	const glm::ivec2& topLeftPos, GLuint minoTextureId, const int minoLength /*= 16*/) {
 
-	m_tetriminoes = tetriminoes;
-
-	int numRows = m_tetriminoes.size() * m_tetriminoMaxHeight;
+	int numRows = tetriminoes.size() * m_tetriminoMaxHeight;
 	int numColumns = 8;
 
 	m_name = name;
@@ -32,11 +30,7 @@ void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const std::string& n
 
 	Matrix::init(m_matrixPos, minoTextureId, numRows, 8, minoLength);
 
-	for (int i = 0; i < m_tetriminoes.size(); i++) {
-		if (m_tetriminoes[i] != nullptr) {
-			addTetrimino(i, m_tetriminoes[i]);
-		}
-	}
+	addTetriminoes(tetriminoes);
 }
 
 Tetrimino* ExtraMatrix::pushAndPop(Tetrimino* newTetrimino) {
@@ -55,13 +49,18 @@ Tetrimino* ExtraMatrix::pushAndPop(Tetrimino* newTetrimino) {
 
 	emptyMatrix();
 
-	for (int i = 0; i < m_tetriminoes.size(); i++) {
-		if (m_tetriminoes[i] != nullptr) {
-			addTetrimino(i, m_tetriminoes[i]);
-		}
-	}
+	addTetriminoes(m_tetriminoes);
 
 	return pop;
+}
+
+void ExtraMatrix::reset(std::vector<Tetrimino*> tetriminoes) {
+	if (m_tetriminoes.size() != tetriminoes.size()) {
+		EVOLVE_REPORT_ERROR("Invalid vector passed.", reset);
+		return;
+	}
+	Matrix::reset();
+	addTetriminoes(tetriminoes);
 }
 
 void ExtraMatrix::drawName(Evolve::TextureRenderer& textureRenderer) {
@@ -69,23 +68,33 @@ void ExtraMatrix::drawName(Evolve::TextureRenderer& textureRenderer) {
 	m_font.drawTextToRenderer(m_name, m_namePos.x, m_namePos.y, m_nameColor, textureRenderer);
 }
 
-void ExtraMatrix::addTetrimino(int index, Tetrimino* tetrimino) {
-	int originX = m_numColumns / 2;
-	int originY = index * m_tetriminoMaxHeight + 2;
+void ExtraMatrix::addTetriminoes(std::vector<Tetrimino*> tetriminoes) {
 
-	m_matrix[originY][originX] = tetrimino->m_minoSign;
+	m_tetriminoes = tetriminoes;
 
-	for (int i = 0; i < 4; i++) {
-		if (i != tetrimino->m_originMinoIndex) {
-			int minoX = 0, minoY = 0;
+	for (int i = 0; i < m_tetriminoes.size(); i++) {
 
-			minoX = originX + 
-				(tetrimino->m_spawnMinoPositions[i].x - tetrimino->m_spawnMinoPositions[tetrimino->m_originMinoIndex].x);
+		auto& current = m_tetriminoes[i];
 
-			minoY = originY +
-				(tetrimino->m_spawnMinoPositions[i].y - tetrimino->m_spawnMinoPositions[tetrimino->m_originMinoIndex].y);
+		if (current != nullptr) {
+			int originX = m_numColumns / 2;
+			int originY = i * m_tetriminoMaxHeight + 2;
 
-			m_matrix[minoY][minoX] = tetrimino->m_minoSign;
+			m_matrix[originY][originX] = current->m_minoSign;
+
+			for (int j = 0; j < 4; j++) {
+				if (j != current->m_originMinoIndex) {
+					int minoX = 0, minoY = 0;
+
+					minoX = originX +
+						(current->m_spawnMinoPositions[j].x - current->m_spawnMinoPositions[current->m_originMinoIndex].x);
+
+					minoY = originY +
+						(current->m_spawnMinoPositions[j].y - current->m_spawnMinoPositions[current->m_originMinoIndex].y);
+
+					m_matrix[minoY][minoX] = current->m_minoSign;
+				}
+			}
 		}
 	}
 }

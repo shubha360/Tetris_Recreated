@@ -23,6 +23,8 @@ public:
 
 	void drawMatrix(Evolve::TextureRenderer& renderer) const;
 
+	void reset();
+
 	std::vector<std::string>& getMatrix() { return m_matrix; }
 	const int getColumns() const { return m_numColumns; }
 	const int getRows() const { return m_numRows; }

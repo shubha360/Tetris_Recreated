@@ -17,6 +17,8 @@ public:
 
 	Tetrimino* pushAndPop(Tetrimino* newTetrimino);
 
+	void reset(std::vector<Tetrimino*> tetriminoes);
+
 	void drawName(Evolve::TextureRenderer& textureRenderer);
 
 private:
@@ -30,7 +32,7 @@ private:
 	glm::ivec2 m_namePos {};
 	glm::ivec2 m_matrixPos {};
 
-	void addTetrimino(int index, Tetrimino* tetrimino);
+	void addTetriminoes(std::vector<Tetrimino*> tetriminoes);
 	void emptyMatrix();
 
 	int m_tetriminoMaxHeight = 5;

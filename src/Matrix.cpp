@@ -127,3 +127,11 @@ void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 		}
 	}
 }
+
+void Matrix::reset() {
+	for (auto& row : m_matrix) {
+		for (auto& c : row) {
+			c = ' ';
+		}
+	}
+}
