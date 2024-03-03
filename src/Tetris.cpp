@@ -101,6 +101,22 @@ bool Tetris::initGame() {
 
 	{ // Initialize the Gui compoments
 
+		m_guiStartButtonId = m_gui.addTextButton(
+			"Start",
+			m_guiQuicksandFontId,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			Evolve::ColorRgba{ 0, 0, 20, 255 },
+			Evolve::GlyphOrigin::CENTER,
+			Evolve::RectDimension{ (int) m_windowDims.x / 2, (int) m_windowDims.y / 2, 512, 64 },
+			[&]() { 
+				m_gameState = GameState::PLAYING;
+				m_gui.hideComponent(m_guiStartButtonId);
+				m_gui.showComponent(m_guiScoreTextId);
+				m_gui.showComponent(m_guiLegendId);
+			}
+		);
+
 		m_guiExitButtonId = m_gui.addTextButton(
 			"Exit",
 			m_guiQuicksandFontId,
@@ -108,17 +124,19 @@ bool Tetris::initGame() {
 			Evolve::ColorRgba{ 255, 255, 255, 255 },
 			Evolve::ColorRgba{ 0, 0, 20, 255 },
 			Evolve::GlyphOrigin::TOP_RIGHT,
-			Evolve::RectDimension{ (int)m_windowDims.x - 10, (int)m_windowDims.y - 10, 128, 64 },
+			Evolve::RectDimension{ (int) m_windowDims.x - 10, (int) m_windowDims.y - 10, 80, 64 },
 			[&]() { m_gameState = GameState::QUIT; }
 		);
 
-		m_guiTextId = m_gui.addPlainText(
+		m_guiScoreTextId = m_gui.addPlainText(
 			"",
 			m_guiQuicksandFontId,
 			1.0f,
 			Evolve::ColorRgba{ 255, 255, 255, 255 },
 			scorePos
 		);
+
+		m_gui.hideComponent(m_guiScoreTextId);
 
 		std::string legend =
 			"A, D - Move left, right\n\n"
@@ -135,6 +153,8 @@ bool Tetris::initGame() {
 			Evolve::ColorRgba{ 255, 255, 255, 255 },
 			legendPos
 		);
+
+		m_gui.hideComponent(m_guiLegendId);
 
 		m_guiGameStateTextId = m_gui.addPlainText(
 			m_pauseText,
@@ -521,7 +541,9 @@ void Tetris::draw() {
 			m_drawUpdateNeeded = false;
 		}
 
-		m_textureRenderer.renderTextures();
+		if (m_gameState != GameState::MAIN_MENU && m_gameState != GameState::QUIT) {
+			m_textureRenderer.renderTextures();
+		}
 	}
 
 	m_shaderProgram.unuseProgram();
@@ -530,7 +552,7 @@ void Tetris::draw() {
 		"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
 		"Level: " + std::to_string(m_currentLevel) + "\n";
 
-	m_gui.setComponentLabel(m_guiTextId, scoreText);
+	m_gui.setComponentLabel(m_guiScoreTextId, scoreText);
 
 	m_guiRenderer.renderGui(m_gui, m_camera);
 

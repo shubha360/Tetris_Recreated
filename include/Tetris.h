@@ -45,7 +45,7 @@ public:
 private:
 	const Evolve::ColorRgba CLEAR_COLOR { 28,36,56,255 };
 	const float MAX_Fps = 60.0f;
-	GameState m_gameState = GameState::PLAYING;
+	GameState m_gameState = GameState::MAIN_MENU;
 	Evolve::TextureData m_minoTexture {};
 
 	std::string m_pauseText = "PAUSED", m_endText = "GAME ENDED!";
@@ -99,8 +99,9 @@ private:
 	glm::ivec2 m_windowDims { 0, 0 };
 
 	int m_guiQuicksandFontId = 0;
+	int m_guiStartButtonId = -1;
 	int m_guiExitButtonId = -1;
-	int m_guiTextId = -1;
+	int m_guiScoreTextId = -1;
 	int m_guiLegendId = -1;
 	int m_guiGameStateTextId = -1;
 
