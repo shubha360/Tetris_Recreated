@@ -268,6 +268,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	static bool canHold = true;
 	static bool respawn = true;
 	static bool checkLines = false;
+	static bool lastMoveMade = false;
 
 	if (m_gameState == GameState::PLAYING) {
 		if (respawn) {
@@ -298,6 +299,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			timeSinceAutoDown = 0.0f;
 
 			respawn = false;
+			lastMoveMade = false;
 		}
 		else {
 
@@ -319,7 +321,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			}
 
 			// move left
-			if (m_inputProcessor.isKeyDown(SDLK_a) && !inputProcessed) {
+			if (m_inputProcessor.isKeyDown(SDLK_a) && !inputProcessed && !lastMoveMade) {
 
 				if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
 					m_drawUpdateNeeded = true;
@@ -328,15 +330,13 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 
 					// can only make one move if can't move down
 					if (!m_current->canMoveDown()) {
-						respawn = true;
-						canHold = true;
-						checkLines = true;
+						lastMoveMade = true;
 					}
 				}
 			}
 
 			// move right
-			else if (m_inputProcessor.isKeyDown(SDLK_d) && !inputProcessed) {
+			else if (m_inputProcessor.isKeyDown(SDLK_d) && !inputProcessed && !lastMoveMade) {
 
 				if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
 					m_drawUpdateNeeded = true;
@@ -345,9 +345,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 
 					// can only make one move if can't move down
 					if (!m_current->canMoveDown()) {
-						respawn = true;
-						canHold = true;
-						checkLines = true;
+						lastMoveMade = true;
 					}
 				}
 			}
@@ -383,31 +381,27 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			}
 
 			// rotate left
-			else if (m_inputProcessor.isKeyPressed(SDLK_q) && !inputProcessed) {
+			else if (m_inputProcessor.isKeyPressed(SDLK_q) && !inputProcessed && !lastMoveMade) {
 				if (m_current->rotateLeft()) {
 					m_drawUpdateNeeded = true;
 					inputProcessed = true;
 					
 					// can only make one move if can't move down
 					if (!m_current->canMoveDown()) {
-						respawn = true;
-						canHold = true;
-						checkLines = true;
+						lastMoveMade = true;
 					}
 				}
 			}
 				
 			// rotate right
-			else if (m_inputProcessor.isKeyPressed(SDLK_e) && !inputProcessed) {
+			else if (m_inputProcessor.isKeyPressed(SDLK_e) && !inputProcessed && !lastMoveMade) {
 				if (m_current->rotateRight()) {
 					m_drawUpdateNeeded = true;
 					inputProcessed = true;
 
 					// can only make one move if can't move down
 					if (!m_current->canMoveDown()) {
-						respawn = true;
-						canHold = true;
-						checkLines = true;
+						lastMoveMade = true;
 					}
 				}
 			}
