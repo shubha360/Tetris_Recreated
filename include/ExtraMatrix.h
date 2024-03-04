@@ -21,6 +21,8 @@ public:
 
 	void drawName(Evolve::TextureRenderer& textureRenderer);
 
+	int getTetriminoMaxHeight() const { return m_tetriminoMaxHeight; }
+
 private:
 	std::vector<Tetrimino*> m_tetriminoes;
 

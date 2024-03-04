@@ -27,6 +27,7 @@
 #include "ExtraMatrix.h"
 
 enum class GameState {
+	PRE_PLAY,
 	PLAYING,
 	MAIN_MENU,
 	PAUSED,
@@ -104,13 +105,21 @@ private:
 
 	glm::ivec2 m_windowDims { 0, 0 };
 
+	// gui font ids
 	int m_gui_QuicksandFont_Id = 0;
 	
+	// gui component ids
 	int m_gui_StartButton_Id = -1;
 	int m_gui_ExitButton_Id = -1;
 	int m_gui_RestartButton_Id = -1;
 	
-	int m_gui_PauseBgText_Id = -1;
+	int m_gui_HideNextPanel_Id = -1;
+	int m_gui_PreplayDigit_Id = -1;
+	int m_gui_PreplayGo_Id = -1;
+
+	int m_gui_PauseText_Id = -1;
+	int m_gui_PausePanel_Id = -1;
+
 	int m_gui_LevelUpBlinkText_Id = -1;
 
 	int m_gui_ScoreText_Id = -1;
