@@ -109,7 +109,9 @@ private:
 	int m_gui_StartButton_Id = -1;
 	int m_gui_ExitButton_Id = -1;
 	int m_gui_RestartButton_Id = -1;
+	
 	int m_gui_PauseBgText_Id = -1;
+	int m_gui_LevelUpBlinkText_Id = -1;
 
 	int m_gui_ScoreText_Id = -1;
 	int m_gui_Legend_Id = -1;
@@ -138,7 +140,8 @@ private:
 	*/
 	void updateGame(float deltaTime, bool& inputProcessed);
 	
-	void updateScoreAndLevel();
+	// returns true if level upped
+	bool updateScoreAndLevel();
 
 	void draw();
 	

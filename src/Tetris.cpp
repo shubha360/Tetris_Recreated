@@ -33,6 +33,7 @@ bool Tetris::initGame() {
 	Evolve::ImageLoader::FreeTexture(m_minoTexture);
 
 	std::string gameOverText = "GAME OVER!";
+	std::string levelUpText = "LEVEL UP!";
 
 	glm::ivec2 mainMatrixPos {};
 	glm::ivec2 nextMatrixPos {};
@@ -41,6 +42,7 @@ bool Tetris::initGame() {
 	glm::ivec2 scorePos {};
 	glm::ivec2 legendPos {};
 	glm::ivec2 gameOverTextPos{};
+	glm::ivec2 levelUpTextPos{};
 	Evolve::RectDimension pauseBgTextPos {};
 
 	Evolve::RectDimension exitButtonDims{ (int) m_windowDims.x - 10, (int)m_windowDims.y - 10, 80, 64 };
@@ -71,6 +73,11 @@ bool Tetris::initGame() {
 		gameOverTextPos = { 
 			mainMatrixPos.x + mainMatrixWidth / 2 - m_quicksandFont.getLineWidth(gameOverText) / 2, 
 			mainMatrixPos.y - mainMatrxiHeight - 20 
+		};
+
+		levelUpTextPos = { 
+			m_windowDims.x / 2 - m_quicksandFont.getLineWidth(levelUpText) / 2, 
+			m_windowDims.y / 2 + m_quicksandFont.getLineHeight() / 2
 		};
 	}
 
@@ -103,6 +110,7 @@ bool Tetris::initGame() {
 
 	{ // Initialize the Gui compoments
 
+		// start button
 		m_gui_StartButton_Id = m_gui.addTextButton(
 			"Start",
 			m_gui_QuicksandFont_Id,
@@ -122,6 +130,7 @@ bool Tetris::initGame() {
 			}
 		);
 
+		// exit button
 		m_gui_ExitButton_Id = m_gui.addTextButton(
 			"Exit",
 			m_gui_QuicksandFont_Id,
@@ -133,6 +142,7 @@ bool Tetris::initGame() {
 			[&]() { m_gameState = GameState::QUIT; }
 		);
 
+		// restart button
 		m_gui_RestartButton_Id = m_gui.addTextButton(
 			"Restart",
 			m_gui_QuicksandFont_Id,
@@ -148,18 +158,20 @@ bool Tetris::initGame() {
 
 		m_gui.hideComponent(m_gui_RestartButton_Id);
 
+		// pause text
 		m_gui_PauseBgText_Id = m_gui.addBackgroundText(
 			"PAUSED",
 			m_gui_QuicksandFont_Id,
 			1.0f,
 			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			Evolve::ColorRgba{ 0, 0, 0, 150 },
+			Evolve::ColorRgba{ 0, 0, 0, 200 },
 			Evolve::GlyphOrigin::TOP_LEFT,
 			pauseBgTextPos
 		);
 
 		m_gui.hideComponent(m_gui_PauseBgText_Id);
 
+		// score text
 		m_gui_ScoreText_Id = m_gui.addPlainText(
 			"",
 			m_gui_QuicksandFont_Id,
@@ -178,6 +190,7 @@ bool Tetris::initGame() {
 			"W - Hold\n\n"
 			"Esc - Pause / Resume";
 
+		// legend text
 		m_gui_Legend_Id = m_gui.addPlainText(
 			legend,
 			m_gui_QuicksandFont_Id,
@@ -188,6 +201,7 @@ bool Tetris::initGame() {
 
 		m_gui.hideComponent(m_gui_Legend_Id);
 
+		// game over text
 		m_gui_gameOverText_Id = m_gui.addPlainText(
 			gameOverText,
 			m_gui_QuicksandFont_Id,
@@ -197,6 +211,17 @@ bool Tetris::initGame() {
 		);
 
 		m_gui.hideComponent(m_gui_gameOverText_Id);
+
+		m_gui_LevelUpBlinkText_Id = m_gui.addBlinkingText(
+			levelUpText,
+			m_gui_QuicksandFont_Id,
+			1.0f,
+			Evolve::ColorRgba{ 255, 255, 255, 255 },
+			levelUpTextPos,
+			15.0f, 10.0f
+		);
+
+		m_gui.hideComponent(m_gui_LevelUpBlinkText_Id);
 	}
 
 	return true;
@@ -274,6 +299,7 @@ float Tetris::runGameSimulations(float previousTicks) {
 
 		if (m_gameState == GameState::PLAYING) {
 			updateGame(deltaTime, inputProcessed);
+			m_gui.updateTime(deltaTime);
 			totalDeltaTime -= deltaTime;
 			i++;
 		}
@@ -321,6 +347,7 @@ void Tetris::processInput() {
 		if (m_gameState == GameState::PLAYING) {
 			m_gameState = GameState::PAUSED;
 			m_gui.showComponent(m_gui_PauseBgText_Id);
+			m_gui.hideComponent(m_gui_LevelUpBlinkText_Id);
 		}
 		else if (m_gameState == GameState::PAUSED) {
 			m_gameState = GameState::PLAYING;
@@ -358,13 +385,30 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	static float moveDelayDuration = 5.0f;
 	static float currentMoveDelay = moveDelayDuration;
 
-	// can hold only once before respawing
+	static float levelUpDurauion = 100.0f;
+	static float levelUpTime = 0.0f;
+	static bool levelingUp = false;
+
+	if (levelingUp) {
+		if (levelUpTime > levelUpDurauion) {
+			levelingUp = false;
+			levelUpTime = 0.0f;
+			m_gui.hideComponent(m_gui_LevelUpBlinkText_Id);
+		}
+		else {
+			levelUpTime += deltaTime;
+		}
+	}
 
 	if (m_gameState == GameState::PLAYING) {
 		if (m_respawn) {
 
 			if (m_checkLines) {
-				updateScoreAndLevel();
+				if (updateScoreAndLevel()) {
+					levelingUp = true;
+					//m_drawUpdateNeeded = true;
+					m_gui.showComponent(m_gui_LevelUpBlinkText_Id);
+				}
 				m_checkLines = false;
 			}
 
@@ -452,6 +496,8 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 						m_respawn = true;
 						m_canHold = true;
 						m_checkLines = true;
+						inputProcessed = true;
+						m_drawUpdateNeeded = true;
 					}
 				}
 			}
@@ -503,6 +549,8 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 				m_respawn = true;
 				m_canHold = true;
 				m_checkLines = true;
+				inputProcessed = true;
+				m_drawUpdateNeeded = true;
 			}
 
 			// hold
@@ -526,8 +574,11 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	}
 }
 
-void Tetris::updateScoreAndLevel() {
+// returns true if level upped
+bool Tetris::updateScoreAndLevel() {
 	
+	bool levelUp = false;
+
 	static float lowestAutoDownDuration = 10.0f;
 
 	static float eachLevelSpeedIncrease = 10.0f;
@@ -565,6 +616,7 @@ void Tetris::updateScoreAndLevel() {
 
 		// level up
 		if (newLevel > m_currentLevel) {
+			levelUp = true;
 			m_currentLevel = newLevel;
 			m_autoDownDuration -= eachLevelSpeedIncrease;
 
@@ -573,6 +625,7 @@ void Tetris::updateScoreAndLevel() {
 			}
 		}
 	}
+	return levelUp;
 }
 
 void Tetris::draw() {
