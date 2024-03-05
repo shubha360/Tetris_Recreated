@@ -108,13 +108,17 @@ private:
 
 	// fonts
 	Evolve::Font m_font_ubuntu36;
-	Evolve::Font m_font_coolvetica48;
+	Evolve::Font m_font_amaranth48;
+	Evolve::Font m_font_blox;
 
 	// gui font ids
+	int m_guiFont_amaranth48 = 0; // default gui font
 	int m_guiFont_ubuntu36 = 0;
-	int m_guiFont_coolvetica48 = 0;
+	int m_guiFont_blox = 0;
 	
 	// gui component ids
+	int m_gui_TetrisText = -1;
+
 	int m_gui_StartButton = -1;
 	int m_gui_ExitButton = -1;
 	int m_gui_RestartButton = -1;
