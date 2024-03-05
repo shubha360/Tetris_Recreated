@@ -12,12 +12,12 @@ bool Tetris::init() {
 
 bool Tetris::initEngine() {
 	return
-		m_window.init(false, 1720, 980, CLEAR_COLOR) &&
+		m_window.init(true, 1720, 980, CLEAR_COLOR) &&
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_Fps) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
-		m_quicksandFont.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf", 32, 1.0f, 1) &&
-		m_gui.init(m_quicksandFont) &&
+		m_font_quicksand.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf", 32, 1.0f, 1) &&
+		m_gui.init(m_font_quicksand) &&
 		m_guiRenderer.init("../Evolve-Engine/engine-assets");
 }
 
@@ -32,263 +32,22 @@ bool Tetris::initGame() {
 	Evolve::ImageLoader::BufferTextureData(m_minoTexture);
 	Evolve::ImageLoader::FreeTexture(m_minoTexture);
 
-	glm::ivec2 mainMatrixPos{};
-	glm::ivec2 nextMatrixPos{};
-	glm::ivec2 holdMatrixPos{};
+	// matrix component variables
 
-	int mainMatrixWidth = 10 * 32;
-	int mainMatrxiHeight = 20 * 32;
+	const int mainMatrixWidth = 10 * 32;
+	const int mainMatrxiHeight = 20 * 32;
 
-	int extraMatrixWidth = 8 * 16;
-	int nextMatrixHeight = 3 * m_nextMatrix.getTetriminoMaxHeight() * 16;
+	const int extraMatrixWidth = 8 * 16;
 
-	int top = m_windowDims.y / 2 + mainMatrxiHeight / 2;
-	int horizontalMargin = 50;
-
-	{ // Positioning the matrices
+	const int horizontalMargin = 50;
 		
-		mainMatrixPos = { m_windowDims.x / 2 -  mainMatrixWidth / 2, top };
+	glm::ivec2 mainMatrixPos = { m_windowDims.x / 2 -  mainMatrixWidth / 2, m_windowDims.y / 2 + mainMatrxiHeight / 2 };
+	glm::ivec2 nextMatrixPos = { mainMatrixPos.x - horizontalMargin - extraMatrixWidth, mainMatrixPos.y };
+	glm::ivec2 holdMatrixPos = { nextMatrixPos.x, mainMatrixPos.y - 350 };
 
-		nextMatrixPos = { mainMatrixPos.x - horizontalMargin - extraMatrixWidth, top };
+	initMatrices(mainMatrixPos, nextMatrixPos, holdMatrixPos);
 
-		holdMatrixPos = { nextMatrixPos.x, top - 350 };
-	}
-
-	{ // initializing the matrices
-
-		m_matrix.init(mainMatrixPos, m_minoTexture.id);
-
-		m_holdMatrix.init(
-			initHold(),
-			"HOLD",
-			m_quicksandFont,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			holdMatrixPos,
-			m_minoTexture.id
-		);
-
-		m_nextMatrix.init(
-			initNexts(),
-			"NEXT",
-			m_quicksandFont,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			nextMatrixPos,
-			m_minoTexture.id
-		);
-	}
-
-	std::string gameOverText = "GAME OVER!";
-	std::string levelUpText = "LEVEL UP!";
-	std::string pauseText = "PAUSED";
-
-	std::string digitText = "3";
-	std::string goText = "GO!";
-
-	Evolve::RectDimension preplayPanelDims{};
-	Evolve::RectDimension hideNextPanelDims{};
-
-	glm::ivec2 digitPos{};
-	glm::ivec2 goPos{};
-
-	glm::ivec2 scorePos{};
-	glm::ivec2 legendPos{};
-	glm::ivec2 gameOverTextPos{};
-	glm::ivec2 levelUpTextPos{};
-	glm::ivec2 pauseTextPos{};
-	Evolve::RectDimension pausePanelDims{};
-
-	Evolve::RectDimension exitButtonDims{ (int)m_windowDims.x - 10, (int)m_windowDims.y - 10, 80, 64 };
-	Evolve::RectDimension restartButtonDims{ exitButtonDims.x - exitButtonDims.width - 20, exitButtonDims.y, 120, 64 };
-
-	{ // positioning the gui components
-		scorePos = { mainMatrixPos.x + mainMatrixWidth + horizontalMargin , top };
-
-		legendPos = { scorePos.x, top - 200 };
-
-		pauseTextPos = {
-			m_windowDims.x / 2 - m_quicksandFont.getLineWidth(pauseText) / 2,
-			m_windowDims.y / 2 + m_quicksandFont.getLineHeight() / 2
-		};
-
-		pausePanelDims.set(mainMatrixPos.x, mainMatrixPos.y, mainMatrixWidth, mainMatrxiHeight);
-
-		gameOverTextPos = {
-			mainMatrixPos.x + mainMatrixWidth / 2 - m_quicksandFont.getLineWidth(gameOverText) / 2,
-			mainMatrixPos.y - mainMatrxiHeight - 20
-		};
-
-		levelUpTextPos = {
-			m_windowDims.x / 2 - m_quicksandFont.getLineWidth(levelUpText) / 2,
-			m_windowDims.y / 2 + m_quicksandFont.getLineHeight() / 2
-		};
-
-		preplayPanelDims = pausePanelDims;
-
-		hideNextPanelDims.set(m_nextMatrix.getTopLeftPosition().x, m_nextMatrix.getTopLeftPosition().y,
-			extraMatrixWidth, nextMatrixHeight);
-
-		digitPos = {
-			m_windowDims.x / 2 - m_quicksandFont.getLineWidth(digitText) / 2,
-			m_windowDims.y / 2 + m_quicksandFont.getLineHeight() / 2
-		};
-
-		goPos = {
-			m_windowDims.x / 2 - m_quicksandFont.getLineWidth(goText) / 2,
-			m_windowDims.y / 2 + m_quicksandFont.getLineHeight() / 2
-		};
-		
-	}
-
-	{ // Initialize the Gui compoments
-
-		// start button
-		m_gui_StartButton_Id = m_gui.addTextButton(
-			"Start",
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			Evolve::ColorRgba{ 0, 0, 20, 255 },
-			Evolve::GlyphOrigin::CENTER,
-			Evolve::RectDimension{ (int) m_windowDims.x / 2, (int) m_windowDims.y / 2, 512, 64 },
-			[&]() { 
-				m_gameState = GameState::PRE_PLAY;
-				
-				m_gui.hideComponent(m_gui_StartButton_Id);
-				
-				m_gui.showComponent(m_gui_ScoreText_Id);
-				m_gui.showComponent(m_gui_Legend_Id);
-			}
-		);
-
-		// exit button
-		m_gui_ExitButton_Id = m_gui.addTextButton(
-			"Exit",
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			Evolve::ColorRgba{ 0, 0, 20, 255 },
-			Evolve::GlyphOrigin::TOP_RIGHT,
-			exitButtonDims,
-			[&]() { m_gameState = GameState::QUIT; }
-		);
-
-		// restart button
-		m_gui_RestartButton_Id = m_gui.addTextButton(
-			"Restart",
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			Evolve::ColorRgba{ 0, 0, 20, 255 },
-			Evolve::GlyphOrigin::TOP_RIGHT,
-			restartButtonDims,
-			[&]() {
-				restart();
-			}
-		);
-
-		m_gui.hideComponent(m_gui_RestartButton_Id);
-
-		m_gui_HideNextPanel_Id = m_gui.addPanel(
-			hideNextPanelDims,
-			Evolve::GlyphOrigin::TOP_LEFT,
-			Evolve::ColorRgba{ 0, 0, 20, 255 }
-		);
-
-		m_gui.hideComponent(m_gui_HideNextPanel_Id);
-
-		m_gui_PreplayDigit_Id = m_gui.addPlainText(
-			digitText,
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			digitPos
-		);
-
-		m_gui.hideComponent(m_gui_PreplayDigit_Id);
-
-		m_gui_PreplayGo_Id = m_gui.addPlainText(
-			goText,
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			goPos
-		);
-
-		m_gui.hideComponent(m_gui_PreplayGo_Id);
-
-		// pause text
-		m_gui_PauseText_Id = m_gui.addPlainText(
-			pauseText,
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			pauseTextPos
-		);
-
-		m_gui.hideComponent(m_gui_PauseText_Id);
-
-		m_gui_PausePanel_Id = m_gui.addPanel(
-			pausePanelDims,
-			Evolve::GlyphOrigin::TOP_LEFT,
-			Evolve::ColorRgba { 0, 0, 20, 200 }
-		);
-
-		m_gui.hideComponent(m_gui_PausePanel_Id);
-
-		// score text
-		m_gui_ScoreText_Id = m_gui.addPlainText(
-			"",
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			scorePos
-		);
-
-		m_gui.hideComponent(m_gui_ScoreText_Id);
-
-		std::string legend =
-			"A, D - Move left, right\n\n"
-			"Q, E - Rotate left, right\n\n"
-			"S - Soft drop\n\n"
-			"Space - Hard drop\n\n"
-			"W - Hold\n\n"
-			"Esc - Pause / Resume";
-
-		// legend text
-		m_gui_Legend_Id = m_gui.addPlainText(
-			legend,
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			legendPos
-		);
-
-		m_gui.hideComponent(m_gui_Legend_Id);
-
-		// game over text
-		m_gui_gameOverText_Id = m_gui.addPlainText(
-			gameOverText,
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			gameOverTextPos
-		);
-
-		m_gui.hideComponent(m_gui_gameOverText_Id);
-
-		m_gui_LevelUpBlinkText_Id = m_gui.addBlinkingText(
-			levelUpText,
-			m_gui_QuicksandFont_Id,
-			1.0f,
-			Evolve::ColorRgba{ 255, 255, 255, 255 },
-			levelUpTextPos,
-			15.0f, 10.0f
-		);
-
-		m_gui.hideComponent(m_gui_LevelUpBlinkText_Id);
-	}
+	initGuiComponents(horizontalMargin);
 
 	return true;
 }
@@ -311,6 +70,257 @@ std::vector<Tetrimino*> Tetris::initHold() {
 	hold.push_back(nullptr);
 	
 	return hold;
+}
+
+void Tetris::initMatrices(const glm::ivec2& mainMatrixPos, const glm::ivec2& nextMatrixPos, 
+	const glm::ivec2& holdMatrixPos) {
+
+	m_matrix.init(mainMatrixPos, m_minoTexture.id);
+
+	m_holdMatrix.init(
+		initHold(),
+		"HOLD",
+		m_font_quicksand,
+		1.0f,
+		Evolve::ColorRgba{ 255, 255, 255, 255 },
+		holdMatrixPos,
+		m_minoTexture.id
+	);
+
+	m_nextMatrix.init(
+		initNexts(),
+		"NEXT",
+		m_font_quicksand,
+		1.0f,
+		Evolve::ColorRgba{ 255, 255, 255, 255 },
+		nextMatrixPos,
+		m_minoTexture.id
+	);
+}
+
+void Tetris::initGuiComponents(const int horizontalMargin) {
+
+	const Evolve::ColorRgba primaryColor	{	0,   0,  20, 255 };
+	const Evolve::ColorRgba secondaryColor	{ 255, 255, 255, 255 };
+
+	// gui component variables
+
+	std::string gameOverText = "GAME OVER!";
+	std::string levelUpText = "LEVEL UP!";
+	std::string pauseText = "PAUSED";
+
+	std::string digitText = "3";
+	std::string goText = "GO!";
+
+	Evolve::RectDimension preplayPanelDims{};
+	Evolve::RectDimension hideNextPanelDims{};
+
+	glm::ivec2 digitPos{};
+	glm::ivec2 goPos{};
+
+	glm::ivec2 scorePos{};
+	glm::ivec2 legendPos{};
+	glm::ivec2 gameOverTextPos{};
+	glm::ivec2 levelUpTextPos{};
+	glm::ivec2 pauseTextPos{};
+	Evolve::RectDimension pausePanelDims{};
+
+	Evolve::RectDimension startButtonDims{};
+	Evolve::RectDimension exitButtonDims{};
+	Evolve::RectDimension restartButtonDims{};
+
+	auto mainMatrixDims = m_matrix.getDimension();
+	auto nextMatrixDims = m_nextMatrix.getDimension();
+
+	{ // positioning the gui components
+
+		startButtonDims = { (int)m_windowDims.x / 2, (int)m_windowDims.y / 2, 512, 64 };
+		exitButtonDims = { (int)m_windowDims.x - 10, (int)m_windowDims.y - 10, 80, 64 };
+		restartButtonDims = { exitButtonDims.x - (int)exitButtonDims.width - 20, exitButtonDims.y, 120, 64 };
+
+		scorePos = { mainMatrixDims.x + mainMatrixDims.width + horizontalMargin , mainMatrixDims.y };
+
+		legendPos = { scorePos.x, mainMatrixDims.y - 200 };
+
+		pauseTextPos = {
+			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(pauseText) / 2,
+			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+		};
+
+		pausePanelDims.set(mainMatrixDims.x, mainMatrixDims.y, mainMatrixDims.width, mainMatrixDims.height);
+
+		gameOverTextPos = {
+			mainMatrixDims.x + mainMatrixDims.width / 2 - m_font_quicksand.getLineWidth(gameOverText) / 2,
+			mainMatrixDims.y - mainMatrixDims.height - 20
+		};
+
+		levelUpTextPos = {
+			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(levelUpText) / 2,
+			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+		};
+
+		preplayPanelDims = pausePanelDims;
+
+		hideNextPanelDims.set(nextMatrixDims.x, nextMatrixDims.y,
+			nextMatrixDims.width, nextMatrixDims.height);
+
+		digitPos = {
+			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(digitText) / 2,
+			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+		};
+
+		goPos = {
+			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(goText) / 2,
+			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+		};
+
+	}
+
+	// start button
+	m_gui_StartButton = m_gui.addTextButton(
+		"Start",
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		primaryColor,
+		Evolve::GlyphOrigin::CENTER,
+		startButtonDims,
+		[&]() {
+			m_gameState = GameState::PRE_PLAY;
+
+			m_gui.hideComponent(m_gui_StartButton);
+
+			m_gui.showComponent(m_gui_ScoreText);
+			m_gui.showComponent(m_gui_LegendText);
+		}
+	);
+
+	// exit button
+	m_gui_ExitButton = m_gui.addTextButton(
+		"Exit",
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		primaryColor,
+		Evolve::GlyphOrigin::TOP_RIGHT,
+		exitButtonDims,
+		[&]() { m_gameState = GameState::QUIT; }
+	);
+
+	// restart button
+	m_gui_RestartButton = m_gui.addTextButton(
+		"Restart",
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		primaryColor,
+		Evolve::GlyphOrigin::TOP_RIGHT,
+		restartButtonDims,
+		[&]() {
+			restart();
+		}
+	);
+
+	m_gui.hideComponent(m_gui_RestartButton);
+
+	m_gui_HideNextPanel = m_gui.addPanel(
+		hideNextPanelDims,
+		Evolve::GlyphOrigin::TOP_LEFT,
+		primaryColor
+	);
+
+	m_gui.hideComponent(m_gui_HideNextPanel);
+
+	m_gui_PreplayDigit = m_gui.addPlainText(
+		digitText,
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		digitPos
+	);
+
+	m_gui.hideComponent(m_gui_PreplayDigit);
+
+	m_gui_PreplayGo = m_gui.addPlainText(
+		goText,
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		goPos
+	);
+
+	m_gui.hideComponent(m_gui_PreplayGo);
+
+	// pause text
+	m_gui_PauseText = m_gui.addPlainText(
+		pauseText,
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		pauseTextPos
+	);
+
+	m_gui.hideComponent(m_gui_PauseText);
+
+	m_gui_PausePanel = m_gui.addPanel(
+		pausePanelDims,
+		Evolve::GlyphOrigin::TOP_LEFT,
+		Evolve::ColorRgba{ primaryColor.red, primaryColor.green, primaryColor.blue, 200 }
+	);
+
+	m_gui.hideComponent(m_gui_PausePanel);
+
+	// score text
+	m_gui_ScoreText = m_gui.addPlainText(
+		"",
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		scorePos
+	);
+
+	m_gui.hideComponent(m_gui_ScoreText);
+
+	std::string legend =
+		"A, D - Move left, right\n\n"
+		"Q, E - Rotate left, right\n\n"
+		"S - Soft drop\n\n"
+		"Space - Hard drop\n\n"
+		"W - Hold\n\n"
+		"Esc - Pause / Resume";
+
+	// legend text
+	m_gui_LegendText = m_gui.addPlainText(
+		legend,
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		legendPos
+	);
+
+	m_gui.hideComponent(m_gui_LegendText);
+
+	// game over text
+	m_gui_gameOverText = m_gui.addPlainText(
+		gameOverText,
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		gameOverTextPos
+	);
+
+	m_gui.hideComponent(m_gui_gameOverText);
+
+	m_gui_LevelUpBlinkText = m_gui.addBlinkingText(
+		levelUpText,
+		m_guiFont_Quicksand,
+		1.0f,
+		secondaryColor,
+		levelUpTextPos,
+		15.0f, 10.0f
+	);
+
+	m_gui.hideComponent(m_gui_LevelUpBlinkText);
 }
 
 void Tetris::run() {
@@ -413,16 +423,16 @@ void Tetris::processInput() {
 		if (m_gameState == GameState::PLAYING) {
 			m_gameState = GameState::PAUSED;
 			
-			m_gui.showComponent(m_gui_PauseText_Id);
-			m_gui.showComponent(m_gui_PausePanel_Id);
+			m_gui.showComponent(m_gui_PauseText);
+			m_gui.showComponent(m_gui_PausePanel);
 
-			m_gui.hideComponent(m_gui_LevelUpBlinkText_Id);
+			m_gui.hideComponent(m_gui_LevelUpBlinkText);
 		}
 		else if (m_gameState == GameState::PAUSED) {
 			m_gameState = GameState::PLAYING;
 			
-			m_gui.hideComponent(m_gui_PauseText_Id);
-			m_gui.hideComponent(m_gui_PausePanel_Id);
+			m_gui.hideComponent(m_gui_PauseText);
+			m_gui.hideComponent(m_gui_PausePanel);
 		}
 	}
 }
@@ -448,11 +458,74 @@ void Tetris::restart() {
 
 	m_gameState = GameState::PRE_PLAY;
 
-	m_gui.hideComponent(m_gui_RestartButton_Id);
-	m_gui.hideComponent(m_gui_PauseText_Id);
-	m_gui.hideComponent(m_gui_PausePanel_Id);
+	m_gui.hideComponent(m_gui_RestartButton);
+	m_gui.hideComponent(m_gui_PauseText);
+	m_gui.hideComponent(m_gui_PausePanel);
 
 	m_drawUpdateNeeded = true;
+}
+
+void Tetris::displayPreplay(float& preplayTime, const float preplayDuration, const float deltaTime) {
+	static bool set3 = false, set2 = false, set1 = false, setGo = false;
+	static bool textVisible = false;
+
+	if (preplayTime > preplayDuration) {
+
+		//m_gui.hideComponent(m_gui_PreplayPanel_Id);
+		m_gui.hideComponent(m_gui_HideNextPanel);
+		m_gui.hideComponent(m_gui_PreplayGo);
+
+		m_gui.showComponent(m_gui_RestartButton);
+
+		preplayTime = 0.0f;
+		set3 = set2 = set1 = setGo = textVisible = false;
+
+		m_gameState = GameState::PLAYING;
+	}
+	else {
+
+		// show 1
+		if (preplayTime < 60.0f) {
+
+			if (!textVisible) {
+				m_gui.showComponent(m_gui_HideNextPanel);
+				m_gui.showComponent(m_gui_PreplayDigit);
+
+				textVisible = true;
+			}
+
+			if (!set3) {
+				m_gui.setComponentLabel(m_gui_PreplayDigit, "3");
+				set3 = true;
+			}
+		}
+
+		// show 2
+		else if (preplayTime >= 60.0f && preplayTime < 120.0f) {
+
+			if (!set2) {
+				m_gui.setComponentLabel(m_gui_PreplayDigit, "2");
+				set2 = true;
+			}
+		}
+
+		// show 1
+		else if (preplayTime >= 120.0f && preplayTime < 180.0f) {
+
+			if (!set1) {
+				m_gui.setComponentLabel(m_gui_PreplayDigit, "1");
+				set1 = true;
+			}
+		}
+
+		// show go
+		else {
+			m_gui.hideComponent(m_gui_PreplayDigit);
+			m_gui.showComponent(m_gui_PreplayGo);
+		}
+
+		preplayTime += deltaTime;
+	}
 }
 
 void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
@@ -468,7 +541,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 		if (levelUpTime > levelUpDurauion) {
 			levelingUp = false;
 			levelUpTime = 0.0f;
-			m_gui.hideComponent(m_gui_LevelUpBlinkText_Id);
+			m_gui.hideComponent(m_gui_LevelUpBlinkText);
 		}
 		else {
 			levelUpTime += deltaTime;
@@ -479,67 +552,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	static float preplayTime = 0.0f;
 
 	if (m_gameState == GameState::PRE_PLAY) {
-
-		static bool set3 = false, set2 = false, set1 = false, setGo = false;
-		static bool textVisible = false;
-
-		if (preplayTime > preplayDuration) {
-
-			//m_gui.hideComponent(m_gui_PreplayPanel_Id);
-			m_gui.hideComponent(m_gui_HideNextPanel_Id);
-			m_gui.hideComponent(m_gui_PreplayGo_Id);
-
-			m_gui.showComponent(m_gui_RestartButton_Id);
-
-			preplayTime = 0.0f;
-			set3 = set2 = set1 = setGo = textVisible = false;
-
-			m_gameState = GameState::PLAYING;
-		}
-		else {			
-
-			// show 1
-			if (preplayTime < 60.0f) {
-
-				if (!textVisible) {
-					m_gui.showComponent(m_gui_HideNextPanel_Id);
-					m_gui.showComponent(m_gui_PreplayDigit_Id);
-
-					textVisible = true;
-				}
-
-				if (!set3) {
-					m_gui.setComponentLabel(m_gui_PreplayDigit_Id, "3");
-					set3 = true;
-				}
-			}
-
-			// show 2
-			else if (preplayTime >= 60.0f && preplayTime < 120.0f) {
-
-				if (!set2) {
-					m_gui.setComponentLabel(m_gui_PreplayDigit_Id, "2");
-					set2 = true;
-				}
-			}
-
-			// show 1
-			else if (preplayTime >= 120.0f && preplayTime < 180.0f) {
-				
-				if (!set1) {
-					m_gui.setComponentLabel(m_gui_PreplayDigit_Id, "1");
-					set1 = true;
-				}
-			}
-
-			// show go
-			else {
-				m_gui.hideComponent(m_gui_PreplayDigit_Id);
-				m_gui.showComponent(m_gui_PreplayGo_Id);
-			}
-
-			preplayTime += deltaTime;
-		}
+		displayPreplay(preplayTime, preplayDuration, deltaTime);
 	}
 
 	else if (m_gameState == GameState::PLAYING) {
@@ -548,7 +561,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			if (m_checkLines) {
 				if (updateScoreAndLevel()) {
 					levelingUp = true;
-					m_gui.showComponent(m_gui_LevelUpBlinkText_Id);
+					m_gui.showComponent(m_gui_LevelUpBlinkText);
 				}
 				m_checkLines = false;
 			}
@@ -562,7 +575,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 				// game ended
 				m_gameState = GameState::ENDED;
 
-				m_gui.showComponent(m_gui_gameOverText_Id);
+				m_gui.showComponent(m_gui_gameOverText);
 			}
 
 			m_drawUpdateNeeded = true;
@@ -715,7 +728,7 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 	}
 }
 
-// returns true if level upped
+// returns true if leveled up
 bool Tetris::updateScoreAndLevel() {
 	
 	bool levelUp = false;
@@ -812,7 +825,7 @@ void Tetris::draw() {
 		"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
 		"Level: " + std::to_string(m_currentLevel) + "\n";
 
-	m_gui.setComponentLabel(m_gui_ScoreText_Id, scoreText);
+	m_gui.setComponentLabel(m_gui_ScoreText, scoreText);
 
 	m_guiRenderer.renderGui(m_gui, m_camera);
 
@@ -834,7 +847,7 @@ void Tetris::printFps() {
 void Tetris::freeTetris() {
 	Evolve::ImageLoader::DeleteTexture(m_minoTexture);
 
-	m_quicksandFont.deleteFont();
+	m_font_quicksand.deleteFont();
 
 	m_gui.freeGui();
 	m_guiRenderer.freeGuiRenderer();

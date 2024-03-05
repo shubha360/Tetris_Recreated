@@ -26,12 +26,19 @@ public:
 	void reset();
 
 	std::vector<std::string>& getMatrix() { return m_matrix; }
-	glm::ivec2 getTopLeftPosition() const { return m_matrixPosTopLeft; }
 	const int getColumns() const { return m_numColumns; }
 	const int getRows() const { return m_numRows; }
 	const int getMinoLength() const { return m_minoLength; }
 	const char getEmptyCellSign() const { return EMPTY_CELL_SIGN; }
 	const char getGhostCellSign() const { return GHOST_CELL_SIGN; }
+
+	Evolve::RectDimension getDimension() const {
+		return Evolve::RectDimension{
+			m_matrixPosTopLeft.x, m_matrixPosTopLeft.y,
+			(unsigned int) m_numColumns * m_minoLength,
+			(unsigned int) m_numRows * m_minoLength,
+		};
+	}
 
 protected:
 	const Evolve::UvDimension MINO_UV_BLACK		{ 0.0f, 0.0f, 0.1f, 1.0f };

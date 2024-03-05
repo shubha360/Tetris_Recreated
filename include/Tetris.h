@@ -46,11 +46,12 @@ public:
 private:
 	const Evolve::ColorRgba CLEAR_COLOR { 28,36,56,255 };
 	const float MAX_Fps = 60.0f;
+
 	GameState m_gameState = GameState::MAIN_MENU;
 	Evolve::TextureData m_minoTexture {};
+	glm::ivec2 m_windowDims { 0, 0 };
 
 	// game play variables
-	
 	long long m_score = 0;
 	int m_linesCleared = 0;
 	int m_currentLevel = 1;
@@ -63,11 +64,13 @@ private:
 	bool m_checkLines = false;
 	bool m_lastMoveMade = false;
 
-	//
+	bool m_drawUpdateNeeded = true;
 
+	// matrices
 	Matrix m_matrix;
 	ExtraMatrix m_nextMatrix, m_holdMatrix;
 
+	// tetrimino variables
 	Tetrimino_T m_tempMinoT = Tetrimino_T(&m_matrix);
 	Tetrimino_L m_tempMinoL = Tetrimino_L(&m_matrix);
 	Tetrimino_J m_tempMinoJ = Tetrimino_J(&m_matrix);
@@ -88,6 +91,7 @@ private:
 
 	Tetrimino* m_current = nullptr;
 
+	// random generation variables
 	std::random_device m_seed;
 	std::mt19937 m_randomEngine;
 	std::uniform_int_distribution<int> m_getTetriminoIndex;
@@ -101,32 +105,30 @@ private:
 	Evolve::TextureRenderer m_textureRenderer;
 	Evolve::Gui m_gui;
 	Evolve::GuiRenderer m_guiRenderer;
-	Evolve::Font m_quicksandFont;
 
-	glm::ivec2 m_windowDims { 0, 0 };
+	// fonts
+	Evolve::Font m_font_quicksand;
 
 	// gui font ids
-	int m_gui_QuicksandFont_Id = 0;
+	int m_guiFont_Quicksand = 0;
 	
 	// gui component ids
-	int m_gui_StartButton_Id = -1;
-	int m_gui_ExitButton_Id = -1;
-	int m_gui_RestartButton_Id = -1;
+	int m_gui_StartButton = -1;
+	int m_gui_ExitButton = -1;
+	int m_gui_RestartButton = -1;
 	
-	int m_gui_HideNextPanel_Id = -1;
-	int m_gui_PreplayDigit_Id = -1;
-	int m_gui_PreplayGo_Id = -1;
+	int m_gui_HideNextPanel = -1;
+	int m_gui_PreplayDigit = -1;
+	int m_gui_PreplayGo = -1;
 
-	int m_gui_PauseText_Id = -1;
-	int m_gui_PausePanel_Id = -1;
+	int m_gui_PauseText = -1;
+	int m_gui_PausePanel = -1;
 
-	int m_gui_LevelUpBlinkText_Id = -1;
+	int m_gui_LevelUpBlinkText = -1;
 
-	int m_gui_ScoreText_Id = -1;
-	int m_gui_Legend_Id = -1;
-	int m_gui_gameOverText_Id = -1;
-
-	bool m_drawUpdateNeeded = true;
+	int m_gui_ScoreText = -1;
+	int m_gui_LegendText = -1;
+	int m_gui_gameOverText = -1;
 
 	bool initEngine();
 	bool initGame();
@@ -134,11 +136,16 @@ private:
 	std::vector<Tetrimino*> initNexts();
 	std::vector<Tetrimino*> initHold();
 
+	void initMatrices(const glm::ivec2& mainMatrixPos, const glm::ivec2& nextMatrixPos, const glm::ivec2& holdMatrixPos);
+	void initGuiComponents(const int horizontalMargin);
+
 	void gameLoop();
 	float runGameSimulations(float previousTicks);
 	void processInput();
 	
 	void restart();
+
+	void displayPreplay(float& preplayTime, const float preplayDuration, const float deltaTime);
 
 	/*
 	This function is called in every simulation of a frame.
@@ -148,8 +155,8 @@ private:
 	So that the next simulation doesn't process input again.
 	*/
 	void updateGame(float deltaTime, bool& inputProcessed);
-	
-	// returns true if level upped
+
+	// returns true if leveled up
 	bool updateScoreAndLevel();
 
 	void draw();
