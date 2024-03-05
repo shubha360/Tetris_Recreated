@@ -107,10 +107,12 @@ private:
 	Evolve::GuiRenderer m_guiRenderer;
 
 	// fonts
-	Evolve::Font m_font_quicksand;
+	Evolve::Font m_font_ubuntu36;
+	Evolve::Font m_font_coolvetica48;
 
 	// gui font ids
-	int m_guiFont_Quicksand = 0;
+	int m_guiFont_ubuntu36 = 0;
+	int m_guiFont_coolvetica48 = 0;
 	
 	// gui component ids
 	int m_gui_StartButton = -1;

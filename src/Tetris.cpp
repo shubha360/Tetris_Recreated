@@ -16,12 +16,15 @@ bool Tetris::initEngine() {
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_Fps) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
-		m_font_quicksand.initFromFontFile("Quicksand", "resources/fonts/Quicksand.otf", 32, 1.0f, 1) &&
-		m_gui.init(m_font_quicksand) &&
+		m_font_coolvetica48.initFromFontFile("Coolvetica", "resources/fonts/coolvetica.ttf", 48, 1.0f, 1) &&
+		m_font_ubuntu36.initFromFontFile("Ubuntu", "resources/fonts/Ubuntu-Regular.ttf", 36, 1.0f, 1) &&
+		m_gui.init(m_font_coolvetica48) &&
 		m_guiRenderer.init("../Evolve-Engine/engine-assets");
 }
 
 bool Tetris::initGame() {
+
+	m_guiFont_ubuntu36 = m_gui.addFont(m_font_ubuntu36);
 
 	m_windowDims = glm::ivec2 { m_window.getWindowWidth(), m_window.getWindowHeight() };
 
@@ -80,8 +83,8 @@ void Tetris::initMatrices(const glm::ivec2& mainMatrixPos, const glm::ivec2& nex
 	m_holdMatrix.init(
 		initHold(),
 		"HOLD",
-		m_font_quicksand,
-		1.0f,
+		m_font_coolvetica48,
+		0.75f,
 		Evolve::ColorRgba{ 255, 255, 255, 255 },
 		holdMatrixPos,
 		m_minoTexture.id
@@ -90,8 +93,8 @@ void Tetris::initMatrices(const glm::ivec2& mainMatrixPos, const glm::ivec2& nex
 	m_nextMatrix.init(
 		initNexts(),
 		"NEXT",
-		m_font_quicksand,
-		1.0f,
+		m_font_coolvetica48,
+		0.75f,
 		Evolve::ColorRgba{ 255, 255, 255, 255 },
 		nextMatrixPos,
 		m_minoTexture.id
@@ -135,28 +138,32 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	{ // positioning the gui components
 
 		startButtonDims = { (int)m_windowDims.x / 2, (int)m_windowDims.y / 2, 512, 64 };
-		exitButtonDims = { (int)m_windowDims.x - 10, (int)m_windowDims.y - 10, 80, 64 };
-		restartButtonDims = { exitButtonDims.x - (int)exitButtonDims.width - 20, exitButtonDims.y, 120, 64 };
+		exitButtonDims = { (int)m_windowDims.x - 10, (int)m_windowDims.y - 10, 100, 64 };
+		restartButtonDims = { exitButtonDims.x - (int)exitButtonDims.width - 20, exitButtonDims.y, 140, 64 };
 
 		scorePos = { mainMatrixDims.x + mainMatrixDims.width + horizontalMargin , mainMatrixDims.y };
 
 		legendPos = { scorePos.x, mainMatrixDims.y - 200 };
 
 		pauseTextPos = {
-			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(pauseText) / 2,
-			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+			m_windowDims.x / 2 - m_font_coolvetica48.getLineWidth(pauseText) / 2,
+			m_windowDims.y / 2 + m_font_coolvetica48.getLineHeight() / 2
 		};
 
 		pausePanelDims.set(mainMatrixDims.x, mainMatrixDims.y, mainMatrixDims.width, mainMatrixDims.height);
 
+		//m_font_coolvetica48.setFontScale(0.75f);
+
 		gameOverTextPos = {
-			mainMatrixDims.x + mainMatrixDims.width / 2 - m_font_quicksand.getLineWidth(gameOverText) / 2,
+			mainMatrixDims.x + mainMatrixDims.width / 2 - m_font_coolvetica48.getLineWidth(gameOverText) / 2,
 			mainMatrixDims.y - mainMatrixDims.height - 20
 		};
 
+		//m_font_coolvetica48.setFontScale(1.0f);
+
 		levelUpTextPos = {
-			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(levelUpText) / 2,
-			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+			m_windowDims.x / 2 - m_font_coolvetica48.getLineWidth(levelUpText) / 2,
+			m_windowDims.y / 2 + m_font_coolvetica48.getLineHeight() / 2
 		};
 
 		preplayPanelDims = pausePanelDims;
@@ -165,13 +172,13 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 			nextMatrixDims.width, nextMatrixDims.height);
 
 		digitPos = {
-			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(digitText) / 2,
-			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+			m_windowDims.x / 2 - m_font_coolvetica48.getLineWidth(digitText) / 2,
+			m_windowDims.y / 2 + m_font_coolvetica48.getLineHeight() / 2
 		};
 
 		goPos = {
-			m_windowDims.x / 2 - m_font_quicksand.getLineWidth(goText) / 2,
-			m_windowDims.y / 2 + m_font_quicksand.getLineHeight() / 2
+			m_windowDims.x / 2 - m_font_coolvetica48.getLineWidth(goText) / 2,
+			m_windowDims.y / 2 + m_font_coolvetica48.getLineHeight() / 2
 		};
 
 	}
@@ -179,7 +186,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	// start button
 	m_gui_StartButton = m_gui.addTextButton(
 		"Start",
-		m_guiFont_Quicksand,
+		m_guiFont_ubuntu36,
 		1.0f,
 		secondaryColor,
 		primaryColor,
@@ -198,7 +205,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	// exit button
 	m_gui_ExitButton = m_gui.addTextButton(
 		"Exit",
-		m_guiFont_Quicksand,
+		m_guiFont_ubuntu36,
 		1.0f,
 		secondaryColor,
 		primaryColor,
@@ -210,7 +217,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	// restart button
 	m_gui_RestartButton = m_gui.addTextButton(
 		"Restart",
-		m_guiFont_Quicksand,
+		m_guiFont_ubuntu36,
 		1.0f,
 		secondaryColor,
 		primaryColor,
@@ -223,6 +230,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_gui.hideComponent(m_gui_RestartButton);
 
+	// PRE PLAY
 	m_gui_HideNextPanel = m_gui.addPanel(
 		hideNextPanelDims,
 		Evolve::GlyphOrigin::TOP_LEFT,
@@ -233,7 +241,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_gui_PreplayDigit = m_gui.addPlainText(
 		digitText,
-		m_guiFont_Quicksand,
+		m_guiFont_coolvetica48,
 		1.0f,
 		secondaryColor,
 		digitPos
@@ -243,7 +251,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_gui_PreplayGo = m_gui.addPlainText(
 		goText,
-		m_guiFont_Quicksand,
+		m_guiFont_coolvetica48,
 		1.0f,
 		secondaryColor,
 		goPos
@@ -254,7 +262,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	// pause text
 	m_gui_PauseText = m_gui.addPlainText(
 		pauseText,
-		m_guiFont_Quicksand,
+		m_guiFont_coolvetica48,
 		1.0f,
 		secondaryColor,
 		pauseTextPos
@@ -270,11 +278,23 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_gui.hideComponent(m_gui_PausePanel);
 
+	// level up
+	m_gui_LevelUpBlinkText = m_gui.addBlinkingText(
+		levelUpText,
+		m_guiFont_coolvetica48,
+		1.0f,
+		secondaryColor,
+		levelUpTextPos,
+		15.0f, 10.0f
+	);
+
+	m_gui.hideComponent(m_gui_LevelUpBlinkText);
+
 	// score text
 	m_gui_ScoreText = m_gui.addPlainText(
 		"",
-		m_guiFont_Quicksand,
-		1.0f,
+		m_guiFont_coolvetica48,
+		0.75f,
 		secondaryColor,
 		scorePos
 	);
@@ -292,8 +312,8 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	// legend text
 	m_gui_LegendText = m_gui.addPlainText(
 		legend,
-		m_guiFont_Quicksand,
-		1.0f,
+		m_guiFont_coolvetica48,
+		0.75f,
 		secondaryColor,
 		legendPos
 	);
@@ -303,24 +323,13 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	// game over text
 	m_gui_gameOverText = m_gui.addPlainText(
 		gameOverText,
-		m_guiFont_Quicksand,
+		m_guiFont_coolvetica48,
 		1.0f,
 		secondaryColor,
 		gameOverTextPos
 	);
 
 	m_gui.hideComponent(m_gui_gameOverText);
-
-	m_gui_LevelUpBlinkText = m_gui.addBlinkingText(
-		levelUpText,
-		m_guiFont_Quicksand,
-		1.0f,
-		secondaryColor,
-		levelUpTextPos,
-		15.0f, 10.0f
-	);
-
-	m_gui.hideComponent(m_gui_LevelUpBlinkText);
 }
 
 void Tetris::run() {
@@ -847,7 +856,7 @@ void Tetris::printFps() {
 void Tetris::freeTetris() {
 	Evolve::ImageLoader::DeleteTexture(m_minoTexture);
 
-	m_font_quicksand.deleteFont();
+	m_font_coolvetica48.deleteFont();
 
 	m_gui.freeGui();
 	m_guiRenderer.freeGuiRenderer();
