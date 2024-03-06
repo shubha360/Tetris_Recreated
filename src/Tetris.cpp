@@ -11,8 +11,19 @@ bool Tetris::init() {
 }
 
 bool Tetris::initEngine() {
+
+	bool window = true;
+
+#ifdef NDEBUG
+	// nondebug
+	m_window.init(true, 1720, 980, CLEAR_COLOR);
+#else
+	// debug code
+	m_window.init(false, 1720, 980, CLEAR_COLOR);
+#endif
+
 	return
-		m_window.init(true, 1720, 980, CLEAR_COLOR) &&
+		window &&
 		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
 		m_fps.init(MAX_Fps) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
@@ -356,7 +367,10 @@ void Tetris::gameLoop() {
 
 		m_fps.endFrame();
 
+#ifndef NDEBUG
+		// debug code
 		printFps();
+#endif
 	}
 }
 
