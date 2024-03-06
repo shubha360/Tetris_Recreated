@@ -5,3 +5,5 @@ An attempt at recreating the classic **Tetris** using [Evolve Engine](https://gi
 ## Preview
 
 <img src="preview.gif" width="960" height="540" />
+
+Copyright (c) 2024 Raquibul Islam
