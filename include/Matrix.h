@@ -4,12 +4,12 @@
 #include <vector>
 #include <string>
 
-#include "TextureData.h"
-#include "TextureRenderer.h"
-#include "ColorRgba.h"
-#include "RectDimension.h"
-#include "UVDimension.h"
-#include "ImageLoader.h"
+#include <Evolve/TextureData.h>
+#include <Evolve/TextureRenderer.h>
+#include <Evolve/ColorRgba.h>
+#include <Evolve/RectDimension.h>
+#include <Evolve/UVDimension.h>
+#include <Evolve/ImageLoader.h>
 
 class Matrix {
 public:

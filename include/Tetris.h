@@ -9,17 +9,17 @@
 #include <random>
 
 // Engine includes
-#include "Window.h"
-#include "GlslProgram.h"
-#include "Vertex2D.h"
-#include "Fps.h"
-#include "InputProcessor.h"
-#include "ImageLoader.h"
-#include "Camera.h"
-#include "TextureRenderer.h"
-#include "Font.h"
-#include "Gui.h"
-#include "GuiRenderer.h"
+#include <Evolve/Window.h>
+#include <Evolve/GlslProgram.h>
+#include <Evolve/Vertex2D.h>
+#include <Evolve/Fps.h>
+#include <Evolve/InputProcessor.h>
+#include <Evolve/ImageLoader.h>
+#include <Evolve/Camera.h>
+#include <Evolve/TextureRenderer.h>
+#include <Evolve/Font.h>
+#include <Evolve/Gui.h>
+#include <Evolve/GuiRenderer.h>
 
 // Tetris includes
 #include "Matrix.h"

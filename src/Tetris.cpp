@@ -19,12 +19,13 @@ bool Tetris::initEngine() {
 		m_font_amaranth48.initFromFontFile("Coolvetica", "resources/fonts/Amaranth-Regular.ttf", 48, 1.0f, 2) &&
 		m_font_ubuntu36.initFromFontFile("Ubuntu", "resources/fonts/Ubuntu-Regular.ttf", 32, 1.0f, 2) &&
 		m_font_blox.initFromFontFile("Blox", "resources/fonts/Blox2.ttf", 140, 1.0f, 10) &&
-		m_gui.init(m_font_amaranth48) &&
+		m_gui.init() &&
 		m_guiRenderer.init("../Evolve-Engine/engine-assets");
 }
 
 bool Tetris::initGame() {
 
+	m_guiFont_amaranth48 = m_gui.addFont(m_font_amaranth48);
 	m_guiFont_ubuntu36 = m_gui.addFont(m_font_ubuntu36);
 	m_guiFont_blox = m_gui.addFont(m_font_blox);
 
@@ -741,7 +742,7 @@ bool Tetris::updateScoreAndLevel() {
 
 	static float lowestAutoDownDuration = 10.0f;
 
-	static float eachLevelSpeedIncrease = 10.0f;
+	static float eachLevelSpeedIncrease = 5.0f;
 	static int lineClearsForLevelUp = 10;
 
 	int currentLinesCleared = m_matrix.checkLineClears();
