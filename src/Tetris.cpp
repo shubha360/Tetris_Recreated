@@ -417,6 +417,7 @@ void Tetris::processInput() {
 		switch (event.type) {
 		case SDL_QUIT:
 			m_gameState = GameState::QUIT;
+			break;
 			
 		case SDL_MOUSEMOTION:
 			m_inputProcessor.setMouseCoords(event.motion.x, event.motion.y);
@@ -805,7 +806,7 @@ bool Tetris::updateScoreAndLevel() {
 
 void Tetris::draw() {
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	m_window.clearScreen(GL_COLOR_BUFFER_BIT);
 
 	m_shaderProgram.useProgram();
 
@@ -878,6 +879,4 @@ void Tetris::freeTetris() {
 	m_shaderProgram.freeProgram();
 
 	m_window.deleteWindow();
-
-	SDL_Quit();
 }
