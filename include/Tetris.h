@@ -10,7 +10,6 @@
 
 // Engine includes
 #include <Evolve/Window.h>
-#include <Evolve/GlslProgram.h>
 #include <Evolve/Vertex2D.h>
 #include <Evolve/Fps.h>
 #include <Evolve/InputProcessor.h>
@@ -98,7 +97,6 @@ private:
 
 	// Engine Tools
 	Evolve::Window m_window;
-	Evolve::GlslProgram m_shaderProgram;
 	Evolve::Fps m_fps;
 	Evolve::InputProcessor m_inputProcessor;
 	Evolve::Camera m_camera;

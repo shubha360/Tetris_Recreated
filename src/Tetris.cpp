@@ -24,7 +24,7 @@ bool Tetris::initEngine() {
 
 	return
 		window &&
-		m_shaderProgram.compileAndLinkShaders("resources/shaders/mainShader.vert", "resources/shaders/mainShader.frag") &&
+		m_textureRenderer.init("../Evolve-Engine/engine-assets") &&
 		m_fps.init(MAX_Fps) &&
 		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
 		m_font_amaranth48.initFromFontFile("Coolvetica", "resources/fonts/Amaranth-Regular.ttf", 48, 1.0f, 2) &&
@@ -808,48 +808,40 @@ void Tetris::draw() {
 
 	m_window.clearScreen(GL_COLOR_BUFFER_BIT);
 
-	m_shaderProgram.useProgram();
+	{ // rendering
 
-	glActiveTexture(GL_TEXTURE0);
-	GLint samplerLoc = m_shaderProgram.getUniformLocation("u_imageSampler");
-	glUniform1i(samplerLoc, 0);
+		m_textureRenderer.begin(m_camera);
 
-	m_camera.sendMatrixDataToShader(m_shaderProgram);
+		m_matrix.drawMatrix(m_textureRenderer);
 
-	{
-		if (m_drawUpdateNeeded) {
-			m_textureRenderer.begin();
+		m_nextMatrix.drawMatrix(m_textureRenderer);
 
-			// DRAW HERE
-			m_matrix.drawMatrix(m_textureRenderer);
+		m_nextMatrix.drawName(m_textureRenderer);
 
-			m_nextMatrix.drawMatrix(m_textureRenderer);
+		m_holdMatrix.drawMatrix(m_textureRenderer);
 
-			m_nextMatrix.drawName(m_textureRenderer);
+		m_holdMatrix.drawName(m_textureRenderer);
 
-			m_holdMatrix.drawMatrix(m_textureRenderer);
+		m_textureRenderer.end();
 
-			m_holdMatrix.drawName(m_textureRenderer);
-
-			m_textureRenderer.end();
-
-			m_drawUpdateNeeded = false;
-		}
+		m_drawUpdateNeeded = false;
 
 		if (m_gameState != GameState::MAIN_MENU && m_gameState != GameState::QUIT) {
 			m_textureRenderer.renderTextures();
 		}
 	}
 
-	m_shaderProgram.unuseProgram();
+	{ // gui
 
-	std::string scoreText = "Score: " + std::to_string(m_score) + "\n" +
-		"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
-		"Level: " + std::to_string(m_currentLevel) + "\n";
+		// find out score
+		std::string scoreText = "Score: " + std::to_string(m_score) + "\n" +
+			"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
+			"Level: " + std::to_string(m_currentLevel) + "\n";
 
-	m_gui.setComponentLabel(m_gui_ScoreText, scoreText);
+		m_gui.setComponentLabel(m_gui_ScoreText, scoreText);
 
-	m_guiRenderer.renderGui(m_gui, m_camera);
+		m_guiRenderer.renderGui(m_gui, m_camera);
+	}
 
 	m_window.swapBuffer();
 }
@@ -875,8 +867,6 @@ void Tetris::freeTetris() {
 	m_guiRenderer.freeGuiRenderer();
 
 	m_textureRenderer.freeTextureRenderer();
-
-	m_shaderProgram.freeProgram();
 
 	m_window.deleteWindow();
 }
