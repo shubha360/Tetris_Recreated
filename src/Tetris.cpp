@@ -824,8 +824,6 @@ void Tetris::draw() {
 
 		m_textureRenderer.end();
 
-		m_drawUpdateNeeded = false;
-
 		if (m_gameState != GameState::MAIN_MENU && m_gameState != GameState::QUIT) {
 			m_textureRenderer.renderTextures();
 		}

@@ -63,8 +63,6 @@ private:
 	bool m_checkLines = false;
 	bool m_lastMoveMade = false;
 
-	bool m_drawUpdateNeeded = true;
-
 	// matrices
 	Matrix m_matrix;
 	ExtraMatrix m_nextMatrix, m_holdMatrix;
