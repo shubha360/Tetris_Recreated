@@ -131,34 +131,45 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	std::string digitText = "3";
 	std::string goText = "GO!";
 
-	auto mainMatrixDims = m_matrix.getDimension();
-	auto nextMatrixDims = m_nextMatrix.getDimension();
+	Evolve::RectDimension mainMatrixDims = m_matrix.getDimension();
+	Evolve::RectDimension nextMatrixDims = m_nextMatrix.getDimension();
 
 	glm::ivec2 tetrisTextPos = {
 		m_windowDims.x / 2 - m_font_blox.getLineWidth(tetrisText) / 2,
 		m_windowDims.y / 6 * 5
 	};
 
-	Evolve::RectDimension startButtonDims = { (int)m_windowDims.x / 2, (int)m_windowDims.y / 2, 512, 64 };
-	Evolve::RectDimension exitButtonDims = { (int)m_windowDims.x - 10, (int)m_windowDims.y - 10, 100, 64 };
-	Evolve::RectDimension restartButtonDims = { exitButtonDims.x - (int)exitButtonDims.width - 20, exitButtonDims.y, 140, 64 };
+	Evolve::RectDimension startButtonDims(
+		Evolve::Origin::CENTER, (int) m_windowDims.x / 2, (int) m_windowDims.y / 2, 512, 64
+	);
+	
+	Evolve::RectDimension exitButtonDims(
+		Evolve::Origin::TOP_RIGHT, (int) m_windowDims.x - 10, (int) m_windowDims.y - 10, 100, 64
+	);
+	
+	Evolve::RectDimension restartButtonDims(
+		Evolve::Origin::TOP_RIGHT, exitButtonDims.getLeft() - 20, exitButtonDims.getTop(), 140, 64
+	);
 
-	glm::ivec2 scorePos = { mainMatrixDims.x + mainMatrixDims.width + horizontalMargin , mainMatrixDims.y };
+	glm::ivec2 scorePos = { mainMatrixDims.getRight() + horizontalMargin , mainMatrixDims.getTop() };
 
-	glm::ivec2 legendPos = { scorePos.x, mainMatrixDims.y - 200 };
+	glm::ivec2 legendPos = { scorePos.x, mainMatrixDims.getTop() - 200 };
 
 	glm::ivec2 pauseTextPos = {
 		m_windowDims.x / 2 - m_font_amaranth48.getLineWidth(pauseText) / 2,
 		m_windowDims.y / 2 + m_font_amaranth48.getLineHeight() / 2
 	};
 
-	Evolve::RectDimension pausePanelDims { mainMatrixDims.x, mainMatrixDims.y, mainMatrixDims.width, mainMatrixDims.height };
+	Evolve::RectDimension pausePanelDims(
+		Evolve::Origin::TOP_LEFT, mainMatrixDims.getLeft(), mainMatrixDims.getTop(), 
+		mainMatrixDims.getWidth(), mainMatrixDims.getHeight()
+	);
 
 	m_font_amaranth48.setFontScale(0.75f);
 
 	glm::ivec2 gameOverTextPos = {
-		mainMatrixDims.x + mainMatrixDims.width / 2 - m_font_amaranth48.getLineWidth(gameOverText) / 2,
-		mainMatrixDims.y - mainMatrixDims.height - 20
+		mainMatrixDims.getCenterX() - m_font_amaranth48.getLineWidth(gameOverText) / 2,
+		mainMatrixDims.getBottom() - 20
 	};
 
 	m_font_amaranth48.setFontScale(1.0f);
@@ -170,8 +181,10 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	Evolve::RectDimension preplayPanelDims = pausePanelDims;
 
-	Evolve::RectDimension hideNextPanelDims { nextMatrixDims.x, nextMatrixDims.y,
-		nextMatrixDims.width, nextMatrixDims.height };
+	Evolve::RectDimension hideNextPanelDims(
+		Evolve::Origin::TOP_LEFT, nextMatrixDims.getLeft(), nextMatrixDims.getTop(),
+		nextMatrixDims.getWidth(), nextMatrixDims.getHeight()
+	);
 
 	glm::ivec2 digitPos = {
 		m_windowDims.x / 2 - m_font_amaranth48.getLineWidth(digitText) / 2,
@@ -198,7 +211,6 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 		1.0f,
 		secondaryColor,
 		primaryColor,
-		Evolve::GlyphOrigin::CENTER,
 		startButtonDims,
 		[&]() {
 			m_gameState = GameState::PRE_PLAY;
@@ -218,7 +230,6 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 		1.0f,
 		secondaryColor,
 		primaryColor,
-		Evolve::GlyphOrigin::TOP_RIGHT,
 		exitButtonDims,
 		[&]() { m_gameState = GameState::QUIT; }
 	);
@@ -230,7 +241,6 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 		1.0f,
 		secondaryColor,
 		primaryColor,
-		Evolve::GlyphOrigin::TOP_RIGHT,
 		restartButtonDims,
 		[&]() {
 			restart();
@@ -242,7 +252,6 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	// PRE PLAY
 	m_gui_HideNextPanel = m_gui.addPanel(
 		hideNextPanelDims,
-		Evolve::GlyphOrigin::TOP_LEFT,
 		primaryColor
 	);
 
@@ -281,7 +290,6 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_gui_PausePanel = m_gui.addPanel(
 		pausePanelDims,
-		Evolve::GlyphOrigin::TOP_LEFT,
 		Evolve::ColorRgba{ primaryColor.red, primaryColor.green, primaryColor.blue, 200 }
 	);
 

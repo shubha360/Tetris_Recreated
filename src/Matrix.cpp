@@ -111,14 +111,15 @@ void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 				break;
 			}
 
-			Evolve::RectDimension minoDimension{
+			Evolve::RectDimension minoDimension(
+				Evolve::Origin::TOP_LEFT, 
 				m_matrixPosTopLeft.x + column * m_minoLength,
-				m_matrixPosTopLeft.y - row * m_minoLength, 
-				m_minoLength, m_minoLength };
+				m_matrixPosTopLeft.y - row * m_minoLength,
+				m_minoLength, m_minoLength
+			);
 
 
 			renderer.draw(
-				Evolve::GlyphOrigin::TOP_LEFT,
 				minoDimension,
 				minoUV,
 				m_minoTextureId,

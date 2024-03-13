@@ -33,11 +33,12 @@ public:
 	const char getGhostCellSign() const { return GHOST_CELL_SIGN; }
 
 	Evolve::RectDimension getDimension() const {
-		return Evolve::RectDimension{
+		return Evolve::RectDimension(
+			Evolve::Origin::TOP_LEFT,
 			m_matrixPosTopLeft.x, m_matrixPosTopLeft.y,
 			(unsigned int) m_numColumns * m_minoLength,
-			(unsigned int) m_numRows * m_minoLength,
-		};
+			(unsigned int) m_numRows * m_minoLength
+		);
 	}
 
 protected:
