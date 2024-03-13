@@ -152,7 +152,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 		m_windowDims.y / 2 + m_font_amaranth48.getLineHeight() / 2
 	};
 
-	Evolve::RectDimension pausePanelDims { mainMatrixDims.x, mainMatrixDims.y, mainMatrixDims.width, mainMatrixDims.height };	
+	Evolve::RectDimension pausePanelDims { mainMatrixDims.x, mainMatrixDims.y, mainMatrixDims.width, mainMatrixDims.height };
 
 	m_font_amaranth48.setFontScale(0.75f);
 
@@ -483,8 +483,6 @@ void Tetris::restart() {
 	m_gui.hideComponent(m_gui_RestartButton);
 	m_gui.hideComponent(m_gui_PauseText);
 	m_gui.hideComponent(m_gui_PausePanel);
-
-	m_drawUpdateNeeded = true;
 }
 
 void Tetris::displayPreplay(float& preplayTime, const float preplayDuration, const float deltaTime) {
@@ -600,7 +598,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 				m_gui.showComponent(m_gui_gameOverText);
 			}
 
-			m_drawUpdateNeeded = true;
 			currentMoveDelay = moveDelayDuration;
 			m_timeSinceAutoDown = 0.0f;
 
@@ -623,14 +620,12 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 				}
 
 				m_timeSinceAutoDown = 0.0f;
-				m_drawUpdateNeeded = true;
 			}
 
 			// move left
 			if (m_inputProcessor.isKeyDown(SDLK_a) && !inputProcessed && !m_lastMoveMade) {
 
 				if (currentMoveDelay >= moveDelayDuration && m_current->moveLeft()) {
-					m_drawUpdateNeeded = true;
 					inputProcessed = true;
 					currentMoveDelay = 0.0f;
 
@@ -645,7 +640,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			else if (m_inputProcessor.isKeyDown(SDLK_d) && !inputProcessed && !m_lastMoveMade) {
 
 				if (currentMoveDelay >= moveDelayDuration && m_current->moveRight()) {
-					m_drawUpdateNeeded = true;
 					inputProcessed = true;
 					currentMoveDelay = 0.0f;
 
@@ -661,7 +655,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 
 				if (currentMoveDelay >= moveDelayDuration) {
 					if (m_current->moveDown()) {
-						m_drawUpdateNeeded = true;
 						inputProcessed = true;
 						currentMoveDelay = 0.0f;
 						m_timeSinceAutoDown = 0.0f;
@@ -673,7 +666,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 						m_canHold = true;
 						m_checkLines = true;
 						inputProcessed = true;
-						m_drawUpdateNeeded = true;
 					}
 				}
 			}
@@ -691,7 +683,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			// rotate left
 			else if (m_inputProcessor.isKeyPressed(SDLK_q) && !inputProcessed && !m_lastMoveMade) {
 				if (m_current->rotateLeft()) {
-					m_drawUpdateNeeded = true;
 					inputProcessed = true;
 					
 					// can only make one move if can't move down
@@ -704,7 +695,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 			// rotate right
 			else if (m_inputProcessor.isKeyPressed(SDLK_e) && !inputProcessed && !m_lastMoveMade) {
 				if (m_current->rotateRight()) {
-					m_drawUpdateNeeded = true;
 					inputProcessed = true;
 
 					// can only make one move if can't move down
@@ -726,7 +716,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 				m_canHold = true;
 				m_checkLines = true;
 				inputProcessed = true;
-				m_drawUpdateNeeded = true;
 			}
 
 			// hold
@@ -742,7 +731,6 @@ void Tetris::updateGame(float deltaTime, bool& inputProcessed) {
 					m_current->spawn();
 				}
 
-				m_drawUpdateNeeded = true;
 				inputProcessed = true;
 				m_canHold = false;
 			}
