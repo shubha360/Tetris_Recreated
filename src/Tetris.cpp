@@ -806,7 +806,7 @@ void Tetris::draw() {
 
 	{ // rendering
 
-		m_textureRenderer.begin(m_camera);
+		m_textureRenderer.begin();
 
 		m_matrix.drawMatrix(m_textureRenderer);
 
@@ -821,7 +821,7 @@ void Tetris::draw() {
 		m_textureRenderer.end();
 
 		if (m_gameState != GameState::MAIN_MENU && m_gameState != GameState::QUIT) {
-			m_textureRenderer.renderTextures();
+			m_textureRenderer.renderTextures(m_camera);
 		}
 	}
 
