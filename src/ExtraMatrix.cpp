@@ -8,7 +8,7 @@ void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const std::string& n
 	const float nameScale, const Evolve::ColorRgba nameColor,
 	const glm::ivec2& topLeftPos, GLuint minoTextureId, const int minoLength /*= 16*/) {
 
-	int numRows = tetriminoes.size() * m_tetriminoMaxHeight;
+	int numRows = (int) tetriminoes.size() * m_tetriminoMaxHeight;
 	int numColumns = 8;
 
 	m_name = name;
@@ -37,7 +37,7 @@ Tetrimino* ExtraMatrix::pushAndPop(Tetrimino* newTetrimino) {
 
 	Tetrimino* pop = m_tetriminoes[0];
 
-	for (int i = 0; i < m_tetriminoes.size() - 1; i++) {
+	for (size_t i = 0; i < m_tetriminoes.size() - 1; i++) {
 		m_tetriminoes[i] = m_tetriminoes[i + 1];
 	}
 
@@ -72,7 +72,7 @@ void ExtraMatrix::addTetriminoes(std::vector<Tetrimino*> tetriminoes) {
 
 	m_tetriminoes = tetriminoes;
 
-	for (int i = 0; i < m_tetriminoes.size(); i++) {
+	for (size_t i = 0; i < m_tetriminoes.size(); i++) {
 
 		auto& current = m_tetriminoes[i];
 

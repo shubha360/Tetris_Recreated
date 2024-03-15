@@ -15,15 +15,9 @@ bool Matrix::init(const glm::ivec2& topLeftPos, GLuint minoTextureId, const int 
 	
 	m_matrix.resize(m_numRows);
 
-	for (int i = 0; i < m_matrix.size(); i++) {
+	for (size_t i = 0; i < m_matrix.size(); i++) {
 		m_matrix[i] = EMPTY_LINE;
 	}
-	
-	/*m_matrix[16] = "OOOOOOOOO ";
-	m_matrix[17] = "O         ";
-	m_matrix[18] = "O         ";
-	m_matrix[19] = "OOOOOOOOO ";*/
-
 	return true;
 }
 

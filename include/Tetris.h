@@ -108,29 +108,29 @@ private:
 	Evolve::Font m_font_blox;
 
 	// gui font ids
-	int m_guiFont_amaranth48 = 0; // default gui font
-	int m_guiFont_ubuntu36 = 0;
-	int m_guiFont_blox = 0;
+	size_t m_guiFont_amaranth48 = 0; // default gui font
+	size_t m_guiFont_ubuntu36 = 0;
+	size_t m_guiFont_blox = 0;
 	
 	// gui component ids
-	int m_gui_TetrisText = -1;
+	size_t m_gui_TetrisText = -1;
 
-	int m_gui_StartButton = -1;
-	int m_gui_ExitButton = -1;
-	int m_gui_RestartButton = -1;
+	size_t m_gui_StartButton = -1;
+	size_t m_gui_ExitButton = -1;
+	size_t m_gui_RestartButton = -1;
 	
-	int m_gui_HideNextPanel = -1;
-	int m_gui_PreplayDigit = -1;
-	int m_gui_PreplayGo = -1;
+	size_t m_gui_HideNextPanel = -1;
+	size_t m_gui_PreplayDigit = -1;
+	size_t m_gui_PreplayGo = -1;
 
-	int m_gui_PauseText = -1;
-	int m_gui_PausePanel = -1;
+	size_t m_gui_PauseText = -1;
+	size_t m_gui_PausePanel = -1;
 
-	int m_gui_LevelUpBlinkText = -1;
+	size_t m_gui_LevelUpBlinkText = -1;
 
-	int m_gui_ScoreText = -1;
-	int m_gui_LegendText = -1;
-	int m_gui_gameOverText = -1;
+	size_t m_gui_ScoreText = -1;
+	size_t m_gui_LegendText = -1;
+	size_t m_gui_gameOverText = -1;
 
 	bool initEngine();
 	bool initGame();
