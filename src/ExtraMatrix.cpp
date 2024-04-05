@@ -78,7 +78,7 @@ void ExtraMatrix::addTetriminoes(std::vector<Tetrimino*> tetriminoes) {
 
 		if (current != nullptr) {
 			int originX = m_numColumns / 2;
-			int originY = i * m_tetriminoMaxHeight + 2;
+			int originY = (int) i * m_tetriminoMaxHeight + 2;
 
 			m_matrix[originY][originX] = current->m_minoSign;
 

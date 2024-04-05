@@ -48,7 +48,7 @@ private:
 
 	GameState m_gameState = GameState::MAIN_MENU;
 	Evolve::TextureData m_minoTexture {};
-	glm::ivec2 m_windowDims { 0, 0 };
+	Evolve::Size2D m_windowDims { 0, 0 };
 
 	// game play variables
 	long long m_score = 0;

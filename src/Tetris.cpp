@@ -16,17 +16,17 @@ bool Tetris::initEngine() {
 
 #ifdef NDEBUG
 	// nondebug
-	m_window.init(true, 1720, 980, CLEAR_COLOR);
+	m_window.init("Tetris", true, 1720, 980, CLEAR_COLOR);
 #else
 	// debug code
-	m_window.init(false, 1720, 980, CLEAR_COLOR);
+	m_window.init("Tetris", false, 1720, 980, CLEAR_COLOR);
 #endif
 
 	return
 		window &&
 		m_textureRenderer.init("../Evolve-Engine/engine-assets") &&
 		m_fps.init(MAX_Fps) &&
-		m_camera.init(m_window.getWindowWidth(), m_window.getWindowHeight()) &&
+		m_camera.init(Evolve::Size2D { m_window.getWindowWidth(), m_window.getWindowHeight() } ) &&
 		m_font_amaranth48.initFromFontFile("Coolvetica", "resources/fonts/Amaranth-Regular.ttf", 48, 1.0f, 2) &&
 		m_font_ubuntu36.initFromFontFile("Ubuntu", "resources/fonts/Ubuntu-Regular.ttf", 32, 1.0f, 2) &&
 		m_font_blox.initFromFontFile("Blox", "resources/fonts/Blox2.ttf", 140, 1.0f, 10) &&
@@ -40,7 +40,7 @@ bool Tetris::initGame() {
 	m_guiFont_ubuntu36 = m_gui.addFont(m_font_ubuntu36);
 	m_guiFont_blox = m_gui.addFont(m_font_blox);
 
-	m_windowDims = glm::ivec2 { m_window.getWindowWidth(), m_window.getWindowHeight() };
+	m_windowDims.set(m_window.getWindowWidth(), m_window.getWindowHeight());
 
 	m_randomEngine = std::mt19937(m_seed());
 	m_getTetriminoIndex = std::uniform_int_distribution<int>(0, 6);
@@ -58,7 +58,7 @@ bool Tetris::initGame() {
 
 	const int horizontalMargin = 50;
 		
-	glm::ivec2 mainMatrixPos = { m_windowDims.x / 2 -  mainMatrixWidth / 2, m_windowDims.y / 2 + mainMatrxiHeight / 2 };
+	glm::ivec2 mainMatrixPos = { (GLint) m_windowDims.Width / 2 -  mainMatrixWidth / 2, (GLint) m_windowDims.Height / 2 + mainMatrxiHeight / 2 };
 	glm::ivec2 nextMatrixPos = { mainMatrixPos.x - horizontalMargin - extraMatrixWidth, mainMatrixPos.y };
 	glm::ivec2 holdMatrixPos = { nextMatrixPos.x, mainMatrixPos.y - 350 };
 
@@ -134,30 +134,30 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 	Evolve::RectDimension mainMatrixDims = m_matrix.getDimension();
 	Evolve::RectDimension nextMatrixDims = m_nextMatrix.getDimension();
 
-	glm::ivec2 tetrisTextPos = {
-		m_windowDims.x / 2 - m_font_blox.getLineWidth(tetrisText) / 2,
-		m_windowDims.y / 6 * 5
+	Evolve::Position2D tetrisTextPos {
+		(GLint) (m_windowDims.Width / 2 - m_font_blox.getLineWidth(tetrisText) / 2),
+		(GLint) m_windowDims.Height / 6 * 5
 	};
 
 	Evolve::RectDimension startButtonDims(
-		Evolve::Origin::CENTER, (int) m_windowDims.x / 2, (int) m_windowDims.y / 2, 512, 64
+		Evolve::Origin::CENTER, (GLint) m_windowDims.Width / 2, (GLint) m_windowDims.Height / 2, 512, 64
 	);
 	
 	Evolve::RectDimension exitButtonDims(
-		Evolve::Origin::TOP_RIGHT, (int) m_windowDims.x - 10, (int) m_windowDims.y - 10, 100, 64
+		Evolve::Origin::TOP_RIGHT, (GLint) m_windowDims.Width - 10, (GLint) m_windowDims.Height - 10, 100, 64
 	);
 	
 	Evolve::RectDimension restartButtonDims(
 		Evolve::Origin::TOP_RIGHT, exitButtonDims.getLeft() - 20, exitButtonDims.getTop(), 140, 64
 	);
 
-	glm::ivec2 scorePos = { mainMatrixDims.getRight() + horizontalMargin , mainMatrixDims.getTop() };
+	Evolve::Position2D scorePos { mainMatrixDims.getRight() + horizontalMargin , mainMatrixDims.getTop() };
 
-	glm::ivec2 legendPos = { scorePos.x, mainMatrixDims.getTop() - 200 };
+	Evolve::Position2D legendPos { scorePos.X, mainMatrixDims.getTop() - 200 };
 
-	glm::ivec2 pauseTextPos = {
-		m_windowDims.x / 2 - m_font_amaranth48.getLineWidth(pauseText) / 2,
-		m_windowDims.y / 2 + m_font_amaranth48.getLineHeight() / 2
+	Evolve::Position2D pauseTextPos {
+		(GLint) (m_windowDims.Width / 2 - m_font_amaranth48.getLineWidth(pauseText) / 2),
+		(GLint) (m_windowDims.Height / 2 + m_font_amaranth48.getLineHeight() / 2)
 	};
 
 	Evolve::RectDimension pausePanelDims(
@@ -167,16 +167,16 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_font_amaranth48.setFontScale(0.75f);
 
-	glm::ivec2 gameOverTextPos = {
-		mainMatrixDims.getCenterX() - m_font_amaranth48.getLineWidth(gameOverText) / 2,
+	Evolve::Position2D gameOverTextPos {
+		mainMatrixDims.getCenterX() - (int) m_font_amaranth48.getLineWidth(gameOverText) / 2,
 		mainMatrixDims.getBottom() - 20
 	};
 
 	m_font_amaranth48.setFontScale(1.0f);
 
-	glm::ivec2 levelUpTextPos = {
-		m_windowDims.x / 2 - m_font_amaranth48.getLineWidth(levelUpText) / 2,
-		m_windowDims.y / 2 + m_font_amaranth48.getLineHeight() / 2
+	Evolve::Position2D levelUpTextPos {
+		(GLint) (m_windowDims.Width / 2 - m_font_amaranth48.getLineWidth(levelUpText) / 2),
+		(GLint) (m_windowDims.Height / 2 + m_font_amaranth48.getLineHeight() / 2)
 	};
 
 	Evolve::RectDimension preplayPanelDims = pausePanelDims;
@@ -186,14 +186,14 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 		nextMatrixDims.getWidth(), nextMatrixDims.getHeight()
 	);
 
-	glm::ivec2 digitPos = {
-		m_windowDims.x / 2 - m_font_amaranth48.getLineWidth(digitText) / 2,
-		m_windowDims.y / 2 + m_font_amaranth48.getLineHeight() / 2
+	Evolve::Position2D digitPos {
+		(GLint) (m_windowDims.Width / 2 - m_font_amaranth48.getLineWidth(digitText) / 2),
+		(GLint) (m_windowDims.Height / 2 + m_font_amaranth48.getLineHeight() / 2)
 	};
 
-	glm::ivec2 goPos = {
-		m_windowDims.x / 2 - m_font_amaranth48.getLineWidth(goText) / 2,
-		m_windowDims.y / 2 + m_font_amaranth48.getLineHeight() / 2
+	Evolve::Position2D goPos {
+		(GLint) (m_windowDims.Width / 2 - m_font_amaranth48.getLineWidth(goText) / 2),
+		(GLint) (m_windowDims.Height / 2 + m_font_amaranth48.getLineHeight() / 2)
 	};
 
 	m_gui_TetrisText = m_gui.addPlainText(
@@ -290,7 +290,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_gui_PausePanel = m_gui.addPanel(
 		pausePanelDims,
-		Evolve::ColorRgba{ primaryColor.red, primaryColor.green, primaryColor.blue, 200 }
+		Evolve::ColorRgba{ primaryColor.Red, primaryColor.Green, primaryColor.Blue, 200 }
 	);
 
 	m_gui.hideComponent(m_gui_PausePanel);
