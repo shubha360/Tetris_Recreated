@@ -4,7 +4,7 @@ ExtraMatrix::ExtraMatrix() {}
 
 ExtraMatrix::~ExtraMatrix() {}
 
-void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const std::string& name, Evolve::Font& font, 
+void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const char* name, Evolve::Font& font, 
 	const float nameScale, const Evolve::ColorRgba nameColor,
 	const Evolve::Position2D& topLeftPos, GLuint minoTextureId, const int minoLength /*= 16*/) {
 

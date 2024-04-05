@@ -11,7 +11,7 @@ public:
 	ExtraMatrix();
 	~ExtraMatrix();
 
-	void init(std::vector<Tetrimino*> tetriminoes, const std::string& name, Evolve::Font& font,
+	void init(std::vector<Tetrimino*> tetriminoes, const char* name, Evolve::Font& font,
 		const float nameScale, const Evolve::ColorRgba nameColor,
 		const Evolve::Position2D& topLeftPos, GLuint minoTextureId, const int minoLength = 16);
 
@@ -26,7 +26,7 @@ public:
 private:
 	std::vector<Tetrimino*> m_tetriminoes;
 
-	std::string m_name = "";
+	const char* m_name = nullptr;
 	Evolve::Font m_font;
 	float m_nameScale = 1.0f;
 	Evolve::ColorRgba m_nameColor {};

@@ -123,14 +123,14 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	// gui component variables
 
-	std::string tetrisText = "TeTrIs";
+	const char* tetrisText = "TeTrIs";
 
-	std::string gameOverText = "GAME OVER!";
-	std::string levelUpText = "LEVEL UP!";
-	std::string pauseText = "PAUSED";
+	const char* gameOverText = "GAME OVER!";
+	const char* levelUpText = "LEVEL UP!";
+	const char* pauseText = "PAUSED";
 
-	std::string digitText = "3";
-	std::string goText = "GO!";
+	const char* digitText = "3";
+	const char* goText = "GO!";
 
 	Evolve::RectDimension mainMatrixDims = m_matrix.getDimension();
 	Evolve::RectDimension nextMatrixDims = m_nextMatrix.getDimension();
