@@ -13,7 +13,7 @@ public:
 
 	void init(std::vector<Tetrimino*> tetriminoes, const std::string& name, Evolve::Font& font,
 		const float nameScale, const Evolve::ColorRgba nameColor,
-		const glm::ivec2& topLeftPos, GLuint minoTextureId, const int minoLength = 16);
+		const Evolve::Position2D& topLeftPos, GLuint minoTextureId, const int minoLength = 16);
 
 	Tetrimino* pushAndPop(Tetrimino* newTetrimino);
 
@@ -31,8 +31,8 @@ private:
 	float m_nameScale = 1.0f;
 	Evolve::ColorRgba m_nameColor {};
 
-	glm::ivec2 m_namePos {};
-	glm::ivec2 m_matrixPos {};
+	Evolve::Position2D m_namePos {};
+	Evolve::Position2D m_matrixPos {};
 
 	void addTetriminoes(std::vector<Tetrimino*> tetriminoes);
 	void emptyMatrix();

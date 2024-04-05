@@ -16,7 +16,7 @@ public:
 	Matrix();
 	virtual ~Matrix();
 
-	bool init(const glm::ivec2& topLeftPos, GLuint minoTextureId, const int numRows = 20, 
+	bool init(const Evolve::Position2D& topLeftPos, GLuint minoTextureId, const int numRows = 20, 
 		const int numColumns = 10, const int minoLength = 32);
 	
 	int checkLineClears();
@@ -35,7 +35,7 @@ public:
 	Evolve::RectDimension getDimension() const {
 		return Evolve::RectDimension(
 			Evolve::Origin::TOP_LEFT,
-			m_matrixPosTopLeft.x, m_matrixPosTopLeft.y,
+			m_matrixPosTopLeft.X, m_matrixPosTopLeft.Y,
 			(unsigned int) m_numColumns * m_minoLength,
 			(unsigned int) m_numRows * m_minoLength
 		);
@@ -62,7 +62,7 @@ protected:
 	const char GHOST_CELL_SIGN = 'G';
 	const std::string EMPTY_LINE = std::string(m_numColumns, EMPTY_CELL_SIGN);
 
-	glm::ivec2 m_matrixPosTopLeft = glm::ivec2(0);
+	Evolve::Position2D m_matrixPosTopLeft {};
 
 	std::vector<std::string> m_matrix;
 	GLuint m_minoTextureId = 0;

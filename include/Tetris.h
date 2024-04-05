@@ -138,7 +138,8 @@ private:
 	std::vector<Tetrimino*> initNexts();
 	std::vector<Tetrimino*> initHold();
 
-	void initMatrices(const glm::ivec2& mainMatrixPos, const glm::ivec2& nextMatrixPos, const glm::ivec2& holdMatrixPos);
+	void initMatrices(const Evolve::Position2D& mainMatrixPos, 
+		const Evolve::Position2D& nextMatrixPos, const Evolve::Position2D& holdMatrixPos);
 	void initGuiComponents(const int horizontalMargin);
 
 	void gameLoop();

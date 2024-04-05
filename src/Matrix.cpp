@@ -4,7 +4,7 @@ Matrix::Matrix() {}
 
 Matrix::~Matrix() {}
 
-bool Matrix::init(const glm::ivec2& topLeftPos, GLuint minoTextureId, const int numRows /*= 20*/,
+bool Matrix::init(const Evolve::Position2D& topLeftPos, GLuint minoTextureId, const int numRows /*= 20*/,
 	const int numColumns /*= 10*/, const int minoLength /*= 32*/) {
 
 	m_matrixPosTopLeft = topLeftPos;
@@ -107,8 +107,8 @@ void Matrix::drawMatrix(Evolve::TextureRenderer& renderer) const {
 
 			Evolve::RectDimension minoDimension(
 				Evolve::Origin::TOP_LEFT, 
-				m_matrixPosTopLeft.x + column * m_minoLength,
-				m_matrixPosTopLeft.y - row * m_minoLength,
+				m_matrixPosTopLeft.X + column * m_minoLength,
+				m_matrixPosTopLeft.Y - row * m_minoLength,
 				m_minoLength, m_minoLength
 			);
 

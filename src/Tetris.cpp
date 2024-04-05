@@ -58,9 +58,10 @@ bool Tetris::initGame() {
 
 	const int horizontalMargin = 50;
 		
-	glm::ivec2 mainMatrixPos = { (GLint) m_windowDims.Width / 2 -  mainMatrixWidth / 2, (GLint) m_windowDims.Height / 2 + mainMatrxiHeight / 2 };
-	glm::ivec2 nextMatrixPos = { mainMatrixPos.x - horizontalMargin - extraMatrixWidth, mainMatrixPos.y };
-	glm::ivec2 holdMatrixPos = { nextMatrixPos.x, mainMatrixPos.y - 350 };
+	Evolve::Position2D mainMatrixPos { (GLint) m_windowDims.Width / 2 -  mainMatrixWidth / 2, 
+		(GLint) m_windowDims.Height / 2 + mainMatrxiHeight / 2 };
+	Evolve::Position2D nextMatrixPos { mainMatrixPos.X - horizontalMargin - extraMatrixWidth, mainMatrixPos.Y };
+	Evolve::Position2D holdMatrixPos { nextMatrixPos.X, mainMatrixPos.Y - 350 };
 
 	initMatrices(mainMatrixPos, nextMatrixPos, holdMatrixPos);
 
@@ -89,8 +90,8 @@ std::vector<Tetrimino*> Tetris::initHold() {
 	return hold;
 }
 
-void Tetris::initMatrices(const glm::ivec2& mainMatrixPos, const glm::ivec2& nextMatrixPos, 
-	const glm::ivec2& holdMatrixPos) {
+void Tetris::initMatrices(const Evolve::Position2D& mainMatrixPos, const Evolve::Position2D& nextMatrixPos,
+	const Evolve::Position2D& holdMatrixPos) {
 
 	m_matrix.init(mainMatrixPos, m_minoTexture.id);
 

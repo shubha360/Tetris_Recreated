@@ -6,7 +6,7 @@ ExtraMatrix::~ExtraMatrix() {}
 
 void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const std::string& name, Evolve::Font& font, 
 	const float nameScale, const Evolve::ColorRgba nameColor,
-	const glm::ivec2& topLeftPos, GLuint minoTextureId, const int minoLength /*= 16*/) {
+	const Evolve::Position2D& topLeftPos, GLuint minoTextureId, const int minoLength /*= 16*/) {
 
 	int numRows = (int) tetriminoes.size() * m_tetriminoMaxHeight;
 	int numColumns = 8;
@@ -20,13 +20,13 @@ void ExtraMatrix::init(std::vector<Tetrimino*> tetriminoes, const std::string& n
 
 	// set name position, center the name horizontally
 	unsigned int nameWidth = m_font.getLineWidth(m_name);
-	m_namePos.x = topLeftPos.x + ((numColumns * minoLength) - nameWidth) / 2;
-	m_namePos.y = topLeftPos.y;
+	m_namePos.X = topLeftPos.X + ((numColumns * minoLength) - nameWidth) / 2;
+	m_namePos.Y = topLeftPos.Y;
 
 	// set matrix position, just add the height of the font to Y
 	unsigned int nameHeight = m_font.getLineHeight();
-	m_matrixPos.x = topLeftPos.x;
-	m_matrixPos.y = topLeftPos.y - nameHeight - 10;
+	m_matrixPos.X = topLeftPos.X;
+	m_matrixPos.Y = topLeftPos.Y - nameHeight - 10;
 
 	Matrix::init(m_matrixPos, minoTextureId, numRows, 8, minoLength);
 
@@ -65,7 +65,7 @@ void ExtraMatrix::reset(std::vector<Tetrimino*> tetriminoes) {
 
 void ExtraMatrix::drawName(Evolve::TextureRenderer& textureRenderer) {
 	m_font.setFontScale(m_nameScale);
-	m_font.drawTextToRenderer(m_name, m_namePos.x, m_namePos.y, m_nameColor, textureRenderer);
+	m_font.drawTextToRenderer(m_name, m_namePos.X, m_namePos.Y, m_nameColor, textureRenderer);
 }
 
 void ExtraMatrix::addTetriminoes(std::vector<Tetrimino*> tetriminoes) {
