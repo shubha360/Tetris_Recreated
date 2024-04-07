@@ -319,7 +319,7 @@ void Tetris::initGuiComponents(const int horizontalMargin) {
 
 	m_gui.hideComponent(m_gui_ScoreText);
 
-	std::string legend =
+	const char* legend =
 		"A, D - Move left, right\n\n"
 		"Q, E - Rotate left, right\n\n"
 		"S - Soft drop\n\n"
@@ -833,11 +833,10 @@ void Tetris::draw() {
 			"Lines cleared: " + std::to_string(m_linesCleared) + "\n" +
 			"Level: " + std::to_string(m_currentLevel) + "\n";
 
-		m_gui.setComponentLabel(m_gui_ScoreText, scoreText);
+		m_gui.setComponentLabel(m_gui_ScoreText, scoreText.c_str());
 
 		m_guiRenderer.renderGui(m_gui, m_camera);
 	}
-
 	m_window.swapBuffer();
 }
 

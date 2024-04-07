@@ -43,10 +43,6 @@ Tetrimino* ExtraMatrix::pushAndPop(Tetrimino* newTetrimino) {
 
 	m_tetriminoes[m_tetriminoes.size() - 1] = newTetrimino;
 
-	/*m_tetriminoes[0] = m_tetriminoes[1];
-	m_tetriminoes[1] = m_tetriminoes[2];
-	m_tetriminoes[2] = newTetrimino;*/
-
 	emptyMatrix();
 
 	addTetriminoes(m_tetriminoes);
