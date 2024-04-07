@@ -13,6 +13,7 @@ bool Tetris::init() {
 bool Tetris::initEngine() {
 
 	bool window = true;
+	std::string assetsPath = "../Evolve-Engine/engine-assets";
 
 #ifdef NDEBUG
 	// nondebug
@@ -24,14 +25,14 @@ bool Tetris::initEngine() {
 
 	return
 		window &&
-		m_textureRenderer.init("../Evolve-Engine/engine-assets") &&
+		m_textureRenderer.init(assetsPath) &&
 		m_fps.init(MAX_Fps) &&
 		m_camera.init(Evolve::Size2D { m_window.getWindowWidth(), m_window.getWindowHeight() } ) &&
 		m_font_amaranth48.initFromFontFile("Coolvetica", "resources/fonts/Amaranth-Regular.ttf", 48, 1.0f, 2) &&
 		m_font_ubuntu36.initFromFontFile("Ubuntu", "resources/fonts/Ubuntu-Regular.ttf", 32, 1.0f, 2) &&
 		m_font_blox.initFromFontFile("Blox", "resources/fonts/Blox2.ttf", 140, 1.0f, 10) &&
 		m_gui.init() &&
-		m_guiRenderer.init("../Evolve-Engine/engine-assets");
+		m_guiRenderer.init(assetsPath);
 }
 
 bool Tetris::initGame() {
