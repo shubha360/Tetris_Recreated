@@ -420,7 +420,7 @@ float Tetris::runGameSimulations(float previousTicks) {
 }
 
 void Tetris::processInput() {
-	SDL_Event event;
+	static SDL_Event event;
 
 	while (SDL_PollEvent(&event)) {
 
